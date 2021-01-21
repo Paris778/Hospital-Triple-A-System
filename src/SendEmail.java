@@ -3,6 +3,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.*;
 import java.util.Properties;
+import java.util.Random;
 
 
 public class SendEmail {
@@ -28,12 +29,16 @@ public class SendEmail {
         Session session = Session.getInstance(props, auth);
 
         try {
+            // Generate random number
+            int code = new Random().nextInt(900000) + 100000;
+            String text = "Your verification code is: " + code;
+            
             // Create email message
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject("Verification code");
-            message.setText("Your verification code is: 1234");
+            message.setText(text);
 
             // Send message
             Transport.send(message);
