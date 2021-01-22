@@ -4,20 +4,27 @@ import javax.crypto.IllegalBlockSizeException;
 import java.util.Scanner;
 import java.io.IOException;
 import java.rmi.NotBoundException;
+///
+import utility.*;
 
 public class Client {
     private static final String host = "localhost";
-    private static final int port = 1099;       //default port
-    private static int Authenticcondition = -1; //condition of authentication ,1 means authentication completed,using int can expand more options
-    private static User user;                   // a class encapsulate user information
+    private static final int port = 1099; // default port
+    private static int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
+                                                // int can expand more options
+    private static User user; // a class encapsulate user information
     static Scanner input = new Scanner(System.in);
+    //////
+    private static final PasswordHandler passwordHandler = new PasswordHandler();
 
     public static void main(String[] args) throws IllegalBlockSizeException, IOException, Exception {
 
-        String op = "";//record the command
+        String op = "";// record the command
+        String password = null;
+        byte [] hash = null;
         try {
             // link to server
-            Serverinterface c = (Serverinterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
+            Serverinterface server = (Serverinterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
 
             System.out.println("Welcome to use the hospital service system");
@@ -54,30 +61,50 @@ public class Client {
                                     break;
                             }
 
-                            //if information all valid
+                            // if information all valid
                             if (user != null) {
-                                //generate private keys and public key for user
-                                //---------------------------------------------
+                                // generate private keys and public key for user
+                                // ---------------------------------------------
+
+
+                                //Register and validate password
                                 while (true) {
-                                    System.out.println("please set your password");
-                                    System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-                                    String temp1 = input.nextLine();
+                                    while (true) {
+                                        System.out.println("Please set your password");
+                                        System.out.println(
+                                                "The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                                        password = input.nextLine();
 
-                                    //password evaluation
-                                    //-------------------
-
-                                    System.out.println("confirm your password");
+                                        // password evaluation
+                                        if (passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD) {
+                                            System.out.println("Thank you !");
+                                            break;
+                                        } else {
+                                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
+                                            System.out.println("Suggsted strong password: " + passwordHandler.getStrongPassword());
+                                        }
+                                    }
+                                    //
+                                    System.out.println("Pease confirm your password (type again)");
                                     String temp2 = input.nextLine();
-                                    if (temp1.equals(temp2))//&&satisfy password requirements
+                                    if (password.equals(temp2))// &&satisfy password requirements
                                     {
+                                        hash = passwordHandler.hashPassword(password);
+                                        password = null; //Safety stuff
+                                        temp2 = null; //Safety stuff
                                         break;
                                     } else
-                                        System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
+                                        System.out.println(
+                                                "The entered password is different from the previous one or the format doesn't match the requirements");
                                 }
                             }
 
-                            //server store password
-                            //---------------------
+                            ////////////////////////////////////////////////////////////////
+                            //If all is gucci with the password, store hashed password
+                            // server store password
+                            // ---------------------
+                            server.storeHashedPassword(hash);
+                            
                         } else
                             System.out.println("please log out first");
                         break;
@@ -107,40 +134,41 @@ public class Client {
 
                             System.out.println("please enter your email address and a one time password will be sent");
                             String email_address = input.nextLine();
-                            //sent otp
-                            //--------------
+                            // sent otp
+                            // --------------
                             System.out.println("please enter your one time password");
                             String otp = input.nextLine();
-                            //verify the otp
-                            //--------------
+                            // verify the otp
+                            // --------------
                             while (true) {
                                 System.out.println("please set your password");
-                                System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                                System.out.println(
+                                        "The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                 String temp1 = input.nextLine();
 
-                                //password evaluation
-                                //-------------------
+                                // password evaluation
+                                // -------------------
 
                                 System.out.println("confirm your password");
                                 String temp2 = input.nextLine();
-                                if (temp1.equals(temp2))//&&satisfy password requirements
+                                if (temp1.equals(temp2))// &&satisfy password requirements
                                 {
                                     break;
                                 } else
-                                    System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
+                                    System.out.println(
+                                            "The entered password is different from the previous one or the format doesn't match the requirements");
                             }
                         } else
                             System.out.println("please log out first");
                         break;
 
-                    //logout
+                    // logout
                     case "logout":
                         if (Authenticcondition > 0) {
                             Authenticcondition = -1;
                         } else
                             System.out.println("please log in first");
                         break;
-
 
                 }
             }
@@ -163,10 +191,10 @@ public class Client {
         System.out.println("Please enter your email to register");
         String email_address = input.nextLine();
 
-        //if the email has been used for register already then break
-        //--------------------------------------------
-        //--------------------------------------------
-        //--------------------------------------------    
+        // if the email has been used for register already then break
+        // --------------------------------------------
+        // --------------------------------------------
+        // --------------------------------------------
         System.out.println("please enter your role title");
         String role_title = input.nextLine();
         System.out.println("please enter your phone number");
@@ -186,10 +214,11 @@ public class Client {
     private static User staff_login() {
         System.out.println("enter your mail ");
         String email_address = input.nextLine();
-        System.out.println("Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
+        System.out.println(
+                "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
         if (input.nextLine().equals("y")) {
-            //send email:
-            //---------------
+            // send email:
+            // ---------------
             System.out.println("enter your password");
             String otp = input.nextLine();
         } else {
@@ -199,14 +228,14 @@ public class Client {
         System.out.println("type y to confirm / n to cancel logging ");
 
         if (input.nextLine().equals("y")) {
-            //check if the user has been register or been logged in on other client
-            //---------------------------------------------------------------------
-            //check which method was used when logging in
-            //---------------------------------------------------------------------
-            //authentication
-            //---------------------------------------------------------------------
-            //and get the user data from DB and pack as staff type
-            //---------------------------------------------------------------------     
+            // check if the user has been register or been logged in on other client
+            // ---------------------------------------------------------------------
+            // check which method was used when logging in
+            // ---------------------------------------------------------------------
+            // authentication
+            // ---------------------------------------------------------------------
+            // and get the user data from DB and pack as staff type
+            // ---------------------------------------------------------------------
             Authenticcondition = 1;
             return null;
         } else
@@ -218,10 +247,10 @@ public class Client {
         System.out.println("Please enter your email to register");
         String email_address = input.nextLine();
 
-        //if the email has been used for register already then break
-        //--------------------------------------------
-        //--------------------------------------------
-        //--------------------------------------------    
+        // if the email has been used for register already then break
+        // --------------------------------------------
+        // --------------------------------------------
+        // --------------------------------------------
         System.out.println("please enter forename");
         String forename = input.nextLine();
         System.out.println("please enter your surname");
@@ -237,10 +266,11 @@ public class Client {
     private static User patient_login() {
         System.out.println("enter your mail ");
         String email_address = input.nextLine();
-        System.out.println("Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
+        System.out.println(
+                "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
         if (input.nextLine().equals("y")) {
-            //send email:
-            //---------------
+            // send email:
+            // ---------------
             System.out.println("enter your password");
             String otp = input.nextLine();
         } else {
@@ -250,14 +280,14 @@ public class Client {
 
         System.out.println("type y to confirm / n to cancel logging ");
         if (input.nextLine().equals("y")) {
-            //check if the user has been register or been logged in on other client
-            //---------------------------------------------------------------------
-            //check which method was used when logging in
-            //---------------------------------------------------------------------
-            //authentication
-            //---------------------------------------------------------------------
-            //and get the user data from DB and pack as patient type
-            //---------------------------------------------------------------------
+            // check if the user has been register or been logged in on other client
+            // ---------------------------------------------------------------------
+            // check which method was used when logging in
+            // ---------------------------------------------------------------------
+            // authentication
+            // ---------------------------------------------------------------------
+            // and get the user data from DB and pack as patient type
+            // ---------------------------------------------------------------------
             Authenticcondition = 1;
             return null;
         } else
@@ -265,21 +295,3 @@ public class Client {
 
     }
 }
-            
-            
-            
-             
-           
-       
-	   
-        
-            
-    
-
-        
-  
-        
-
-    
-
-

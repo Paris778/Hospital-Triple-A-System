@@ -11,10 +11,10 @@ package utility;
 public class Constants {
     
     //PASSWORD CONSTANTS
-    public static final int WEAK_PASSWORD = 10;
-    public static final int OK_PASSWORD = 11;
-    public static final int INTERMEDIATE_PASSWORD = 12;
-    public static final int STRONG_PASSWORD = 13;
+    public static final int WEAK_PASSWORD = 5;
+    public static final int OK_PASSWORD = 8;
+    public static final int INTERMEDIATE_PASSWORD = 9;
+    public static final int STRONG_PASSWORD = 11;
     //PASSWORD LENGTHS
     public static final int MIN_PASSWORD_LENGTH = 8;
     public static final int ADEQUATE_PASSWORD_LENGTH = 15;

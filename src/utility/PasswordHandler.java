@@ -25,15 +25,20 @@ public class PasswordHandler{
 
     }
 
+    //
+    public String unhash(byte[] hash){
+        return "";
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public int checkPasswordStrength(String password){
+    public int checkPasswordStrength(String hash){
         int passwordScore = 0;
         
         //Check the length of password
-        if(password.length() < Constants.MIN_PASSWORD_LENGTH){
+        if(hash.length() < Constants.MIN_PASSWORD_LENGTH){
             this.suggestions.append("- Password should be more than 8 characters long.\n");
         }
-        else if (password.length() >= Constants.ADEQUATE_PASSWORD_LENGTH){
+        else if (hash.length() >= Constants.ADEQUATE_PASSWORD_LENGTH){
             passwordScore += 2;
         }
         else{
@@ -41,7 +46,7 @@ public class PasswordHandler{
         }
 
         //Check if password contains at least one number
-        if( password.matches("(?=.*[0-9]).*")){
+        if( hash.matches("(?=.*[0-9]).*")){
             passwordScore += 2;
         }
         else{
@@ -49,7 +54,7 @@ public class PasswordHandler{
         }
         
         //Check if password contains lowercase letters
-        if( password.matches("(?=.*[a-z]).*") ){
+        if( hash.matches("(?=.*[a-z]).*") ){
             passwordScore += 2;
         }
         else{
@@ -58,7 +63,7 @@ public class PasswordHandler{
          
         
         //Check if password contains upper case letters
-        if( password.matches("(?=.*[A-Z]).*") ){
+        if( hash.matches("(?=.*[A-Z]).*") ){
             passwordScore += 2;
         }
         else{
@@ -67,14 +72,14 @@ public class PasswordHandler{
            
         
         //Check if password contains special characters
-        if( password.matches("(?=.*[~!@#$%^&*()_-]).*") ){
+        if(hash.matches("(?=.*[~!@#$%^&*()_-]).*") ){
             passwordScore += 2;
         }
         else{
             this.suggestions.append("- Password should contain at least one special character (!?<>,.).\n");
         }
            
-        password = null; //Just a safety precaution so that the value doesn't stay in memory even though Java garbage collection should get it anyways 
+        hash = null; //Just a safety precaution so that the value doesn't stay in memory even though Java garbage collection should get it anyways 
         return passwordScore;
     }
 
