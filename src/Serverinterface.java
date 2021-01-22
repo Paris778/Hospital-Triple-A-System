@@ -1,5 +1,3 @@
-
-public interface Serverinterface extends java.rmi.Remote 
-{
+public interface Serverinterface extends java.rmi.Remote {
 
 }
