@@ -17,14 +17,14 @@ public class Client {
         String op = "";//record the command
         try {
             // link to server
-            Serverinterface c = (Serverinterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
+            ServerInterface c = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
 
             System.out.println("Welcome to use the hospital service system");
             System.out.println("If you don't have an account,use command -register register and validate");
             System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
             System.out.println("type -help to see all the avaliable command");
-            c.createUser(user);
+
             while (true) {
                 op = input.nextLine();
                 switch (op) {
@@ -68,11 +68,13 @@ public class Client {
 
                                     System.out.println("confirm your password");
                                     String temp2 = input.nextLine();
-                                    if (temp1.equals(temp2))//&&satisfy password requirements
-                                    {
-                                        break;
-                                    } else
+                                    //&&satisfy password requirements
+                                    if (temp1.equals(temp2)) {
+                                        c.createUser(user);
+                                        c.viewPatients();
+                                    } else {
                                         System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
+                                    }
                                 }
                             }
 

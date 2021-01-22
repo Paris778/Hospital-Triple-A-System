@@ -1,4 +1,6 @@
-public class Userimpl implements User {
+import java.io.Serializable;
+
+public class UserImpl implements User, Serializable {
     private int id;
     private String forenames = "";
     private String surnames = "";
@@ -7,7 +9,7 @@ public class Userimpl implements User {
     private String email_address = "";
     private String identity = "";
 
-    public Userimpl(String forenames, String surnames, String date_of_birth, String address, String email_address, String identity) {
+    public UserImpl(String forenames, String surnames, String date_of_birth, String address, String email_address, String identity) {
 
         this.forenames = forenames;
         this.surnames = surnames;
@@ -17,27 +19,31 @@ public class Userimpl implements User {
         this.identity = identity;
     }
 
-    public String getname() {
-        return forenames + surnames;
+    public String getForenames() {
+        return forenames;
     }
 
-    public int getid() {
+    public String getSurnames() {
+        return surnames;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public String getmail() {
+    public String getEmail() {
         return email_address;
     }
 
-    public String getaddress() {
+    public String getAddress() {
         return address;
     }
 
-    public String getidentity() {
+    public String getIdentity() {
         return identity;
     }
 
-    public String getdateofbirth() {
+    public String getDoB() {
         return date_of_birth;
     }
 }

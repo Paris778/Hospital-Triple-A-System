@@ -10,7 +10,8 @@ public class Server {
             // Start running rmi registry
             LocateRegistry.createRegistry(1099);
 
-            Serverimpl c = new Serverimpl();
+            ServerImpl c = new ServerImpl();
+
             //generate the link for rmi to bind
             Naming.rebind("rmi://" + host + ":" + port + "/Service", c);
         } catch (Exception e) {
