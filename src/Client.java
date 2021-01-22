@@ -104,6 +104,7 @@ public class Client {
                             // server store password
                             // ---------------------
                             server.storeHashedPassword(hash);
+                            hash = null; //Security stuff
                             
                         } else
                             System.out.println("please log out first");
