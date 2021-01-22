@@ -12,7 +12,30 @@ public class DatabaseConnection {
     private static PreparedStatement p = null;
     private static ResultSet results = null;
 
-    private static void establishConnection() {
+    public void createUser(User user) {
+        try {
+            // Execute SQL query
+            String statement = "INSERT INTO patients (forename, surname) VALUES ('GEORGE', 'ruellan');";
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+
+            // Execute SQL query
+            p = con.prepareStatement("SELECT * FROM patients");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("patient_id");
+                String forename = results.getString("forename");
+                String surname = results.getString("surname");
+                System.out.println(id + "\t\t" + forename + "\t\t" + surname);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DatabaseConnection() {
         try {
             // Load the JDBC driver
             Class.forName(JDBC_DRIVER);
@@ -31,16 +54,8 @@ public class DatabaseConnection {
                 String surname = results.getString("surname");
                 System.out.println(id + "\t\t" + forename + "\t\t" + surname);
             }
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            establishConnection();
             con.setAutoCommit(false);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

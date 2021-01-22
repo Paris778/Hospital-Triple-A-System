@@ -8,4 +8,10 @@ public class Serverimpl extends java.rmi.server.UnicastRemoteObject implements S
     public Serverimpl() throws RemoteException {
 
     }
+
+    public void createUser(User user) {
+        System.out.println("hello");
+        DatabaseConnection dbConnection = new DatabaseConnection();
+        dbConnection.createUser(user);
+    }
 }

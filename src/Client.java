@@ -24,7 +24,7 @@ public class Client {
             System.out.println("If you don't have an account,use command -register register and validate");
             System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
             System.out.println("type -help to see all the avaliable command");
-
+            c.createUser(user);
             while (true) {
                 op = input.nextLine();
                 switch (op) {
@@ -78,6 +78,7 @@ public class Client {
 
                             //server store password
                             //---------------------
+
                         } else
                             System.out.println("please log out first");
                         break;
