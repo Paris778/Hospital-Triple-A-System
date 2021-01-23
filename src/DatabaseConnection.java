@@ -31,22 +31,36 @@ public class DatabaseConnection {
 
     public synchronized void createUser(User user, byte[] hashedPassword) {
         try {
-            // Add user to database
-            String statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
-                    user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                    user.getAddress() + "', '" + user.getEmail() + "'); ";
+            String statement = "";
+            // Check if user is patient or staff
+            if (user instanceof Patient) {
+                statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
+                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "', '" + user.getEmail() + "'); ";
+            } else {
+                statement = "INSERT INTO staff (forename, surname, date_of_birth, address, email, role_title, phone_number) VALUES ('" +
+                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "', '" + user.getEmail() + "', '" + ((Staff) user).getrole_title() + "', '" + ((Staff) user).getphone_number() + "'); ";
+            }
+
+            // Add user to statement
             p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
             p.executeUpdate();
 
             // Return row ID to add foreign key in passwords table
-            int patientId = -1;
+            int userId = -1;
             ResultSet results = p.getGeneratedKeys();
-            if (results.next())
-                patientId = results.getInt(1);
-            System.out.println(patientId);
+            if (results.next()) {
+                userId = results.getInt(1);
+            }
 
             // Add the user's password
-            statement = "INSERT INTO passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + patientId + "');";
+            if (user instanceof Patient) {
+                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'patient');";
+            } else {
+                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'staff');";
+            }
+
             p = con.prepareStatement(statement);
             p.executeUpdate();
 
