@@ -10,10 +10,14 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection = new DatabaseConnection();
     }
 
-    public void createUser(User user) {
-        System.out.println("hello");
+    public void createUser(User user, byte[] hashedPassword) {
+        System.out.println("Creating user in database...");
+        dbConnection.createUser(user, hashedPassword);
+    }
 
-        dbConnection.createUser(user);
+    public void createFakeUser() {
+        System.out.println("Creating user in database...");
+        dbConnection.createFakeUser();
     }
 
     public void viewPatients() {

@@ -25,7 +25,10 @@ public class Client {
             // link to server
             ServerInterface server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
-
+            server.createFakeUser();
+            server.createFakeUser();
+            Thread.sleep(1000);
+            server.viewPatients();
             System.out.println("Welcome to use the hospital service system");
             System.out.println("If you don't have an account,use command -register register and validate");
             System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
@@ -60,30 +63,30 @@ public class Client {
 
                                 //Register and validate password
                                 while (true) {
-                                    while (true) {
+                                    boolean passwordEval = false;
+                                    while (!passwordEval) {
                                         System.out.println("Please set your password");
-                                        System.out.println(
-                                                "The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                                        System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                         password = input.nextLine();
-
+                                        passwordEval = passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD;
                                         // password evaluation
-                                        if (passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD) {
+                                        if (passwordEval) {
                                             System.out.println("Thank you !");
                                             break;
                                         } else {
                                             passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
-                                            System.out.println("Suggsted strong password: " + passwordHandler.getStrongPassword());
+                                            System.out.println("Suggested strong password: " + passwordHandler.getStrongPassword());
                                         }
                                     }
                                     //
-                                    System.out.println("Pease confirm your password (type again)");
+                                    System.out.println("Please confirm your password (type again)");
                                     String temp2 = input.nextLine();
                                     if (password.equals(temp2))// &&satisfy password requirements
                                     {
                                         hash = passwordHandler.hashPassword(password);
                                         password = null; //Safety stuff
                                         temp2 = null; //Safety stuff
-                                        server.createUser(user);
+                                        server.createUser(user, hash);
                                         break;
                                     } else
                                         System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");

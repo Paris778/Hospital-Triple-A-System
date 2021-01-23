@@ -16,7 +16,6 @@ import java.util.Random;
 //////////////////////////////////////////////////////////////////////////////
 
 public class PasswordHandler {
-
     //Variables
     StringBuilder suggestions = new StringBuilder();
 

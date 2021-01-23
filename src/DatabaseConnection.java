@@ -11,18 +11,51 @@ public class DatabaseConnection {
     private static PreparedStatement p = null;
     private static ResultSet results = null;
 
-    public synchronized void createUser(User user) {
+
+    public void createFakeUser() {
         try {
-            // Execute SQL query
-            String statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
-                    user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                    user.getAddress() + "', '" + user.getEmail() + "');";
+            // Add user to database
+            String statement = "INSERT INTO patients(forename, surname, date_of_birth, address, email) VALUES ('test', 'test', '2000-01-01', 'china', 'g@gmail.com');";
             p = con.prepareStatement(statement);
             p.executeUpdate();
 
-            // TODO: why does this cause a "database file locked" error?
-            // viewPatients();
-        } catch (SQLException e) {
+            results.close();
+            p.close();
+
+            // TODO: replace this with actual race condition prevention lol
+            Thread.sleep(1000);
+        } catch (SQLException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void createUser(User user, byte[] hashedPassword) {
+        try {
+            // Add user to database
+            String statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
+                    user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                    user.getAddress() + "', '" + user.getEmail() + "'); ";
+            p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+            p.executeUpdate();
+
+            // Return row ID to add foreign key in passwords table
+            int patientId = -1;
+            ResultSet results = p.getGeneratedKeys();
+            if (results.next())
+                patientId = results.getInt(1);
+            System.out.println(patientId);
+
+            // Add the user's password
+            statement = "INSERT INTO passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + patientId + "');";
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+
+            results.close();
+            p.close();
+
+            // TODO: replace this with actual race condition prevention lol
+            Thread.sleep(1000);
+        } catch (SQLException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -41,6 +74,9 @@ public class DatabaseConnection {
                 String dob = results.getString("date_of_birth");
                 System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
             }
+
+            results.close();
+            p.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -55,7 +91,7 @@ public class DatabaseConnection {
             con = DriverManager.getConnection(DATABASE_LOCATION + dbName);
 
             viewPatients();
-            con.setAutoCommit(false);
+            con.setAutoCommit(true);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
