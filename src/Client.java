@@ -12,14 +12,13 @@ public class Client {
     private static User user;                   // a class encapsulate user information
     static Scanner input = new Scanner(System.in);
 
-    public static void main(String[] args) throws IllegalBlockSizeException, IOException, Exception {
+    public static void main(String[] args) throws Exception {
+        String op = "";
 
-        String op = "";//record the command
         try {
             // link to server
             ServerInterface c = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
-
             System.out.println("Welcome to use the hospital service system");
             System.out.println("If you don't have an account,use command -register register and validate");
             System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
@@ -41,34 +40,24 @@ public class Client {
                             String identity = input.nextLine();
 
                             switch (identity) {
-                                case "staff":
-                                    user = staff_register();
-                                    break;
-
-                                case "patient":
-                                    user = patient_register();
-                                    break;
-
-                                default:
-                                    System.out.println("please enter an valid identity");
-                                    break;
+                                case "staff" -> user = staff_register();
+                                case "patient" -> user = patient_register();
+                                default -> System.out.println("please enter an valid identity");
                             }
 
-                            //if information all valid
+                            // If information all valid
                             if (user != null) {
-                                //generate private keys and public key for user
-                                //---------------------------------------------
+                                // Generate private keys and public key for user
                                 while (true) {
                                     System.out.println("please set your password");
                                     System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                     String temp1 = input.nextLine();
 
-                                    //password evaluation
-                                    //-------------------
-
+                                    // Password evaluation
                                     System.out.println("confirm your password");
                                     String temp2 = input.nextLine();
-                                    //&&satisfy password requirements
+
+                                    // If satisfied password requirements, create account
                                     if (temp1.equals(temp2)) {
                                         c.createUser(user);
                                         c.viewPatients();
@@ -77,43 +66,32 @@ public class Client {
                                     }
                                 }
                             }
-
-                            //server store password
-                            //---------------------
-
                         } else
                             System.out.println("please log out first");
                         break;
 
                     case "login":
-                        if (Authenticcondition > 0)
+                        if (Authenticcondition > 0) {
                             System.out.println("please log out first");
-                        else {
+                        } else {
                             System.out.println("Choose what identity you want to login as  staff/patient");
                             String identity = input.nextLine();
                             switch (identity) {
-
-                                case "staff":
-                                    user = staff_login();
-                                    break;
-
-                                case "patient":
-                                    user = patient_login();
-                                    break;
-
+                                case "staff" -> user = staff_login();
+                                case "patient" -> user = patient_login();
                             }
                         }
                         break;
 
                     case "forgotpw":
                         if (Authenticcondition < 0) {
-
                             System.out.println("please enter your email address and a one time password will be sent");
                             String email_address = input.nextLine();
+
                             //sent otp
-                            //--------------
                             System.out.println("please enter your one time password");
                             String otp = input.nextLine();
+
                             //verify the otp
                             //--------------
                             while (true) {
@@ -122,8 +100,6 @@ public class Client {
                                 String temp1 = input.nextLine();
 
                                 //password evaluation
-                                //-------------------
-
                                 System.out.println("confirm your password");
                                 String temp2 = input.nextLine();
                                 if (temp1.equals(temp2))//&&satisfy password requirements
@@ -136,15 +112,13 @@ public class Client {
                             System.out.println("please log out first");
                         break;
 
-                    //logout
+                    // Logout
                     case "logout":
                         if (Authenticcondition > 0) {
                             Authenticcondition = -1;
                         } else
                             System.out.println("please log in first");
                         break;
-
-
                 }
             }
         } catch (RemoteException re) {

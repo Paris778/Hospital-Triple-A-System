@@ -9,7 +9,6 @@ public class Server {
         try {
             // Start running rmi registry
             LocateRegistry.createRegistry(1099);
-
             ServerImpl c = new ServerImpl();
 
             //generate the link for rmi to bind
@@ -17,7 +16,6 @@ public class Server {
         } catch (Exception e) {
             System.out.println("Server Error: " + e);
         }
-
     }
 
     public static void main(String args[]) {
