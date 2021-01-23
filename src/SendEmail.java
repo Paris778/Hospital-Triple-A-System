@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class SendEmail {
     public static void send(String to) {
+        
         final String from = "scc363auth@gmail.com";
         final String username = "scc363auth@gmail.com";
         final String password = "SCC363auth!";
