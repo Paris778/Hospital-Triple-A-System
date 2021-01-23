@@ -9,14 +9,13 @@ public class Server {
         try {
             // Start running rmi registry
             LocateRegistry.createRegistry(1099);
+            ServerImpl c = new ServerImpl();
 
-            Serverimpl c = new Serverimpl();
             //generate the link for rmi to bind
             Naming.rebind("rmi://" + host + ":" + port + "/Service", c);
         } catch (Exception e) {
             System.out.println("Server Error: " + e);
         }
-
     }
 
     public static void main(String args[]) {

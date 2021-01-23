@@ -4,29 +4,31 @@ import javax.crypto.IllegalBlockSizeException;
 import java.util.Scanner;
 import java.io.IOException;
 import java.rmi.NotBoundException;
-///
+
 import utility.*;
 
 public class Client {
     private static final String host = "localhost";
     private static final int port = 1099; // default port
     private static int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
-                                                // int can expand more options
+    // int can expand more options
     private static User user; // a class encapsulate user information
     static Scanner input = new Scanner(System.in);
-    //////
     private static final PasswordHandler passwordHandler = new PasswordHandler();
 
-    public static void main(String[] args) throws IllegalBlockSizeException, IOException, Exception {
-
+    public static void main(String[] args) throws Exception {
         String op = "";// record the command
         String password = null;
-        byte [] hash = null;
+        byte[] hash = null;
+
         try {
             // link to server
-            Serverinterface server = (Serverinterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
+            ServerInterface server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
-
+            server.createFakeUser();
+            server.createFakeUser();
+            Thread.sleep(1000);
+            server.viewPatients();
             System.out.println("Welcome to use the hospital service system");
             System.out.println("If you don't have an account,use command -register register and validate");
             System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
@@ -48,17 +50,9 @@ public class Client {
                             String identity = input.nextLine();
 
                             switch (identity) {
-                                case "staff":
-                                    user = staff_register();
-                                    break;
-
-                                case "patient":
-                                    user = patient_register();
-                                    break;
-
-                                default:
-                                    System.out.println("please enter an valid identity");
-                                    break;
+                                case "staff" -> user = staff_register();
+                                case "patient" -> user = patient_register();
+                                default -> System.out.println("please enter an valid identity");
                             }
 
                             // if information all valid
@@ -69,33 +63,33 @@ public class Client {
 
                                 //Register and validate password
                                 while (true) {
-                                    while (true) {
+                                    boolean passwordEval = false;
+                                    while (!passwordEval) {
                                         System.out.println("Please set your password");
-                                        System.out.println(
-                                                "The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                                        System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                         password = input.nextLine();
-
+                                        passwordEval = passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD;
                                         // password evaluation
-                                        if (passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD) {
+                                        if (passwordEval) {
                                             System.out.println("Thank you !");
                                             break;
                                         } else {
                                             passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
-                                            System.out.println("Suggsted strong password: " + passwordHandler.getStrongPassword());
+                                            System.out.println("Suggested strong password: " + passwordHandler.getStrongPassword());
                                         }
                                     }
                                     //
-                                    System.out.println("Pease confirm your password (type again)");
+                                    System.out.println("Please confirm your password (type again)");
                                     String temp2 = input.nextLine();
                                     if (password.equals(temp2))// &&satisfy password requirements
                                     {
                                         hash = passwordHandler.hashPassword(password);
                                         password = null; //Safety stuff
                                         temp2 = null; //Safety stuff
+                                        server.createUser(user, hash);
                                         break;
                                     } else
-                                        System.out.println(
-                                                "The entered password is different from the previous one or the format doesn't match the requirements");
+                                        System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
                                 }
                             }
 
@@ -105,27 +99,20 @@ public class Client {
                             // ---------------------
                             server.storeHashedPassword(hash);
                             hash = null; //Security stuff
-                            
+
                         } else
                             System.out.println("please log out first");
                         break;
 
                     case "login":
-                        if (Authenticcondition > 0)
+                        if (Authenticcondition > 0) {
                             System.out.println("please log out first");
-                        else {
+                        } else {
                             System.out.println("Choose what identity you want to login as  staff/patient");
                             String identity = input.nextLine();
                             switch (identity) {
-
-                                case "staff":
-                                    user = staff_login();
-                                    break;
-
-                                case "patient":
-                                    user = patient_login();
-                                    break;
-
+                                case "staff" -> user = staff_login();
+                                case "patient" -> user = patient_login();
                             }
                         }
                         break;

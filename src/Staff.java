@@ -1,4 +1,6 @@
-public class Staff extends Userimpl implements User {
+import java.io.Serializable;
+
+public class Staff extends UserImpl implements User, Serializable {
     private String role_title;
     private String phone_number;
 

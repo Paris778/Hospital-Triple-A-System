@@ -1,14 +1,16 @@
 public interface User {
 
-    public String getname();
+    public String getForenames();
 
-    public int getid();
+    public String getSurnames();
 
-    public String getmail();
+    public int getId();
 
-    public String getaddress();
+    public String getEmail();
 
-    public String getidentity();
+    public String getAddress();
 
-    public String getdateofbirth();
+    public String getIdentity();
+
+    public String getDoB();
 }

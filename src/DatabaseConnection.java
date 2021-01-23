@@ -1,4 +1,3 @@
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,12 +6,97 @@ import java.sql.*;
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
     private static final String DATABASE_LOCATION = "jdbc:sqlite:";
-    private static String dbName = "patients.db";
+    private static String dbName = "database.db";
     private static Connection con = null;
     private static PreparedStatement p = null;
     private static ResultSet results = null;
 
-    private static void establishConnection() {
+
+    public void createFakeUser() {
+        try {
+            // Add user to database
+            String statement = "INSERT INTO patients(forename, surname, date_of_birth, address, email) VALUES ('test', 'test', '2000-01-01', 'china', 'g@gmail.com');";
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+
+            results.close();
+            p.close();
+
+            // TODO: replace this with actual race condition prevention lol
+            Thread.sleep(1000);
+        } catch (SQLException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void createUser(User user, byte[] hashedPassword) {
+        try {
+            String statement = "";
+            // Check if user is patient or staff
+            if (user instanceof Patient) {
+                statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
+                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "', '" + user.getEmail() + "'); ";
+            } else {
+                statement = "INSERT INTO staff (forename, surname, date_of_birth, address, email, role_title, phone_number) VALUES ('" +
+                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "', '" + user.getEmail() + "', '" + ((Staff) user).getrole_title() + "', '" + ((Staff) user).getphone_number() + "'); ";
+            }
+
+            // Add user to statement
+            p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+            p.executeUpdate();
+
+            // Return row ID to add foreign key in passwords table
+            int userId = -1;
+            ResultSet results = p.getGeneratedKeys();
+            if (results.next()) {
+                userId = results.getInt(1);
+            }
+
+            // Add the user's password
+            if (user instanceof Patient) {
+                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'patient');";
+            } else {
+                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'staff');";
+            }
+
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+
+            results.close();
+            p.close();
+
+            // TODO: replace this with actual race condition prevention lol
+            Thread.sleep(1000);
+        } catch (SQLException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void viewPatients() {
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("SELECT * FROM patients");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("p_id");
+                String forename = results.getString("forename");
+                String surname = results.getString("surname");
+                String dob = results.getString("date_of_birth");
+                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
+            }
+
+            results.close();
+            p.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DatabaseConnection() {
         try {
             // Load the JDBC driver
             Class.forName(JDBC_DRIVER);
@@ -20,27 +104,9 @@ public class DatabaseConnection {
             // Attempt to open a connection
             con = DriverManager.getConnection(DATABASE_LOCATION + dbName);
 
-            // Execute SQL query
-            p = con.prepareStatement("SELECT * FROM patients");
-            results = p.executeQuery();
-
-            // Loop through each row and print
-            while (results.next()) {
-                int id = results.getInt("patient_id");
-                String forename = results.getString("forename");
-                String surname = results.getString("surname");
-                System.out.println(id + "\t\t" + forename + "\t\t" + surname);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            establishConnection();
-            con.setAutoCommit(false);
-        } catch (SQLException e) {
+            viewPatients();
+            con.setAutoCommit(true);
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

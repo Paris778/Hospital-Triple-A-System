@@ -9,7 +9,6 @@ package utility;
 //////////////////////////////////////////////////////////////////////////////
 
 public class Constants {
-    
     //PASSWORD CONSTANTS
     public static final int WEAK_PASSWORD = 5;
     public static final int OK_PASSWORD = 8;
