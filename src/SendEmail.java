@@ -7,7 +7,8 @@ import java.util.Random;
 
 
 public class SendEmail {
-    public static void send(String to) {
+    public static int send(String to)
+    {
         
         final String from = "scc363auth@gmail.com";
         final String username = "scc363auth@gmail.com";
@@ -44,8 +45,10 @@ public class SendEmail {
             // Send message
             Transport.send(message);
             System.out.println("Email sent successfully");
+            return code;
         } catch (MessagingException e) {
             e.printStackTrace();
+            return 0;
         }
     }
 

@@ -1,9 +1,12 @@
 import java.rmi.RemoteException;
+import java.util.HashMap;
+
 import utility.*;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;
     private static final PasswordHandler passwordHandler = new PasswordHandler();
+    private HashMap<String,Integer> otp = new HashMap<String,Integer>();
     private DatabaseConnection dbConnection;
 
     public ServerImpl() throws RemoteException {
@@ -32,5 +35,9 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public boolean varifyPassword(byte[] hash, int clientId) throws RemoteException {
         return false;
+    }
+
+    public void sendEmail(String email_address) throws RemoteException {
+        otp.put(email_address,SendEmail.send(email_address));
     }
 }

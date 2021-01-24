@@ -8,7 +8,11 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void viewPatients() throws RemoteException;
 
+    void sendEmail(String email_address) throws RemoteException;
+
     abstract public boolean storeHashedPassword(byte[] hash) throws RemoteException;
+
+
 
     abstract public boolean varifyPassword(byte[] hash, int clientId) throws RemoteException;
 }

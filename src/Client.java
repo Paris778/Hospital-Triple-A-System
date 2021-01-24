@@ -15,7 +15,7 @@ public class Client {
     private static User user; // a class encapsulate user information
     static Scanner input = new Scanner(System.in);
     private static final PasswordHandler passwordHandler = new PasswordHandler();
-
+    private static ServerInterface server;
     public static void main(String[] args) throws Exception {
         String op = "";// record the command
         String password = null;
@@ -23,7 +23,7 @@ public class Client {
 
         try {
             // link to server
-            ServerInterface server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
+            server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
             server.createFakeUser();
             server.createFakeUser();
@@ -122,16 +122,15 @@ public class Client {
 
                             System.out.println("please enter your email address and a one time password will be sent");
                             String email_address = input.nextLine();
-                            // sent otp
-                            // --------------
+                            // sent email
+                            server.sendEmail(email_address);
                             System.out.println("please enter your one time password");
                             String otp = input.nextLine();
                             // verify the otp
                             // --------------
                             while (true) {
                                 System.out.println("please set your password");
-                                System.out.println(
-                                        "The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                                System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                 String temp1 = input.nextLine();
 
                                 // password evaluation
@@ -200,34 +199,43 @@ public class Client {
     }
 
     private static User staff_login() {
-        System.out.println("enter your mail ");
-        String email_address = input.nextLine();
-        System.out.println(
-                "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
-        if (input.nextLine().equals("y")) {
-            // send email:
-            // ---------------
-            System.out.println("enter your password");
-            String otp = input.nextLine();
-        } else {
-            System.out.println("enter your password");
-            String password = input.nextLine();
-        }
-        System.out.println("type y to confirm / n to cancel logging ");
+        try
+        {
+            System.out.println("enter your mail ");
+            String email_address = input.nextLine();
+            System.out.println(
+                    "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
+            if (input.nextLine().equals("y")) {
+                // send email:
+                server.sendEmail(email_address);
 
-        if (input.nextLine().equals("y")) {
-            // check if the user has been register or been logged in on other client
-            // ---------------------------------------------------------------------
-            // check which method was used when logging in
-            // ---------------------------------------------------------------------
-            // authentication
-            // ---------------------------------------------------------------------
-            // and get the user data from DB and pack as staff type
-            // ---------------------------------------------------------------------
-            Authenticcondition = 1;
+                System.out.println("enter your verification code");
+                String otp = input.nextLine();
+            } else {
+                System.out.println("enter your password");
+                String password = input.nextLine();
+            }
+            System.out.println("type y to confirm / n to cancel logging ");
+
+            if (input.nextLine().equals("y")) {
+                // check if the user has been register or been logged in on other client
+                // ---------------------------------------------------------------------
+                // check which method was used when logging in
+                // ---------------------------------------------------------------------
+                // authentication
+                // ---------------------------------------------------------------------
+                // and get the user data from DB and pack as staff type
+                // ---------------------------------------------------------------------
+                Authenticcondition = 1;
+                return null;
+            } else
+                return null;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
             return null;
-        } else
-            return null;
+        }
 
     }
 
@@ -252,34 +260,42 @@ public class Client {
     }
 
     private static User patient_login() {
-        System.out.println("enter your mail ");
-        String email_address = input.nextLine();
-        System.out.println(
-                "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
-        if (input.nextLine().equals("y")) {
-            // send email:
-            // ---------------
-            System.out.println("enter your password");
-            String otp = input.nextLine();
-        } else {
-            System.out.println("enter your password");
-            String password = input.nextLine();
+        try
+        {
+            System.out.println("enter your mail ");
+            String email_address = input.nextLine();
+            System.out.println(
+                    "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
+            if (input.nextLine().equals("y")) {
+                // send email:
+                server.sendEmail(email_address);
+
+                System.out.println("enter your verification code");
+                String otp = input.nextLine();
+            } else {
+                System.out.println("enter your password");
+                String password = input.nextLine();
+            }
+
+            System.out.println("type y to confirm / n to cancel logging ");
+            if (input.nextLine().equals("y")) {
+                // check if the user has been register or been logged in on other client
+                // ---------------------------------------------------------------------
+                // check which method was used when logging in
+                // ---------------------------------------------------------------------
+                // authentication
+                // ---------------------------------------------------------------------
+                // and get the user data from DB and pack as patient type
+                // ---------------------------------------------------------------------
+                Authenticcondition = 1;
+                return null;
+            } else
+                return null;
         }
-
-        System.out.println("type y to confirm / n to cancel logging ");
-        if (input.nextLine().equals("y")) {
-            // check if the user has been register or been logged in on other client
-            // ---------------------------------------------------------------------
-            // check which method was used when logging in
-            // ---------------------------------------------------------------------
-            // authentication
-            // ---------------------------------------------------------------------
-            // and get the user data from DB and pack as patient type
-            // ---------------------------------------------------------------------
-            Authenticcondition = 1;
+        catch (Exception e)
+        {
+            e.printStackTrace();
             return null;
-        } else
-            return null;
-
+        }
     }
 }
