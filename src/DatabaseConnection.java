@@ -56,9 +56,9 @@ public class DatabaseConnection {
 
             // Add the user's password
             if (user instanceof Patient) {
-                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'patient');";
+                statement = "INSERT INTO patient_passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + userId + "');";
             } else {
-                statement = "INSERT INTO passwords(hashed_value, user_id, patient_or_staff) VALUES ('" + hashedPassword + "', '" + userId + "', 'staff');";
+                statement = "INSERT INTO staff_passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + userId + "');";
             }
 
             p = con.prepareStatement(statement);
