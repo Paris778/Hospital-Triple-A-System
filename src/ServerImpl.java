@@ -1,6 +1,8 @@
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
+import database.DatabaseConnection;
+import database.User;
 import utility.*;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
@@ -8,6 +10,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     private static final PasswordHandler passwordHandler = new PasswordHandler();
     private HashMap<String,Integer> otp = new HashMap<String,Integer>();
     private DatabaseConnection dbConnection;
+    private Logger logger = new Logger(dbConnection);
 
     public ServerImpl() throws RemoteException {
         dbConnection = new DatabaseConnection();
@@ -33,7 +36,12 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public boolean varifyPassword(byte[] hash, int clientId) throws RemoteException {
+    public void logEvent(int EVENT_ID, int userId) throws RemoteException {
+        this.logger.logEvent(EVENT_ID, userId);
+    }
+
+    @Override
+    public boolean verifyPassword(byte[] hash, int clientId) throws RemoteException {
         return false;
     }
 

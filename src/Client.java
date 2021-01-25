@@ -1,13 +1,15 @@
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import javax.crypto.IllegalBlockSizeException;
 import java.util.Scanner;
-import java.io.IOException;
 import java.rmi.NotBoundException;
 
+import database.Patient;
+import database.Staff;
+import database.User;
 import utility.*;
 
 public class Client {
+    //Variables
     private static final String host = "localhost";
     private static final int port = 1099; // default port
     private static int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
@@ -16,6 +18,9 @@ public class Client {
     static Scanner input = new Scanner(System.in);
     private static final PasswordHandler passwordHandler = new PasswordHandler();
     private static ServerInterface server;
+
+
+
     public static void main(String[] args) throws Exception {
         String op = "";// record the command
         String password = null;
@@ -68,10 +73,10 @@ public class Client {
                                         System.out.println("Please set your password");
                                         System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                         password = input.nextLine();
-                                        passwordEval = passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD;
+                                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
                                         // password evaluation
                                         if (passwordEval) {
-                                            System.out.println("Thank you !");
+                                            System.out.println("Strong Password !");
                                             break;
                                         } else {
                                             passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
@@ -83,6 +88,7 @@ public class Client {
                                     String temp2 = input.nextLine();
                                     if (password.equals(temp2))// &&satisfy password requirements
                                     {
+                                        System.out.println("Password Confirmed !!!!");
                                         hash = passwordHandler.hashPassword(password);
                                         password = null; //Safety stuff
                                         temp2 = null; //Safety stuff
