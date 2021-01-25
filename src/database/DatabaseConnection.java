@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
+import java.util.Calendar;
 
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
@@ -117,7 +118,6 @@ public class DatabaseConnection {
     public synchronized void appendLog(int userId, String eventType, String eventDescription) {
         try {
             String statement = "";
-            // Check if user is patient or staff
 
             statement =("INSERT INTO events (user_id, event_type, description) VALUES ('"
                     + userId + "', '"
@@ -128,7 +128,6 @@ public class DatabaseConnection {
             // Add to statement
             p = con.prepareStatement(statement);
             p.executeUpdate();
-
             results.close();
             p.close();
 

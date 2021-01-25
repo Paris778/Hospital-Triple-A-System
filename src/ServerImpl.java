@@ -10,15 +10,23 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     private static final PasswordHandler passwordHandler = new PasswordHandler();
     private HashMap<String,Integer> otp = new HashMap<String,Integer>();
     private DatabaseConnection dbConnection;
-    private Logger logger = new Logger(dbConnection);
+    private Logger logger;
 
     public ServerImpl() throws RemoteException {
         dbConnection = new DatabaseConnection();
+        logger = new Logger(dbConnection);
+        logger.logEvent(Constants.LOG_SYSTEM_ONLINE,0);
     }
 
     public void createUser(User user, byte[] hashedPassword) {
-        System.out.println("Creating user in database...");
+        System.err.println(user.getId() + "****************");
+        System.err.println("Creating user in database...");
         dbConnection.createUser(user, hashedPassword);
+        try {
+            logEvent(Constants.LOG_USER_REGISTERED,user.getId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void createFakeUser() {

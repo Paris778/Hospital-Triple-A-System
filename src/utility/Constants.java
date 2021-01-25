@@ -33,6 +33,7 @@ public class Constants {
     public static final int LOG_USER_LOGGED_OUT = 103;
     public static final int LOG_USER_ACCESSED_DATA = 104;
     public static final int LOG_USER_CHANGED_PASSWORD = 105;
+    public static final int LOG_SYSTEM_ONLINE = 106;
     //Warnings 2--
     public static final int LOG_USER_MODIFIED_DATA = 201;
     public static final int LOG_USER_DELETED_DATA = 202;

@@ -14,9 +14,18 @@ public class Logger {
 
     //This is the main function to log events.
     // Takes in a constants for the type of event and the database.User ID if applicable
+    // The logEvent method is super charged for various logging types (future thing)
     public void logEvent(int EVENT_ID, int userId){
-
+    System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
         switch (EVENT_ID){
+            case Constants.LOG_SYSTEM_ONLINE:
+                System.out.println("Trying to make online log");
+                connection.appendLog(
+                        00000,
+                        this.getEventType(EVENT_ID),
+                        "Server is online." //Event description
+                );
+                break;
             case Constants.LOG_USER_REGISTERED:
                 connection.appendLog(
                         userId,
