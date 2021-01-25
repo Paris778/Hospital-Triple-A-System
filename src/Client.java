@@ -26,9 +26,6 @@ public class Client {
             // link to server
             server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
             System.out.println("link to server");
-            server.createFakeUser();
-            server.createFakeUser();
-            Thread.sleep(1000);
             server.viewPatients();
             System.out.println("Welcome to use the hospital service system");
             System.out.println("If you don't have an account,use command -register register and validate");
@@ -207,6 +204,13 @@ public class Client {
             } else {
                 System.out.println("enter your password");
                 String password = input.nextLine();
+
+                // Check password matches password hash in database
+                if (server.verifyPassword(password, email_address, false)) {
+                    System.out.println("Login successful.");
+                } else {
+                    System.out.println("Incorrect. Please try again.");
+                }
             }
             System.out.println("type y to confirm / n to cancel logging ");
 

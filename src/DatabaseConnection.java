@@ -71,8 +71,6 @@ public class DatabaseConnection {
 
             p = con.prepareStatement(statement);
             p.executeUpdate();
-            results.close();
-            p.close();
 
             // TODO: replace this with actual race condition prevention lol
             Thread.sleep(1000);
@@ -123,13 +121,11 @@ public class DatabaseConnection {
                 System.out.println("Patient id: " + results.getInt(1));
                 id = results.getInt("p_id");
             } else {
-                p = con.prepareStatement("SELECT employee_id FROM staff WHERE email='" + email + "';");
+                p = con.prepareStatement("SELECT s_id FROM staff WHERE email='" + email + "';");
                 results = p.executeQuery();
                 System.out.println("Staff id: " + results.getInt(1));
                 id = results.getInt(1);
             }
-            p.close();
-            results.close();
             return id;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -152,8 +148,6 @@ public class DatabaseConnection {
                 System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
             }
 
-            results.close();
-            p.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
