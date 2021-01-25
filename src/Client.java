@@ -68,10 +68,10 @@ public class Client {
                                         System.out.println("Please set your password");
                                         System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
                                         password = input.nextLine();
-                                        passwordEval = passwordHandler.checkPasswordStrength(password) > Constants.INTERMEDIATE_PASSWORD;
+                                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
                                         // password evaluation
                                         if (passwordEval) {
-                                            System.out.println("Thank you !");
+                                            System.out.println("Strong Password !");
                                             break;
                                         } else {
                                             passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
@@ -83,6 +83,7 @@ public class Client {
                                     String temp2 = input.nextLine();
                                     if (password.equals(temp2))// &&satisfy password requirements
                                     {
+                                        System.out.println("Password Confirmed !!!!");
                                         hash = passwordHandler.hashPassword(password);
                                         password = null; //Safety stuff
                                         temp2 = null; //Safety stuff
