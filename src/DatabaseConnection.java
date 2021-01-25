@@ -1,7 +1,11 @@
+import utility.PasswordHandler;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
+import java.util.Arrays;
 
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
@@ -10,7 +14,7 @@ public class DatabaseConnection {
     private static Connection con = null;
     private static PreparedStatement p = null;
     private static ResultSet results = null;
-
+    private PasswordHandler passwordHandler = new PasswordHandler();
 
     public void createFakeUser() {
         try {
@@ -29,7 +33,7 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void createUser(User user, byte[] hashedPassword) {
+    public synchronized void createUser(User user, String plaintext) {
         try {
             String statement = "";
             // Check if user is patient or staff
@@ -54,23 +58,82 @@ public class DatabaseConnection {
                 userId = results.getInt(1);
             }
 
+            // Hash and salt user password
+            String salt = passwordHandler.generateSalt();
+            String hashedPassword = passwordHandler.hashPassword(plaintext, salt.getBytes());
+
             // Add the user's password
             if (user instanceof Patient) {
-                statement = "INSERT INTO patient_passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + userId + "');";
+                statement = "INSERT INTO patient_passwords(hashed_value, salt, user_id) VALUES ('" + hashedPassword + "', '" + salt + "', '" + userId + "');";
             } else {
-                statement = "INSERT INTO staff_passwords(hashed_value, user_id) VALUES ('" + hashedPassword + "', '" + userId + "');";
+                statement = "INSERT INTO staff_passwords(hashed_value, salt, user_id) VALUES ('" + hashedPassword + "', '" + salt + "', '" + userId + "');";
             }
 
             p = con.prepareStatement(statement);
             p.executeUpdate();
-
             results.close();
             p.close();
 
             // TODO: replace this with actual race condition prevention lol
             Thread.sleep(1000);
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException | InterruptedException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+        }
+    }
+
+    public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
+        try {
+            // Get user id that corresponds to the email
+            int id = getUserId(email, isPatient);
+
+            // Prepare SQL query
+            if (isPatient) {
+                p = con.prepareStatement("SELECT hashed_value, salt FROM patient_passwords WHERE user_id=" + id + ";");
+            } else {
+                p = con.prepareStatement("SELECT hashed_value, salt FROM staff_passwords WHERE user_id=" + id + ";");
+            }
+
+            // Get correct password hash and salt for that user
+            results = p.executeQuery();
+            while (results.next()) {
+                String passwordHash = results.getString("hashed_value");
+                String salt = results.getString("salt");
+
+                // Hash password attempt using the correct salt
+                String attemptHash = passwordHandler.hashPassword(plaintext, salt.getBytes());
+
+                // Compare values
+                if (Arrays.equals(passwordHash.getBytes(), attemptHash.getBytes())) {
+                    return true;
+                }
+            }
+        } catch (SQLException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public synchronized int getUserId(String email, boolean isPatient) {
+        try {
+            // Get user id that corresponds to the email
+            int id;
+            if (isPatient) {
+                p = con.prepareStatement("SELECT p_id FROM patients WHERE email='" + email + "';");
+                results = p.executeQuery();
+                System.out.println("Patient id: " + results.getInt(1));
+                id = results.getInt("p_id");
+            } else {
+                p = con.prepareStatement("SELECT employee_id FROM staff WHERE email='" + email + "';");
+                results = p.executeQuery();
+                System.out.println("Staff id: " + results.getInt(1));
+                id = results.getInt(1);
+            }
+            p.close();
+            results.close();
+            return id;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
         }
     }
 

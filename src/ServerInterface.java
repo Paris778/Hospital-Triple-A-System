@@ -2,7 +2,7 @@ import java.rmi.RemoteException;
 
 public interface ServerInterface extends java.rmi.Remote {
 
-    void createUser(User user, byte[] hashedPassword) throws RemoteException;
+    void createUser(User user, String password) throws RemoteException;
 
     void createFakeUser() throws RemoteException;
 
@@ -10,9 +10,5 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void sendEmail(String email_address) throws RemoteException;
 
-    abstract public boolean storeHashedPassword(byte[] hash) throws RemoteException;
-
-
-
-    abstract public boolean varifyPassword(byte[] hash, int clientId) throws RemoteException;
+    boolean verifyPassword(String plaintext, String email, boolean isPatient) throws RemoteException;
 }

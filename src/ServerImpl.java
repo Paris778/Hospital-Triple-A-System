@@ -5,7 +5,6 @@ import utility.*;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;
-    private static final PasswordHandler passwordHandler = new PasswordHandler();
     private HashMap<String,Integer> otp = new HashMap<String,Integer>();
     private DatabaseConnection dbConnection;
 
@@ -13,9 +12,9 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection = new DatabaseConnection();
     }
 
-    public void createUser(User user, byte[] hashedPassword) {
+    public void createUser(User user, String plaintext) {
         System.out.println("Creating user in database...");
-        dbConnection.createUser(user, hashedPassword);
+        dbConnection.createUser(user, plaintext);
     }
 
     public void createFakeUser() {
@@ -28,16 +27,11 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public boolean storeHashedPassword(byte[] hash) throws RemoteException {
-        return false;
+    public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
+        return dbConnection.verifyPassword(plaintext, email, isPatient);
     }
 
-    @Override
-    public boolean varifyPassword(byte[] hash, int clientId) throws RemoteException {
-        return false;
-    }
-
-    public void sendEmail(String email_address) throws RemoteException {
+    public void sendEmail(String email_address) {
         otp.put(email_address,SendEmail.send(email_address));
     }
 }

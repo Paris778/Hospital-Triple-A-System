@@ -16,6 +16,7 @@ public class Client {
     static Scanner input = new Scanner(System.in);
     private static final PasswordHandler passwordHandler = new PasswordHandler();
     private static ServerInterface server;
+
     public static void main(String[] args) throws Exception {
         String op = "";// record the command
         String password = null;
@@ -81,26 +82,18 @@ public class Client {
                                     //
                                     System.out.println("Please confirm your password (type again)");
                                     String temp2 = input.nextLine();
-                                    if (password.equals(temp2))// &&satisfy password requirements
-                                    {
+                                    // Satisfy password requirements
+                                    if (password.equals(temp2)) {
                                         System.out.println("Password Confirmed !!!!");
-                                        hash = passwordHandler.hashPassword(password);
+                                        // Create user and store hashed password in DB
+                                        server.createUser(user, password);
                                         password = null; //Safety stuff
                                         temp2 = null; //Safety stuff
-                                        server.createUser(user, hash);
                                         break;
                                     } else
                                         System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
                                 }
                             }
-
-                            ////////////////////////////////////////////////////////////////
-                            //If all is gucci with the password, store hashed password
-                            // server store password
-                            // ---------------------
-                            server.storeHashedPassword(hash);
-                            hash = null; //Security stuff
-
                         } else
                             System.out.println("please log out first");
                         break;
@@ -200,8 +193,7 @@ public class Client {
     }
 
     private static User staff_login() {
-        try
-        {
+        try {
             System.out.println("enter your mail ");
             String email_address = input.nextLine();
             System.out.println(
@@ -231,9 +223,7 @@ public class Client {
                 return null;
             } else
                 return null;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -261,21 +251,26 @@ public class Client {
     }
 
     private static User patient_login() {
-        try
-        {
-            System.out.println("enter your mail ");
+        try {
+            System.out.println("Enter your email");
             String email_address = input.nextLine();
-            System.out.println(
-                    "Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
+            System.out.println("Do you want to log in with an email verification code?  type y to use OTP / type n to use password");
             if (input.nextLine().equals("y")) {
                 // send email:
                 server.sendEmail(email_address);
 
-                System.out.println("enter your verification code");
+                System.out.println("Enter your verification code");
                 String otp = input.nextLine();
             } else {
-                System.out.println("enter your password");
+                System.out.println("Enter your password");
                 String password = input.nextLine();
+
+                // Check password matches password hash in database
+                if (server.verifyPassword(password, email_address, true)) {
+                    System.out.println("Login successful.");
+                } else {
+                    System.out.println("Incorrect. Please try again.");
+                }
             }
 
             System.out.println("type y to confirm / n to cancel logging ");
@@ -292,9 +287,7 @@ public class Client {
                 return null;
             } else
                 return null;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
