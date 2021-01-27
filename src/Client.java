@@ -9,14 +9,14 @@ import database.User;
 import utility.*;
 
 public class Client {
-    private static final String host = "localhost";
-    private static final int port = 1099; // default port
-    private static int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
+    private final String host = "localhost";
+    private final int port = 1099; // default port
+    private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
     // int can expand more options
-    private static User user; // a class encapsulate user information
+    private User user; // a class encapsulate user information
     static Scanner input = new Scanner(System.in);
-    private static final PasswordHandler passwordHandler = new PasswordHandler();
-    private static ServerInterface server;
+    private final PasswordHandler passwordHandler = new PasswordHandler();
+    private ServerInterface server;
 
     //////////////////////////////////////////////////
     //Main Method
@@ -105,6 +105,8 @@ public class Client {
         if (Authenticcondition < 0) {
             System.out.println("Choose what identity you want to register as staff/patient");
             String identity = input.nextLine();
+            //Integrity stuff
+            identity = identity.toLowerCase();
 
             switch (identity) {
                 case "staff" -> user = staff_register();
@@ -229,7 +231,7 @@ public class Client {
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static User staff_register() {
+    private User staff_register() {
         System.out.println("Please enter your email to register");
         String email_address = input.nextLine();
 
@@ -253,7 +255,7 @@ public class Client {
 
     }
 
-    private static User staff_login() {
+    private User staff_login() {
         try {
             System.out.println("enter your mail ");
             String email_address = input.nextLine();
@@ -298,7 +300,7 @@ public class Client {
 
     }
 
-    private static User patient_register() {
+    private User patient_register() {
         System.out.println("Please enter your email to register");
         String email_address = input.nextLine();
 
@@ -318,7 +320,7 @@ public class Client {
 
     }
 
-    private static User patient_login() {
+    private User patient_login() {
         try {
             System.out.println("Enter your email");
             String email_address = input.nextLine();
