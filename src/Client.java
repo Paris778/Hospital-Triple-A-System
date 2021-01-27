@@ -163,6 +163,14 @@ public class Client {
                             System.out.println("please log in first");
                         break;
 
+                    // logout
+                    case "shutdown":
+                        if (user.getIdentity()) {
+                            Authenticcondition = -1;
+                        } else
+                            System.out.println("please log in first");
+                        break;
+
                 }
             }
         } catch (RemoteException re) {

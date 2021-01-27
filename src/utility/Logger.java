@@ -1,9 +1,9 @@
 package utility;
 
-
 import database.DatabaseConnection;
 
 public class Logger {
+
     private DatabaseConnection connection;
 
     public Logger(DatabaseConnection connection){
@@ -13,11 +13,12 @@ public class Logger {
 
 
     //This is the main function to log events.
-    // Takes in a constants for the type of event and the database.User ID if applicable
+    // Takes in a CONSTANT for the type of event and the database.User ID if applicable
     // The logEvent method is super charged for various logging types (future thing)
     public void logEvent(int EVENT_ID, int userId){
-    System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
+        System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
         switch (EVENT_ID){
+            //
             case Constants.LOG_SYSTEM_ONLINE:
                 System.out.println("Trying to make online log");
                 connection.appendLog(
@@ -26,6 +27,7 @@ public class Logger {
                         "Server is online." //Event description
                 );
                 break;
+            //
             case Constants.LOG_USER_REGISTERED:
                 connection.appendLog(
                         userId,
@@ -33,6 +35,7 @@ public class Logger {
                         "User " + userId + " has been registered." //Event description
                 );
                 break;
+            //
             case Constants.LOG_USER_LOGGED_IN:
                 connection.appendLog(
                         userId,
@@ -40,6 +43,7 @@ public class Logger {
                         "User " + userId + " has logged in." //Event description
                 );
                 break;
+            //
             case Constants.LOG_USER_LOGGED_OUT:
                 connection.appendLog(
                         userId,
@@ -47,8 +51,8 @@ public class Logger {
                         "User " + userId + " has logged out." //Event description
                 );
                 break;
-                //////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////
             // Might need to make a separate method for these
             case Constants.LOG_USER_ACCESSED_DATA:
                 connection.appendLog(
@@ -119,7 +123,7 @@ public class Logger {
             return ("ACTIVITY");
         }
         else{
-            return ("UNKNOWN");
+            return ("NON-REGISTERED EVENT");
         }
     }
 

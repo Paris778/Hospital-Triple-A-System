@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
 import java.util.Calendar;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
@@ -16,6 +18,9 @@ public class DatabaseConnection {
     private static Connection con = null;
     private static PreparedStatement p = null;
     private static ResultSet results = null;
+
+    //Concurrency control
+    private Lock binary_Lock = new ReentrantLock();
 
 
     public void createFakeUser() {
@@ -116,6 +121,9 @@ public class DatabaseConnection {
        */
 
     public synchronized void appendLog(int userId, String eventType, String eventDescription) {
+        //Race Condition Control
+        binary_Lock.lock();
+        //
         try {
             String statement = "";
 
@@ -131,11 +139,13 @@ public class DatabaseConnection {
             results.close();
             p.close();
 
-            // TODO: replace this with actual race condition prevention lol
-            Thread.sleep(1000);
-        } catch (SQLException | InterruptedException e) {
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        //Race Condition Control
+        binary_Lock.unlock();
+        //
     }
 
     public DatabaseConnection() {
