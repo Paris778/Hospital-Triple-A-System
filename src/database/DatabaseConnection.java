@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
@@ -17,8 +19,11 @@ public class DatabaseConnection {
     private static PreparedStatement p = null;
     private static ResultSet results = null;
     private PasswordHandler passwordHandler = new PasswordHandler();
+    private Lock lock = new ReentrantLock();
 
     public void createFakeUser() {
+        //Race condition control
+        lock.lock();
         try {
             // Add user to database
             String statement = "INSERT INTO patients(forename, surname, date_of_birth, address, email) VALUES ('test', 'test', '2000-01-01', 'china', 'g@gmail.com');";
@@ -28,14 +33,17 @@ public class DatabaseConnection {
             results.close();
             p.close();
 
-            // TODO: replace this with actual race condition prevention lol
-            Thread.sleep(1000);
-        } catch (SQLException | InterruptedException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
         }
     }
 
     public synchronized void createUser(User user, String plaintext) {
+        //Race condition control
+        lock.lock();
         try {
             String statement = "";
             // Check if user is patient or staff
@@ -74,14 +82,17 @@ public class DatabaseConnection {
             p = con.prepareStatement(statement);
             p.executeUpdate();
 
-            // TODO: replace this with actual race condition prevention lol
-            Thread.sleep(1000);
-        } catch (SQLException | InterruptedException | NoSuchAlgorithmException e) {
+        } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+        }  finally {
+            //Race condition control
+            lock.unlock();
         }
     }
 
     public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
+        //Race condition control
+        lock.lock();
         try {
             // Get user id that corresponds to the email
             int id = getUserId(email, isPatient);
@@ -104,16 +115,22 @@ public class DatabaseConnection {
 
                 // Compare values
                 if (Arrays.equals(passwordHash.getBytes(), attemptHash.getBytes())) {
+                    //Finally block will execute before that, don't worry
                     return true;
                 }
             }
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+        }  finally {
+            //Race condition control
+            lock.unlock();
         }
         return false;
     }
 
     public synchronized int getUserId(String email, boolean isPatient) {
+        //Race condition control
+        lock.lock();
         try {
             // Get user id that corresponds to the email
             int id;
@@ -132,10 +149,15 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        }  finally {
+            //Race condition control
+            lock.unlock();
         }
     }
 
     public synchronized void viewPatients() {
+        //Race condition control
+        lock.lock();
         try {
             // Execute SQL query
             p = con.prepareStatement("SELECT * FROM patients");
@@ -152,6 +174,9 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
         }
     }
 
