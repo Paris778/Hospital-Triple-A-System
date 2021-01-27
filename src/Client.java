@@ -18,153 +18,216 @@ public class Client {
     private static final PasswordHandler passwordHandler = new PasswordHandler();
     private static ServerInterface server;
 
-    public static void main(String[] args) throws Exception {
+    //////////////////////////////////////////////////
+    //Main Method
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.runUserInterface();
+    }
+
+    ////////////////////////////////////////////////
+    //This method runs the main user interface
+    private void runUserInterface(){
         String op = "";// record the command
-        String password = null;
         byte[] hash = null;
 
         try {
             // link to server
             server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
-            System.out.println("link to server");
-            server.viewPatients();
-            System.out.println("Welcome to use the hospital service system");
-            System.out.println("If you don't have an account,use command -register register and validate");
-            System.out.println("If you already have an account,use command -login to login as stuff/admin/patient");
-            System.out.println("type -help to see all the avaliable command");
+            System.out.println("> Connected to server successfully");
+
+            server.viewPatients(); //Just a test thingy
+
+            System.out.println("> Welcome to  the Hospital Service System");
+            System.out.println("> If you don't have an account,use command 'register'.");
+            System.out.println("> If you already have an account,use command 'login' to login as stuff/admin/patient");
+            System.out.println("> Type 'help' to see all available commands.");
 
             while (true) {
                 op = input.nextLine();
-                switch (op) {
-                    case "help":
-                        System.out.println("use command -register register and validate");
-                        System.out.println("use command -login to make the following command avaliable");
-                        System.out.println("use command -logout to logout");
-                        System.out.println("use command -forgotpw to find your forgotten password");
-                        break;
+                //Input integrity thing
+                op = op.toLowerCase();
 
-                    case "register":
-                        if (Authenticcondition < 0) {
-                            System.out.println("Choose what identity you want to register as staff/patient");
-                            String identity = input.nextLine();
-
-                            switch (identity) {
-                                case "staff" -> user = staff_register();
-                                case "patient" -> user = patient_register();
-                                default -> System.out.println("please enter an valid identity");
-                            }
-
-                            // if information all valid
-                            if (user != null) {
-                                // generate private keys and public key for user
-                                // ---------------------------------------------
-
-
-                                //Register and validate password
-                                while (true) {
-                                    boolean passwordEval = false;
-                                    while (!passwordEval) {
-                                        System.out.println("Please set your password");
-                                        System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-                                        password = input.nextLine();
-                                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
-                                        // password evaluation
-                                        if (passwordEval) {
-                                            System.out.println("Strong Password !");
-                                            break;
-                                        } else {
-                                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
-                                            System.out.println("Suggested strong password: " + passwordHandler.getStrongPassword());
-                                        }
-                                    }
-                                    //
-                                    System.out.println("Please confirm your password (type again)");
-                                    String temp2 = input.nextLine();
-                                    // Satisfy password requirements
-                                    if (password.equals(temp2)) {
-                                        System.out.println("Password Confirmed !!!!");
-                                        // Create user and store hashed password in DB
-                                        server.createUser(user, password);
-                                        password = null; //Safety stuff
-                                        temp2 = null; //Safety stuff
-                                        break;
-                                    } else
-                                        System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
-                                }
-                            }
-                        } else
-                            System.out.println("please log out first");
-                        break;
-
-                    case "login":
-                        if (Authenticcondition > 0) {
-                            System.out.println("please log out first");
-                        } else {
-                            System.out.println("Choose what identity you want to login as  staff/patient");
-                            String identity = input.nextLine();
-                            switch (identity) {
-                                case "staff" -> user = staff_login();
-                                case "patient" -> user = patient_login();
-                            }
-                        }
-                        break;
-
-                    case "forgotpw":
-                        if (Authenticcondition < 0) {
-
-                            System.out.println("please enter your email address and a one time password will be sent");
-                            String email_address = input.nextLine();
-                            // sent email
-                            server.sendEmail(email_address);
-                            System.out.println("please enter your one time password");
-                            String otp = input.nextLine();
-                            // verify the otp
-                            // --------------
-                            while (true) {
-                                System.out.println("please set your password");
-                                System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-                                String temp1 = input.nextLine();
-
-                                // password evaluation
-                                // -------------------
-
-                                System.out.println("confirm your password");
-                                String temp2 = input.nextLine();
-                                if (temp1.equals(temp2))// &&satisfy password requirements
-                                {
-                                    break;
-                                } else
-                                    System.out.println(
-                                            "The entered password is different from the previous one or the format doesn't match the requirements");
-                            }
-                        } else
-                            System.out.println("please log out first");
-                        break;
-
-                    // logout
-                    case "logout":
-                        if (Authenticcondition > 0) {
-                            Authenticcondition = -1;
-                        } else
-                            System.out.println("please log in first");
-                        break;
-
+                //////////////////////////////////////
+                //Help Command
+                if (op.contains("help")) {
+                    helpCommand();
+                }
+                //////////////////////////////////////
+                //Register command
+                else if (op.contains("register")) {
+                    registerCommand();
+                }
+                //////////////////////////////////////
+                //Login command
+                else if (op.contains("login")) {
+                    loginCommand();
+                }
+                //////////////////////////////////////
+                //Logout command
+                else if (op.contains("logout")) {
+                    logoutCommand();
+                }
+                //////////////////////////////////////
+                //Forgot Password command
+                else if (op.contains("forgotpw") || op.contains("forgot")) {
+                    forgotPasswordCommand();
+                }
+                /////////////////////////////////////
+                // Unrecognised Command
+                else {
+                    System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                 }
             }
-        } catch (RemoteException re) {
-            System.out.println();
-            System.out.println("RemoteException");
-            System.out.println(re);
-        } catch (NotBoundException nbe) {
-            System.out.println();
-            System.out.println("NotBoundException");
-            System.out.println(nbe);
-        } catch (java.lang.ArithmeticException ae) {
-            System.out.println();
-            System.out.println("java.lang.ArithmeticException");
-            System.out.println(ae);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // User input commands !!
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////
+    // Help command function
+    //////////////////////////////////////
+    private void helpCommand(){
+        System.out.println("> Use command 'register' if you're a new user.");
+        System.out.println("> Use command 'login' if you're already registered.");
+        System.out.println("> Use command 'logout' to logout.");
+        System.out.println("> Use command 'forgotpw' to reset your password.");
+    }
+
+    private void registerCommand(){
+        String password = null;
+        if (Authenticcondition < 0) {
+            System.out.println("Choose what identity you want to register as staff/patient");
+            String identity = input.nextLine();
+
+            switch (identity) {
+                case "staff" -> user = staff_register();
+                case "patient" -> user = patient_register();
+                default -> System.out.println("please enter an valid identity");
+            }
+
+            // if information all valid
+            if (user != null) {
+                // generate private keys and public key for user
+                // ---------------------------------------------
+
+
+                //Register and validate password
+                while (true) {
+                    boolean passwordEval = false;
+                    while (!passwordEval) {
+                        System.out.println("Please set your password");
+                        System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                        password = input.nextLine();
+                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
+                        // password evaluation
+                        if (passwordEval) {
+                            System.out.println("Strong Password !");
+                            break;
+                        } else {
+                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
+                            System.out.println("Suggested strong password: " + passwordHandler.getStrongPassword());
+                        }
+                    }
+                    //
+                    System.out.println("Please confirm your password (type again)");
+                    String temp2 = input.nextLine();
+                    // Satisfy password requirements
+                    if (password.equals(temp2)) {
+                        System.out.println("Password Confirmed !!!!");
+                        // Create user and store hashed password in DB
+                        try {
+                            server.createUser(user, password);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                        password = null; //Safety stuff
+                        temp2 = null; //Safety stuff
+                        break;
+                    } else
+                        System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
+                }
+            }
+        } else
+            System.out.println("please log out first");
+    }
+
+    //////////////////////////////////////
+    // Login command function
+    //////////////////////////////////////
+    public void loginCommand() {
+        if (Authenticcondition > 0) {
+            System.out.println("please log out first");
+        } else {
+            System.out.println("Choose what identity you want to login as  staff/patient");
+            String identity = input.nextLine();
+            switch (identity) {
+                case "staff" -> user = staff_login();
+                case "patient" -> user = patient_login();
+            }
+        }
+    }
+
+    //////////////////////////////////////
+    // Logout command function
+    //////////////////////////////////////
+    public void logoutCommand(){
+        if (Authenticcondition > 0) {
+            Authenticcondition = -1;
+        } else {
+            System.out.println("please log in first");
+        }
+    }
+
+    //////////////////////////////////////
+    // Forgot Password command function
+    //////////////////////////////////////
+    public void forgotPasswordCommand() {
+        if (Authenticcondition < 0) {
+
+            System.out.println("please enter your email address and a one time password will be sent");
+            String email_address = input.nextLine();
+            // sent email
+            try {
+                server.sendEmail(email_address);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            System.out.println("please enter your one time password");
+            String otp = input.nextLine();
+            // verify the otp
+            // --------------
+            while (true) {
+                System.out.println("please set your password");
+                System.out.println("The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                String temp1 = input.nextLine();
+
+                // password evaluation
+                // -------------------
+
+                System.out.println("confirm your password");
+                String temp2 = input.nextLine();
+                if (temp1.equals(temp2))// &&satisfy password requirements
+                {
+                    break;
+                } else {
+                    System.out.println("The entered password is different from the previous one or the format doesn't match the requirements");
+                }
+            }
+        } else {
+            System.out.println("please log out first");
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Helper Methods
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private static User staff_register() {
         System.out.println("Please enter your email to register");
