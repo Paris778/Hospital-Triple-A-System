@@ -14,7 +14,7 @@ public class Client {
     private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
     // int can expand more options
     private User user; // a class encapsulate user information
-    static Scanner input = new Scanner(System.in);
+    private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
 
@@ -100,6 +100,9 @@ public class Client {
         System.out.println("> Use command 'forgotpw' to reset your password.");
     }
 
+    //////////////////////////////////////
+    // Register command function
+    //////////////////////////////////////
     private void registerCommand(){
         String password = null;
         if (Authenticcondition < 0) {
