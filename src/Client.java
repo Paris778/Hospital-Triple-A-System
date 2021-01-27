@@ -1,10 +1,11 @@
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import javax.crypto.IllegalBlockSizeException;
 import java.util.Scanner;
-import java.io.IOException;
 import java.rmi.NotBoundException;
 
+import database.Patient;
+import database.Staff;
+import database.User;
 import utility.*;
 
 public class Client {

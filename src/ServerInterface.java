@@ -1,3 +1,5 @@
+import database.User;
+
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends java.rmi.Remote {

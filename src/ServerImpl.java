@@ -1,7 +1,8 @@
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-import utility.*;
+import database.DatabaseConnection;
+import database.User;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;
