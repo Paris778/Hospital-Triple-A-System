@@ -8,12 +8,15 @@ import database.Staff;
 import database.User;
 import utility.*;
 
+import javax.mail.search.SentDateTerm;
+
 public class Client {
     private final String host = "localhost";
     private final int port = 1099; // default port
     private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
     // int can expand more options
-    private User user; // a class encapsulate user information
+    private String email_address;
+    private String identity;
     private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
@@ -73,6 +76,18 @@ public class Client {
                 else if (op.contains("forgotpw") || op.contains("forgot")) {
                     forgotPasswordCommand();
                 }
+
+                else if (op.contains("view")){
+                    viewCommand();
+                }
+
+                else if(op.contains("delete")){
+                    deleteCommand();
+                }
+
+                else if (op.contains("update")){
+                    updateCommand();
+                }
                 /////////////////////////////////////
                 // Unrecognised Command
                 else {
@@ -110,7 +125,7 @@ public class Client {
             String identity = input.nextLine();
             //Integrity stuff
             identity = identity.toLowerCase();
-
+            User user = null;
             switch (identity) {
                 case "staff" -> user = staff_register();
                 case "patient" -> user = patient_register();
@@ -173,11 +188,15 @@ public class Client {
             System.out.println("> Choose what identity you want to login as  (staff/patient)");
             String identity = input.nextLine();
             switch (identity) {
-                case "staff" -> user = staff_login();
-                case "patient" -> user = patient_login();
+                case "staff" ->  staff_login();
+                case "patient" ->  patient_login();
             }
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Helper Methods
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////
     // Logout command function
@@ -230,6 +249,132 @@ public class Client {
         }
     }
 
+    public void viewCommand() {
+        if (Authenticcondition > 0) {
+            try {
+                System.out.println("What type of data do you want to view? myprofile/patient/staff");
+                String temp = input.nextLine();
+                int id;
+                switch (temp) {
+                    case "myprofile":
+                        id = server.getUserId(email_address, identity.equals("patient"));
+                        server.viewPatients(id);
+                        break;
+                    case "patient":
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if(id<=0)
+                            server.viewPatients();
+                        else
+                            server.viewPatients(id);
+                        break;
+                    case "staff":
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if(id<=0)
+                            server.viewStaffs();
+                        else
+                            server.viewStaffs(id);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            System.out.println("> Please log out first");
+    }
+
+    public void deleteCommand() {
+        if (Authenticcondition > 0) {
+            try {
+                System.out.println("What kind of user data do you want to delete? patient/staff");
+                String temp = input.nextLine();
+                int id;
+                switch (temp) {
+                    case "patient":
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if(id<=0)
+                            System.out.println("id invalid");
+                        else
+                            server.viewPatients(id);
+                            System.out.println("print y to confirm");
+                            if(input.nextLine().equals("y"))
+                            {
+                                server.deletePatients(id);
+                            }
+                        break;
+                    case "staff":
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if(id<=0)
+                            System.out.println("id invalid");
+                        else
+                            server.viewStaffs(id);
+                        System.out.println("print y to confirm");
+                        if(input.nextLine().equals("y"))
+                        {
+                            server.deleteStaffs(id);
+                        }
+                        break;
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            System.out.println("> Please log out first");
+    }
+
+    public void updateCommand() {
+        if (Authenticcondition > 0) {
+            try {
+                System.out.println("What kind of user data do you want to delete? patient/staff");
+                String temp = input.nextLine();
+                int id;
+                String command;
+                switch (temp) {
+                    case "patient" -> {
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if (id <= 0)
+                            System.out.println("id invalid");
+                        else
+                            server.viewPatients(id);
+                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                        command = input.nextLine();
+                        server.updatePatients(id, command);
+                    }
+                    case "staff" -> {
+                        System.out.println("Enter a valid id to view patient information or type");
+                        id = input.nextInt();
+                        if (id <= 0)
+                            System.out.println("id invalid");
+                        else
+                            server.viewStaffs(id);
+                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                        command = input.nextLine();
+                        server.updateStaffs(id, command);
+                    }
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            System.out.println("> Please log out first");
+    }
+
+
+
+
+
+
+
+
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,7 +406,7 @@ public class Client {
 
     }
 
-    private User staff_login() {
+    private void staff_login() {
         try {
             System.out.println("> Please enter your e-mail. ");
             String email_address = input.nextLine();
@@ -279,28 +424,17 @@ public class Client {
                 // Check password matches password hash in database
                 if (server.verifyPassword(password, email_address, false)) {
                     System.out.println("> Logged in successfully.");
+                    Authenticcondition = 1;
+                    this.email_address = email_address;
+                    this.identity = "staff";
                 } else {
                     System.out.println("> Incorrect. Please try again.");
                 }
             }
-            System.out.println("> Type 'y' to confirm / 'n' to cancel logging ");
 
-            if (input.nextLine().toLowerCase().equals("y")) {
-                // check if the user has been register or been logged in on other client
-                // ---------------------------------------------------------------------
-                // check which method was used when logging in
-                // ---------------------------------------------------------------------
-                // authentication
-                // ---------------------------------------------------------------------
-                // and get the user data from DB and pack as staff type
-                // ---------------------------------------------------------------------
-                Authenticcondition = 1;
-                return null;
-            } else
-                return null;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+
         }
 
     }
@@ -322,10 +456,9 @@ public class Client {
         System.out.println("> Please enter your address");
         String address = input.nextLine();
         return new Patient(forename, surname, date_of_birth, address, email_address, "patient");
-
     }
 
-    private User patient_login() {
+    private void patient_login() {
         try {
             System.out.println("> Enter your email");
             String email_address = input.nextLine();
@@ -343,28 +476,19 @@ public class Client {
                 // Check password matches password hash in database
                 if (server.verifyPassword(password, email_address, true)) {
                     System.out.println("> Login successful.");
+                    Authenticcondition = 1;
+                    this.email_address = email_address;
+                    this.identity = "patient";
                 } else {
                     System.out.println("> Incorrect. Please try again.");
                 }
             }
 
             System.out.println("> Type 'y' to confirm / 'n' to cancel log-in");
-            if (input.nextLine().toLowerCase().equals("y")) {
-                // check if the user has been register or been logged in on other client
-                // ---------------------------------------------------------------------
-                // check which method was used when logging in
-                // ---------------------------------------------------------------------
-                // authentication
-                // ---------------------------------------------------------------------
-                // and get the user data from DB and pack as patient type
-                // ---------------------------------------------------------------------
-                Authenticcondition = 1;
-                return null;
-            } else
-                return null;
+
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+
         }
     }
 }

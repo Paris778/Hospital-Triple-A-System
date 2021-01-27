@@ -154,13 +154,21 @@ public class DatabaseConnection {
             lock.unlock();
         }
     }
+    //overload to give default parameters
+    public void viewPatients()
+    {
+        viewPatients(-1);
+    }
 
-    public synchronized void viewPatients() {
+    public synchronized void viewPatients(int p_id) {
         //Race condition control
         lock.lock();
         try {
             // Execute SQL query
-            p = con.prepareStatement("SELECT * FROM patients");
+            if(p_id==-1)
+                p = con.prepareStatement("SELECT * FROM patients");
+            else
+                p = con.prepareStatement("SELECT * FROM patients WHERE p_id = "+ p_id);
             results = p.executeQuery();
 
             // Loop through each row and print
@@ -179,6 +187,105 @@ public class DatabaseConnection {
             lock.unlock();
         }
     }
+    //overload to give default parameters
+    public void viewStaffs()
+    {
+        viewStaffs(-1);
+    }
+    public synchronized void viewStaffs(int s_id) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+            if(s_id==-1)
+                p = con.prepareStatement("SELECT * FROM staffs");
+            else
+                p = con.prepareStatement("SELECT * FROM staffs WHERE s_id = "+ s_id);
+
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("s_id");
+                String forename = results.getString("forename");
+                String surname = results.getString("surname");
+                String dob = results.getString("date_of_birth");
+                String role_title = results.getString("role_title");
+                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob+"\t\t"+role_title);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void deletePatients(int p_id) {
+        lock.lock();
+
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("DELETE FROM patients WHERE p_id = " + p_id);
+            results = p.executeQuery();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void deleteStaffs(int s_id) {
+        lock.lock();
+
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("DELETE FROM staffs WHERE s_id = " + s_id);
+            results = p.executeQuery();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void updatePatients(int p_id,String command) {
+        lock.lock();
+
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("UPDATE patients SET "+command+" WHERE p_id = " + p_id);
+            results = p.executeQuery();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void updateStaffs(int s_id,String command) {
+        lock.lock();
+
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("UPDATE patients SET "+command+" WHERE s_id = " + s_id);
+            results = p.executeQuery();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
 
     public DatabaseConnection() {
         try {
