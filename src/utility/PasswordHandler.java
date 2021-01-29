@@ -110,18 +110,20 @@ public class PasswordHandler{
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //HASH PASSWORD SHA-256
-    public byte[] hashPassword(String password) throws NoSuchAlgorithmException {
-
-        //Generating a salt
-        SecureRandom secRand = new SecureRandom();
-        byte[] salt = new byte[16];
-        secRand.nextBytes(salt);
-
+    public String hashPassword(String password, byte[] salt) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA3-256");
         digest.update(salt); //Add salt to hash
-        byte[] hashed_password = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-
+        byte[] hash = digest.digest(password.getBytes());
+        String hashed_password = new String(hash);
         password = null; //Another safety precaution even though java garbage collection should get it anyway
         return hashed_password;
+    }
+
+    public String generateSalt() {
+        //Generating a random salt
+        SecureRandom secRand = new SecureRandom();
+        byte[] salt = new byte[4];
+        secRand.nextBytes(salt);
+        return new String(salt);
     }
 }

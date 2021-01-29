@@ -18,10 +18,10 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         logger.logEvent(Constants.LOG_SYSTEM_ONLINE,0);
     }
 
-    public void createUser(User user, byte[] hashedPassword) {
+    public void createUser(User user, String plaintext) {
         System.err.println(user.getId() + "****************");
         System.err.println("Creating user in database...");
-        dbConnection.createUser(user, hashedPassword);
+        dbConnection.createUser(user, plaintext);
         try {
             logEvent(Constants.LOG_USER_REGISTERED,user.getId());
         } catch (RemoteException e) {
@@ -34,26 +34,64 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createFakeUser();
     }
 
-    public void viewPatients() {
-        dbConnection.viewPatients();
-    }
-
-    @Override
-    public boolean storeHashedPassword(byte[] hash) throws RemoteException {
-        return false;
-    }
-
     @Override
     public void logEvent(int EVENT_ID, int userId) throws RemoteException {
         this.logger.logEvent(EVENT_ID, userId);
     }
 
-    @Override
-    public boolean verifyPassword(byte[] hash, int clientId) throws RemoteException {
-        return false;
+    public void viewPatients() throws RemoteException {
+        dbConnection.viewPatients(-1);
     }
 
-    public void sendEmail(String email_address) throws RemoteException {
-        otp.put(email_address,SendEmail.send(email_address));
+    public void viewPatients(int s_id) throws RemoteException {
+        dbConnection.viewPatients(s_id);
+    }
+
+    @Override
+    public void viewStaffs() throws RemoteException {
+        dbConnection.viewStaffs(-1);
+    }
+
+    @Override
+    public void viewStaffs(int s_id) throws RemoteException {
+        dbConnection.viewStaffs(s_id);
+    }
+
+    public void deletePatients(int p_id) throws RemoteException {
+        dbConnection.deletePatients(p_id);
+    }
+
+    @Override
+    public void deleteStaffs(int s_id) throws RemoteException {
+        dbConnection.deletePatients(s_id);
+    }
+
+    @Override
+    public void updatePatients(int p_id, String command) throws RemoteException {
+        dbConnection.updatePatients(p_id, command);
+    }
+
+    @Override
+    public void updateStaffs(int s_id, String command) throws RemoteException {
+        dbConnection.updateStaffs(s_id, command);
+    }
+
+    @Override
+    public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
+        return dbConnection.verifyPassword(plaintext, email, isPatient);
+    }
+
+    public void sendOTP(String email_address) {
+        //otpTable.put(email_address, SendEmail.send(email_address));
+    }
+
+    public boolean verifyOTP(String email, Integer attempt) {
+        //Integer otp = otpTable.get(email);
+        return attempt.equals(otp);
+    }
+
+    @Override
+    public int getUserId(String email_address, Boolean isPatient) throws RemoteException {
+        return dbConnection.getUserId(email_address, isPatient);
     }
 }
