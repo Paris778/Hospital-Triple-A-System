@@ -120,10 +120,12 @@ public class Client {
             //Integrity stuff
             identity = identity.toLowerCase();
             User user = null;
-            switch (identity) {
-                case "staff" -> user = staff_register();
-                case "patient" -> user = patient_register();
-                default -> System.out.println("> Please enter an valid identity");
+
+            // Print error message if no valid identity entered
+            if (!identity.equals("patient") && !identity.equals("staff")) {
+                System.out.println("> Please enter an valid identity");
+            } else {
+                user = register(identity.equals("patient"));
             }
 
             // if information all valid
@@ -181,9 +183,11 @@ public class Client {
         } else {
             System.out.println("> Choose what identity you want to login as  (staff/patient)");
             String identity = input.nextLine();
-            switch (identity) {
-                case "staff" -> staff_login();
-                case "patient" -> patient_login();
+            // Print error message if no valid identity entered
+            if (!identity.equals("patient") && !identity.equals("staff")) {
+                System.out.println("> Please enter an valid identity");
+            } else {
+                login(identity.equals("patient"));
             }
         }
     }
@@ -360,8 +364,7 @@ public class Client {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private User staff_register() {
+    private User register(boolean isPatient) {
         System.out.println("> Please enter your email to register");
         String email_address = input.nextLine();
 
@@ -372,10 +375,6 @@ public class Client {
         //Note from Paris: Also make sure to do type checks and format checks
         //e.g That letters are not passed to integer fields and the date is formatted properly for
         // database storage
-        System.out.println("> Please enter your role title");
-        String role_title = input.nextLine();
-        System.out.println("> Please enter your phone number");
-        String phone_number = input.nextLine();
         System.out.println("> Please enter forename");
         String forename = input.nextLine();
         System.out.println("> Please enter your surname");
@@ -384,11 +383,21 @@ public class Client {
         String date_of_birth = input.nextLine();
         System.out.println("> Please enter your address");
         String address = input.nextLine();
-        return new Staff(forename, surname, date_of_birth, address, email_address, "staff", role_title, phone_number);
 
+        // Register patient
+        if (isPatient) {
+            return new Patient(forename, surname, date_of_birth, address, email_address, "patient");
+        } else {
+            // Register staff
+            System.out.println("> Please enter your role title");
+            String role_title = input.nextLine();
+            System.out.println("> Please enter your phone number");
+            String phone_number = input.nextLine();
+            return new Staff(forename, surname, date_of_birth, address, email_address, "staff", role_title, phone_number);
+        }
     }
 
-    private void staff_login() {
+    private void login(boolean isPatient) {
         try {
             System.out.println("> Please enter your e-mail. ");
             String email_address = input.nextLine();
@@ -410,71 +419,15 @@ public class Client {
                 String password = input.nextLine();
 
                 // Check password matches password hash in database
-                if (server.verifyPassword(password, email_address, false)) {
+                if (server.verifyPassword(password, email_address, isPatient)) {
                     System.out.println("> Logged in successfully.");
                     Authenticcondition = 1;
                     this.email_address = email_address;
-                    this.identity = "staff";
+                    this.identity = (isPatient) ? "patient" : "staff";
                 } else {
                     System.out.println("> Incorrect. Please try again.");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private User patient_register() {
-        System.out.println("> Please enter your email to register");
-        String email_address = input.nextLine();
-
-        // if the email has been used for register already then break
-        // --------------------------------------------
-        // --------------------------------------------
-        // --------------------------------------------
-        System.out.println("> Please enter forename");
-        String forename = input.nextLine();
-        System.out.println("> Please enter your surname");
-        String surname = input.nextLine();
-        System.out.println("> Please enter your date of birth in format XXXX-XX-XX");
-        String date_of_birth = input.nextLine();
-        System.out.println("> Please enter your address");
-        String address = input.nextLine();
-        return new Patient(forename, surname, date_of_birth, address, email_address, "patient");
-    }
-
-    private void patient_login() {
-        try {
-            System.out.println("> Enter your email");
-            String email_address = input.nextLine();
-            System.out.println("> Do you want to log in with an email verification code?  (Type 'y' to use OTP / type 'n' to use password)");
-            if (input.nextLine().toLowerCase().equals("y")) {
-                // Send OTP email
-                server.sendOTP(email_address);
-
-                System.out.println("> Enter your verification code");
-                Integer otp = input.nextInt();
-                // Verify that OTP matches OTP sent by server
-                if (server.verifyOTP(email_address, otp)) {
-                    System.out.println("OTP verified!");
-                } else {
-                    System.out.println("The OTP you entered does not match the one sent to your email address");
-                }
-            } else {
-                System.out.println("> Enter your password");
-                String password = input.nextLine();
-
-                // Check password matches password hash in database
-                if (server.verifyPassword(password, email_address, true)) {
-                    System.out.println("> Login successful.");
-                    Authenticcondition = 1;
-                    this.email_address = email_address;
-                    this.identity = "patient";
-                } else {
-                    System.out.println("> Incorrect. Please try again.");
-                }
-            }
-            System.out.println("> Type 'y' to confirm / 'n' to cancel log-in");
         } catch (Exception e) {
             e.printStackTrace();
         }
