@@ -1,14 +1,14 @@
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.util.Scanner;
-import java.rmi.NotBoundException;
-
 import database.Patient;
 import database.Staff;
 import database.User;
-import utility.*;
+import utility.Constants;
+import utility.PasswordHandler;
 
-import javax.mail.search.SentDateTerm;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Scanner;
 
 public class Client {
     private final String host = "localhost";
@@ -20,12 +20,30 @@ public class Client {
     private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
+    private Registry registry;
+
 
     //////////////////////////////////////////////////
     //Main Method
     public static void main(String[] args) {
         Client client = new Client();
         client.runUserInterface();
+    }
+
+    private void connectToServer() throws Exception{
+
+        System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "password");
+
+        try{
+            registry = LocateRegistry.getRegistry("localhost",1099,new SslRMIClientSocketFactory());
+            server = (ServerInterface) registry.lookup("HelloServer");
+            System.out.println("Connected");
+
+        }catch(Exception e){System.out.println(e);}
+
+
+
     }
 
     ////////////////////////////////////////////////
@@ -36,7 +54,7 @@ public class Client {
 
         try {
             // link to server
-            server = (ServerInterface) Naming.lookup("rmi://" + host + ":" + port + "/Service");
+            connectToServer();
             System.out.println("> Connected to server successfully");
 
             server.viewPatients(); //Just a test thingy
