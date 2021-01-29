@@ -30,7 +30,7 @@ public class Client {
 
     ////////////////////////////////////////////////
     //This method runs the main user interface
-    private void runUserInterface(){
+    private void runUserInterface() {
         String op = "";// record the command
         byte[] hash = null;
 
@@ -75,17 +75,11 @@ public class Client {
                 //Forgot Password command
                 else if (op.contains("forgotpw") || op.contains("forgot")) {
                     forgotPasswordCommand();
-                }
-
-                else if (op.contains("view")){
+                } else if (op.contains("view")) {
                     viewCommand();
-                }
-
-                else if(op.contains("delete")){
+                } else if (op.contains("delete")) {
                     deleteCommand();
-                }
-
-                else if (op.contains("update")){
+                } else if (op.contains("update")) {
                     updateCommand();
                 }
                 /////////////////////////////////////
@@ -108,7 +102,7 @@ public class Client {
     //////////////////////////////////////
     // Help command function
     //////////////////////////////////////
-    private void helpCommand(){
+    private void helpCommand() {
         System.out.println("> Use command 'register' if you're a new user.");
         System.out.println("> Use command 'login' if you're already registered.");
         System.out.println("> Use command 'logout' to logout.");
@@ -118,7 +112,7 @@ public class Client {
     //////////////////////////////////////
     // Register command function
     //////////////////////////////////////
-    private void registerCommand(){
+    private void registerCommand() {
         String password = null;
         if (Authenticcondition < 0) {
             System.out.println("> Choose what identity you want to register as (staff/patient)");
@@ -188,8 +182,8 @@ public class Client {
             System.out.println("> Choose what identity you want to login as  (staff/patient)");
             String identity = input.nextLine();
             switch (identity) {
-                case "staff" ->  staff_login();
-                case "patient" ->  patient_login();
+                case "staff" -> staff_login();
+                case "patient" -> patient_login();
             }
         }
     }
@@ -201,7 +195,7 @@ public class Client {
     //////////////////////////////////////
     // Logout command function
     //////////////////////////////////////
-    public void logoutCommand(){
+    public void logoutCommand() {
         if (Authenticcondition > 0) {
             Authenticcondition = -1;
         } else {
@@ -219,7 +213,7 @@ public class Client {
             String email_address = input.nextLine();
             // sent email
             try {
-                server.sendEmail(email_address);
+                server.sendOTP(email_address);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -227,6 +221,8 @@ public class Client {
             String otp = input.nextLine();
             // verify the otp
             // --------------
+
+
             while (true) {
                 System.out.println("> Please set your password");
                 System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
@@ -263,7 +259,7 @@ public class Client {
                     case "patient":
                         System.out.println("Enter a valid id to view patient information or type");
                         id = input.nextInt();
-                        if(id<=0)
+                        if (id <= 0)
                             server.viewPatients();
                         else
                             server.viewPatients(id);
@@ -271,7 +267,7 @@ public class Client {
                     case "staff":
                         System.out.println("Enter a valid id to view patient information or type");
                         id = input.nextInt();
-                        if(id<=0)
+                        if (id <= 0)
                             server.viewStaffs();
                         else
                             server.viewStaffs(id);
@@ -279,8 +275,7 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
             System.out.println("> Please log out first");
     }
 
@@ -294,26 +289,24 @@ public class Client {
                     case "patient":
                         System.out.println("Enter a valid id to view patient information or type");
                         id = input.nextInt();
-                        if(id<=0)
+                        if (id <= 0)
                             System.out.println("id invalid");
                         else
                             server.viewPatients(id);
-                            System.out.println("print y to confirm");
-                            if(input.nextLine().equals("y"))
-                            {
-                                server.deletePatients(id);
-                            }
+                        System.out.println("print y to confirm");
+                        if (input.nextLine().equals("y")) {
+                            server.deletePatients(id);
+                        }
                         break;
                     case "staff":
                         System.out.println("Enter a valid id to view patient information or type");
                         id = input.nextInt();
-                        if(id<=0)
+                        if (id <= 0)
                             System.out.println("id invalid");
                         else
                             server.viewStaffs(id);
                         System.out.println("print y to confirm");
-                        if(input.nextLine().equals("y"))
-                        {
+                        if (input.nextLine().equals("y")) {
                             server.deleteStaffs(id);
                         }
                         break;
@@ -321,8 +314,7 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
             System.out.println("> Please log out first");
     }
 
@@ -360,19 +352,9 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
             System.out.println("> Please log out first");
     }
-
-
-
-
-
-
-
-
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -412,11 +394,17 @@ public class Client {
             String email_address = input.nextLine();
             System.out.println("> Do you want to log in with an email verification code? (Type 'y' to use OTP / type 'n' to use password)");
             if (input.nextLine().toLowerCase().equals("y")) {
-                // send email:
-                server.sendEmail(email_address);
+                // Send OTP email
+                server.sendOTP(email_address);
 
                 System.out.println("> Enter your verification code");
-                String otp = input.nextLine();
+                Integer otp = input.nextInt();
+                // Verify that OTP matches OTP sent by server
+                if (server.verifyOTP(email_address, otp)) {
+                    System.out.println("OTP verified!");
+                } else {
+                    System.out.println("The OTP you entered does not match the one sent to your email address");
+                }
             } else {
                 System.out.println("> Enter your password");
                 String password = input.nextLine();
@@ -431,12 +419,9 @@ public class Client {
                     System.out.println("> Incorrect. Please try again.");
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
     private User patient_register() {
@@ -464,11 +449,17 @@ public class Client {
             String email_address = input.nextLine();
             System.out.println("> Do you want to log in with an email verification code?  (Type 'y' to use OTP / type 'n' to use password)");
             if (input.nextLine().toLowerCase().equals("y")) {
-                // send email:
-                server.sendEmail(email_address);
+                // Send OTP email
+                server.sendOTP(email_address);
 
                 System.out.println("> Enter your verification code");
-                String otp = input.nextLine();
+                Integer otp = input.nextInt();
+                // Verify that OTP matches OTP sent by server
+                if (server.verifyOTP(email_address, otp)) {
+                    System.out.println("OTP verified!");
+                } else {
+                    System.out.println("The OTP you entered does not match the one sent to your email address");
+                }
             } else {
                 System.out.println("> Enter your password");
                 String password = input.nextLine();
@@ -483,12 +474,9 @@ public class Client {
                     System.out.println("> Incorrect. Please try again.");
                 }
             }
-
             System.out.println("> Type 'y' to confirm / 'n' to cancel log-in");
-
         } catch (Exception e) {
             e.printStackTrace();
-
         }
     }
 }

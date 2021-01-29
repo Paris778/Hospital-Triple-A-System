@@ -24,11 +24,11 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void updateStaffs(int s_id,String command) throws RemoteException;
 
-    void sendEmail(String email_address) throws RemoteException;
+    void sendOTP(String email_address) throws RemoteException;
+
+    boolean verifyOTP(String email, Integer attempt) throws RemoteException;
 
     int getUserId(String emial_address,Boolean isPatient) throws  RemoteException;
-
-
 
     boolean verifyPassword(String plaintext, String email, boolean isPatient) throws RemoteException;
 }
