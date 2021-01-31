@@ -396,4 +396,119 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////
+
+    public synchronized void viewLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void viewWarningLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IS 'WARNING' ");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public synchronized void viewErrorLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IS 'ERROR' ");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public void viewErrorAndWarningLogEntries() {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IN ('WARNING','ERROR');");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
 }

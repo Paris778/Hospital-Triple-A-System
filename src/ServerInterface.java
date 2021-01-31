@@ -1,5 +1,6 @@
 import database.User;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends java.rmi.Remote {
@@ -35,4 +36,12 @@ public interface ServerInterface extends java.rmi.Remote {
     //Logger Methods
 
     abstract public void logEvent(int userId, int EVENT_ID, int appendedBy) throws RemoteException;
+
+    void viewLogEntries() throws RemoteException;
+
+    void viewLogEntriesWarnings() throws RemoteException;
+
+    void viewLogEntriesErrors() throws RemoteException;
+
+    void viewLogEntriesWarningsAndErrors() throws RemoteException;
 }

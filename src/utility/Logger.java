@@ -97,9 +97,9 @@ public class Logger {
         }
     }
 
-    //This method prints out the most recent x-amount of entries
-    public String dumpLog(int amountOfEntries){
-        return "";
+    //This method prints out log entries
+    public void dumpLog(){
+        connection.viewLogEntries();
     }
 
     //This method prints out the most recent WARNING entries

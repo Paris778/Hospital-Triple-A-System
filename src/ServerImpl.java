@@ -16,12 +16,26 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection = new DatabaseConnection();
         logger = new Logger(dbConnection);
         logger.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
-        createFakeLogWarning();
-        createFakeLogWarning();
-        createFakeLogWarning();
+        //createFakeLogWarning();
+        //createFakeLogWarning();
+        //createFakeLogWarning();
         //
-        createFakeLogError();
-        createFakeLogError();
+        //createFakeLogError();
+        //();
+
+        // Tests
+        viewLogEntries();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesWarnings();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesErrors();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesWarningsAndErrors();
+    }
+
+    @Override
+    public void viewLogEntriesWarningsAndErrors() {
+        dbConnection.viewErrorAndWarningLogEntries();
     }
 
     public void createUser(User user, String plaintext) {
@@ -40,6 +54,10 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createFakeUser();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
     public void createFakeLogWarning(){
         System.out.println("Making fake log...");
         dbConnection.createFakeLog(101,"WARNING","999999999");
@@ -49,10 +67,27 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createFakeLog(2000,"ERROR","999999999");
     }
 
+    /////////////////////////////////////////////////////////
+
     @Override
     public void logEvent(int EVENT_ID, int userId,int appendedBy) throws RemoteException {
 
         this.logger.logEvent(userId,EVENT_ID,appendedBy);
+    }
+
+    @Override
+    public void viewLogEntries() throws RemoteException {
+        this.dbConnection.viewLogEntries();
+    }
+
+    @Override
+    public void viewLogEntriesWarnings() throws RemoteException {
+        dbConnection.viewWarningLogEntries();
+    }
+
+    @Override
+    public void viewLogEntriesErrors() throws RemoteException {
+        dbConnection.viewErrorLogEntries();
     }
 
     public void viewPatients() throws RemoteException {
