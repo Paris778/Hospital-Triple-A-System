@@ -23,4 +23,29 @@ public class Constants {
     public static final String LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz"; 
     public static final String NUMBERS = "0123456789";
     //
+
+    //////////////////////////////////////////////////////////////////////////
+    //      LOGGER CONSTANTS
+    //////////////////////////////////////////////////////////////////////////
+
+    //Appended By System
+    public static final int USER_ID_SYSTEM = 999999999;
+
+    //Normal Activity 1--
+    public static final int LOG_USER_REGISTERED = 101;
+    public static final int LOG_USER_LOGGED_IN = 102;
+    public static final int LOG_USER_LOGGED_OUT = 103;
+    public static final int LOG_USER_ACCESSED_DATA = 104;
+    public static final int LOG_USER_CHANGED_PASSWORD = 105;
+    public static final int LOG_SYSTEM_ONLINE = 106;
+    //Warnings 2--
+    public static final int LOG_USER_MODIFIED_DATA = 201;
+    public static final int LOG_USER_DELETED_DATA = 202;
+    public static final int LOG_USER_ENTERED_WRONG_PASSWORD = 203;
+    public static final int LOG_USER_TIMEDOUT_WRONG_PASSWORDS = 204;
+    public static final int LOG_USER_DENIED_ACCESS = 210;
+    //Errors 3--
+    public static final int LOG_ERROR_SERVER_DOWN = 301;
+    //Unknown Activity 4--
+    public static final int LOG_UNKNOWN_EVENT = 401;
 }

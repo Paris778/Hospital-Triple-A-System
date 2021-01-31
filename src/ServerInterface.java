@@ -31,4 +31,5 @@ public interface ServerInterface extends java.rmi.Remote {
     int getUserId(String emial_address,Boolean isPatient) throws  RemoteException;
 
     boolean verifyPassword(String plaintext, String email, boolean isPatient) throws RemoteException;
+
 }

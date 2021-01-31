@@ -3,14 +3,20 @@ import java.util.HashMap;
 
 import database.DatabaseConnection;
 import database.User;
+import utility.Constants;
+import utility.Logger;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;
     private HashMap<String, Integer> otpTable = new HashMap<String, Integer>();
     private DatabaseConnection dbConnection;
+    private Logger logger;
 
     public ServerImpl() throws RemoteException {
         dbConnection = new DatabaseConnection();
+        logger = new Logger(dbConnection);
+
+        logger.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
     }
 
     public void createUser(User user, String plaintext) {

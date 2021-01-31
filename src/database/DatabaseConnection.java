@@ -286,6 +286,39 @@ public class DatabaseConnection {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // LOGGER METHODS
+    ////////////////////////////////////////////////////////////////////////////////
+
+    public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
+        //Race Condition Control
+        lock.lock();
+        //
+        try {
+            String statement = "";
+
+            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
+                    + userId + "', '"
+                    + eventType + "', '"
+                    + eventDescription + "', '"
+                    + appendedBy + "'); "
+            );
+
+            // Add to statement
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+            results.close();
+            p.close();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //Race Condition Control
+        lock.unlock();
+        //
+    }
+
 
     public DatabaseConnection() {
         try {
