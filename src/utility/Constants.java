@@ -27,6 +27,9 @@ public class Constants {
     //      LOGGER CONSTANTS
     //////////////////////////////////////////////////////////////////////////
 
+    //Appended By System
+    public static final int USER_ID_SYSTEM = 999999999;
+
     //Normal Activity 1--
     public static final int LOG_USER_REGISTERED = 101;
     public static final int LOG_USER_LOGGED_IN = 102;

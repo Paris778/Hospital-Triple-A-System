@@ -15,7 +15,13 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     public ServerImpl() throws RemoteException {
         dbConnection = new DatabaseConnection();
         logger = new Logger(dbConnection);
-        logger.logEvent(Constants.LOG_SYSTEM_ONLINE,0);
+        logger.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
+        createFakeLogWarning();
+        createFakeLogWarning();
+        createFakeLogWarning();
+        //
+        createFakeLogError();
+        createFakeLogError();
     }
 
     public void createUser(User user, String plaintext) {
@@ -23,7 +29,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         System.err.println("Creating user in database...");
         dbConnection.createUser(user, plaintext);
         try {
-            logEvent(Constants.LOG_USER_REGISTERED,user.getId());
+            logEvent(user.getId(),Constants.LOG_USER_REGISTERED,Constants.USER_ID_SYSTEM);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -34,9 +40,19 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createFakeUser();
     }
 
+    public void createFakeLogWarning(){
+        System.out.println("Making fake log...");
+        dbConnection.createFakeLog(101,"WARNING","999999999");
+    }
+    public void createFakeLogError(){
+        System.out.println("Making fake log...");
+        dbConnection.createFakeLog(2000,"ERROR","999999999");
+    }
+
     @Override
-    public void logEvent(int EVENT_ID, int userId) throws RemoteException {
-        this.logger.logEvent(EVENT_ID, userId);
+    public void logEvent(int EVENT_ID, int userId,int appendedBy) throws RemoteException {
+
+        this.logger.logEvent(userId,EVENT_ID,appendedBy);
     }
 
     public void viewPatients() throws RemoteException {

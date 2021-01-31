@@ -32,7 +32,7 @@ public interface ServerInterface extends java.rmi.Remote {
 
     boolean verifyPassword(String plaintext, String email, boolean isPatient) throws RemoteException;
 
-    //
+    //Logger Methods
 
-    abstract public void logEvent(int EVENT_ID, int userId) throws RemoteException;
+    abstract public void logEvent(int userId, int EVENT_ID, int appendedBy) throws RemoteException;
 }

@@ -1,7 +1,5 @@
 package database;
 
-import utility.Constants;
-import utility.Logger;
 import utility.PasswordHandler;
 
 import java.security.NoSuchAlgorithmException;
@@ -10,7 +8,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,7 +34,6 @@ public class DatabaseConnection {
             results.close();
             p.close();
 
-            // TODO: replace this with actual race condition prevention lol
             Thread.sleep(1000);
         } catch (SQLException | InterruptedException e) {
             e.printStackTrace();
@@ -101,13 +97,14 @@ public class DatabaseConnection {
             results = p.executeQuery();
 
             // Loop through each row and print
+            /*
             while (results.next()) {
                 int id = results.getInt("p_id");
                 String forename = results.getString("forename");
                 String surname = results.getString("surname");
                 String dob = results.getString("date_of_birth");
                 System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
-            }
+            } */
 
             results.close();
             p.close();
@@ -129,17 +126,49 @@ public class DatabaseConnection {
             FOREIGN KEY(appended_by) REFERENCES staff(employee_id));
        */
 
-    public synchronized void appendLog(int userId, String eventType, String eventDescription) {
+    public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
         //Race Condition Control
         lock.lock();
         //
         try {
             String statement = "";
 
-            statement =("INSERT INTO events (user_id, event_type, description) VALUES ('"
+            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
                     + userId + "', '"
                     + eventType + "', '"
-                    + eventDescription + "'); "
+                    + eventDescription + "', '"
+                    + appendedBy + "'); "
+            );
+
+            // Add to statement
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+            results.close();
+            p.close();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //Race Condition Control
+        lock.unlock();
+        //
+    }
+
+    //JUST FOR TESTING
+    public synchronized void createFakeLog(int userId, String eventType,String appendedBy) {
+        //Race Condition Control
+        lock.lock();
+        //
+        try {
+            String statement = "";
+            String eventDescription = "Warning Something went wrong ";
+
+            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
+                    + userId + "', '"
+                    + eventType + "', '"
+                    + eventDescription + "', '"
+                    + appendedBy + "'); "
             );
 
             // Add to statement

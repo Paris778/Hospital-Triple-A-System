@@ -15,16 +15,17 @@ public class Logger {
     //This is the main function to log events.
     // Takes in a CONSTANT for the type of event and the database.User ID if applicable
     // The logEvent method is super charged for various logging types (future thing)
-    public void logEvent(int EVENT_ID, int userId){
+    public void logEvent(int userId, int EVENT_ID, int appendedBy){
         System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
         switch (EVENT_ID){
             //
             case Constants.LOG_SYSTEM_ONLINE:
                 System.out.println("Trying to make online log");
                 connection.appendLog(
-                        00000,
+                        userId,
                         this.getEventType(EVENT_ID),
-                        "Server is online." //Event description
+                        "Server is online.", //Event description,
+                        appendedBy
                 );
                 break;
             //
@@ -32,7 +33,8 @@ public class Logger {
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has been registered." //Event description
+                        "User " + userId + " has been registered.", //Event description
+                        appendedBy
                 );
                 break;
             //
@@ -40,7 +42,8 @@ public class Logger {
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has logged in." //Event description
+                        "User " + userId + " has logged in.", //Event description
+                        appendedBy
                 );
                 break;
             //
@@ -48,7 +51,8 @@ public class Logger {
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has logged out." //Event description
+                        "User " + userId + " has logged out.", //Event description
+                        appendedBy
                 );
                 break;
             //////////////////////////////////////////////////////////
@@ -58,7 +62,8 @@ public class Logger {
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has been granted access to view data." //Event description
+                        "User " + userId + " has been granted access to view data.", //Event description
+                        appendedBy
                 );
                 break;
             case Constants.LOG_USER_MODIFIED_DATA:
@@ -69,21 +74,24 @@ public class Logger {
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has changed their password." //Event description
+                        "User " + userId + " has changed their password.", //Event description
+                        appendedBy
                 );
                 break;
             case Constants.LOG_USER_ENTERED_WRONG_PASSWORD:
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has entered the wrong password." //Event description
+                        "User " + userId + " has entered the wrong password.", //Event description
+                        appendedBy
                 );
                 break;
             case Constants.LOG_USER_TIMEDOUT_WRONG_PASSWORDS:
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
-                        "User " + userId + " has been timed out due to repeated wrong password." //Event description
+                        "User " + userId + " has been timed out due to repeated wrong password.", //Event description
+                        appendedBy
                 );
                 break;
         }
