@@ -1,7 +1,6 @@
 package database;
 
 import utility.PasswordHandler;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,26 +13,50 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DatabaseConnection {
     private static final String JDBC_DRIVER = "org.sqlite.JDBC";
     private static final String DATABASE_LOCATION = "jdbc:sqlite:";
-    private static String dbName = "database.db";
+    private static String dbName = "new-database.db";
     private static Connection con = null;
     private static PreparedStatement p = null;
     private static ResultSet results = null;
     private PasswordHandler passwordHandler = new PasswordHandler();
     private Lock lock = new ReentrantLock();
 
-    public void createFakeUser() {
+    public synchronized void createUser(User user, String plaintext) {
         //Race condition control
         lock.lock();
         try {
-            // Add user to database
-            String statement = "INSERT INTO patients(forename, surname, date_of_birth, address, email) VALUES ('test', 'test', '2000-01-01', 'china', 'g@gmail.com');";
-            p = con.prepareStatement(statement);
+            // Hash and salt user password
+            String salt = passwordHandler.generateSalt();
+            String hashedPassword = passwordHandler.hashPassword(plaintext, salt.getBytes());
+
+            // TODO: add roles
+
+            // Add password and email to users table
+            String statement = "INSERT INTO users(email, password_hash, password_salt) VALUES ('" +
+                    user.getEmail() + "', '" + hashedPassword + "', '" + salt + "');";
+            p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
             p.executeUpdate();
 
-            results.close();
-            p.close();
+            // Return user id to add foreign key reference in staff/patient table
+            int userId = -1;
+            ResultSet results = p.getGeneratedKeys();
+            if (results.next()) {
+                userId = results.getInt(1);
+            }
 
-        } catch (SQLException e) {
+            // Check if user is patient or staff and add to corresponding table
+            if (user instanceof Patient) {
+                statement = "INSERT INTO patients(u_id, forenames, surname, date_of_birth, address) VALUES ('" +
+                        userId + "', '" + user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "'); ";
+                System.out.println(statement);
+            } else {
+                statement = "INSERT INTO staff(u_id, forenames, surname, date_of_birth, address, job_title, phone_number) VALUES ('" +
+                        userId + "', '" + user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
+                        user.getAddress() + "', '" + ((Staff) user).getrole_title() + "', '" + ((Staff) user).getphone_number() + "'); ";
+            }
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+        } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
@@ -41,74 +64,21 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void createUser(User user, String plaintext) {
-        //Race condition control
-        lock.lock();
-        try {
-            String statement = "";
-            // Check if user is patient or staff
-            if (user instanceof Patient) {
-                statement = "INSERT INTO patients (forename, surname, date_of_birth, address, email) VALUES ('" +
-                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                        user.getAddress() + "', '" + user.getEmail() + "'); ";
-            } else {
-                statement = "INSERT INTO staff (forename, surname, date_of_birth, address, email, role_title, phone_number) VALUES ('" +
-                        user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                        user.getAddress() + "', '" + user.getEmail() + "', '" + ((Staff) user).getrole_title() + "', '" + ((Staff) user).getphone_number() + "'); ";
-            }
-
-            // Add user to statement
-            p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
-            p.executeUpdate();
-
-            // Return row ID to add foreign key in passwords table
-            int userId = -1;
-            ResultSet results = p.getGeneratedKeys();
-            if (results.next()) {
-                userId = results.getInt(1);
-            }
-
-            // Hash and salt user password
-            String salt = passwordHandler.generateSalt();
-            String hashedPassword = passwordHandler.hashPassword(plaintext, salt.getBytes());
-
-            // Add the user's password
-            if (user instanceof Patient) {
-                statement = "INSERT INTO patient_passwords(hashed_value, salt, user_id) VALUES ('" + hashedPassword + "', '" + salt + "', '" + userId + "');";
-            } else {
-                statement = "INSERT INTO staff_passwords(hashed_value, salt, user_id) VALUES ('" + hashedPassword + "', '" + salt + "', '" + userId + "');";
-            }
-
-            p = con.prepareStatement(statement);
-            p.executeUpdate();
-
-        } catch (SQLException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }  finally {
-            //Race condition control
-            lock.unlock();
-        }
-    }
-
-    public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
+    public boolean verifyPassword(String plaintext, String email) {
         //Race condition control
         lock.lock();
         try {
             // Get user id that corresponds to the email
-            int id = getUserId(email, isPatient);
+            int id = getUserId(email);
 
             // Prepare SQL query
-            if (isPatient) {
-                p = con.prepareStatement("SELECT hashed_value, salt FROM patient_passwords WHERE user_id=" + id + ";");
-            } else {
-                p = con.prepareStatement("SELECT hashed_value, salt FROM staff_passwords WHERE user_id=" + id + ";");
-            }
+            p = con.prepareStatement("SELECT password_hash, password_salt FROM users WHERE u_id=" + id + ";");
 
             // Get correct password hash and salt for that user
             results = p.executeQuery();
             while (results.next()) {
-                String passwordHash = results.getString("hashed_value");
-                String salt = results.getString("salt");
+                String passwordHash = results.getString("password_hash");
+                String salt = results.getString("password_salt");
 
                 // Hash password attempt using the correct salt
                 String attemptHash = passwordHandler.hashPassword(plaintext, salt.getBytes());
@@ -121,65 +91,54 @@ public class DatabaseConnection {
             }
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }  finally {
+        } finally {
             //Race condition control
             lock.unlock();
         }
         return false;
     }
 
-    public synchronized int getUserId(String email, boolean isPatient) {
+    public synchronized int getUserId(String email) {
         //Race condition control
         lock.lock();
         try {
             // Get user id that corresponds to the email
-            int id;
-            if (isPatient) {
-                p = con.prepareStatement("SELECT p_id FROM patients WHERE email='" + email + "';");
-                results = p.executeQuery();
-                System.out.println("database.Patient id: " + results.getInt(1));
-                id = results.getInt("p_id");
-            } else {
-                p = con.prepareStatement("SELECT s_id FROM staff WHERE email='" + email + "';");
-                results = p.executeQuery();
-                System.out.println("database.Staff id: " + results.getInt(1));
-                id = results.getInt(1);
-            }
-            return id;
+            p = con.prepareStatement("SELECT u_id FROM users WHERE email='" + email + "';");
+            results = p.executeQuery();
+            return results.getInt("u_id");
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
-        }  finally {
+        } finally {
             //Race condition control
             lock.unlock();
         }
     }
+
     //overload to give default parameters
-    public void viewPatients()
-    {
+    public void viewPatients() {
         viewPatients(-1);
     }
 
-    public synchronized void viewPatients(int p_id) {
+    public synchronized void viewPatients(int u_id) {
         //Race condition control
         lock.lock();
         try {
             // Execute SQL query
-            if(p_id==-1)
+            if (u_id == -1)
                 p = con.prepareStatement("SELECT * FROM patients");
             else
-                p = con.prepareStatement("SELECT * FROM patients WHERE p_id = "+ p_id);
+                p = con.prepareStatement("SELECT * FROM patients WHERE u_id = " + u_id);
             results = p.executeQuery();
 
             // Loop through each row and print
             while (results.next()) {
-                int id = results.getInt("p_id");
-                String forename = results.getString("forename");
+                int id = results.getInt("u_id");
+                String forename = results.getString("forenames");
                 String surname = results.getString("surname");
                 String dob = results.getString("date_of_birth");
                 System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -187,31 +146,32 @@ public class DatabaseConnection {
             lock.unlock();
         }
     }
+
     //overload to give default parameters
-    public void viewStaffs()
-    {
+    public void viewStaffs() {
         viewStaffs(-1);
     }
-    public synchronized void viewStaffs(int s_id) {
+
+    public synchronized void viewStaffs(int u_id) {
         //Race condition control
         lock.lock();
         try {
             // Execute SQL query
-            if(s_id==-1)
-                p = con.prepareStatement("SELECT * FROM staffs");
+            if (u_id == -1)
+                p = con.prepareStatement("SELECT * FROM staff");
             else
-                p = con.prepareStatement("SELECT * FROM staffs WHERE s_id = "+ s_id);
+                p = con.prepareStatement("SELECT * FROM staff WHERE u_id = " + u_id);
 
             results = p.executeQuery();
 
             // Loop through each row and print
             while (results.next()) {
-                int id = results.getInt("s_id");
-                String forename = results.getString("forename");
+                int id = results.getInt("u_id");
+                String forename = results.getString("forenames");
                 String surname = results.getString("surname");
                 String dob = results.getString("date_of_birth");
-                String role_title = results.getString("role_title");
-                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob+"\t\t"+role_title);
+                String job_title = results.getString("job_title");
+                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob + "\t\t" + job_title);
             }
 
         } catch (SQLException e) {
@@ -222,12 +182,12 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void deletePatients(int p_id) {
+    public synchronized void deletePatients(int u_id) {
         lock.lock();
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("DELETE FROM patients WHERE p_id = " + p_id);
+            p = con.prepareStatement("DELETE FROM patients WHERE u_id = " + u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -238,12 +198,12 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void deleteStaffs(int s_id) {
+    public synchronized void deleteStaffs(int u_id) {
         lock.lock();
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("DELETE FROM staffs WHERE s_id = " + s_id);
+            p = con.prepareStatement("DELETE FROM staff WHERE u_id = " + u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -254,12 +214,12 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void updatePatients(int p_id,String command) {
+    public synchronized void updatePatients(int u_id, String command) {
         lock.lock();
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("UPDATE patients SET "+command+" WHERE p_id = " + p_id);
+            p = con.prepareStatement("UPDATE patients SET " + command + " WHERE u_id = " + u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -270,12 +230,12 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void updateStaffs(int s_id,String command) {
+    public synchronized void updateStaffs(int u_id, String command) {
         lock.lock();
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("UPDATE patients SET "+command+" WHERE s_id = " + s_id);
+            p = con.prepareStatement("UPDATE patients SET " + command + " WHERE u_id = " + u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {

@@ -24,11 +24,6 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createUser(user, plaintext);
     }
 
-    public void createFakeUser() {
-        System.out.println("Creating user in database...");
-        dbConnection.createFakeUser();
-    }
-
     public void viewPatients() throws RemoteException {
         dbConnection.viewPatients(-1);
     }
@@ -67,8 +62,8 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public boolean verifyPassword(String plaintext, String email, boolean isPatient) {
-        return dbConnection.verifyPassword(plaintext, email, isPatient);
+    public boolean verifyPassword(String plaintext, String email) {
+        return dbConnection.verifyPassword(plaintext, email);
     }
 
     public void sendOTP(String email_address) {
@@ -81,7 +76,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public int getUserId(String email_address, Boolean isPatient) throws RemoteException {
-        return dbConnection.getUserId(email_address, isPatient);
+    public int getUserId(String email_address) {
+        return dbConnection.getUserId(email_address);
     }
 }

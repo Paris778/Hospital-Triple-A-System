@@ -275,7 +275,7 @@ public class Client {
                 int id;
                 switch (temp) {
                     case "myprofile":
-                        id = server.getUserId(email_address, identity.equals("patient"));
+                        id = server.getUserId(email_address);
                         server.viewPatients(id);
                         break;
                     case "patient":
@@ -437,7 +437,7 @@ public class Client {
                 String password = input.nextLine();
 
                 // Check password matches password hash in database
-                if (server.verifyPassword(password, email_address, isPatient)) {
+                if (server.verifyPassword(password, email_address)) {
                     System.out.println("> Logged in successfully.");
                     Authenticcondition = 1;
                     this.email_address = email_address;
