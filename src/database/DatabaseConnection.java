@@ -1,6 +1,7 @@
 package database;
 
 import utility.PasswordHandler;
+
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,6 +20,22 @@ public class DatabaseConnection {
     private static ResultSet results = null;
     private PasswordHandler passwordHandler = new PasswordHandler();
     private Lock lock = new ReentrantLock();
+
+    public boolean checkEmailAvailable(String email) {
+        lock.lock();
+        try {
+            p = con.prepareStatement("SELECT * FROM users WHERE email='" + email + "'");
+            results = p.executeQuery();
+
+            // Returns false if email is already assigned to a user, else true
+            return (!results.next());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return true;
+    }
 
     public synchronized void createUser(User user, String plaintext) {
         //Race condition control
@@ -257,7 +274,7 @@ public class DatabaseConnection {
         try {
             String statement = "";
 
-            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
+            statement = ("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
                     + userId + "', '"
                     + eventType + "', '"
                     + eventDescription + "', '"

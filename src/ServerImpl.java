@@ -79,4 +79,8 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     public int getUserId(String email_address) {
         return dbConnection.getUserId(email_address);
     }
+
+    public boolean checkEmailAvailable(String email) {
+        return dbConnection.checkEmailAvailable(email);
+    }
 }

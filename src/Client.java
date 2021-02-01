@@ -30,20 +30,18 @@ public class Client {
         client.runUserInterface();
     }
 
-    private void connectToServer() throws Exception{
+    private void connectToServer() throws Exception {
 
         System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
 
-        try{
-            registry = LocateRegistry.getRegistry("localhost",1099,new SslRMIClientSocketFactory());
+        try {
+            registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
             server = (ServerInterface) registry.lookup("HelloServer");
             System.out.println("Connected");
-
-        }catch(Exception e){System.out.println(e);}
-
-
-
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     ////////////////////////////////////////////////
@@ -383,36 +381,45 @@ public class Client {
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
     private User register(boolean isPatient) {
-        System.out.println("> Please enter your email to register");
-        String email_address = input.nextLine();
+        User user = null;
+        try {
+            System.out.println("> Please enter your email to register");
+            String email_address = input.nextLine();
 
-        // if the email has been used for register already then break
-        // --------------------------------------------
-        // --------------------------------------------
-        // --------------------------------------------
-        //Note from Paris: Also make sure to do type checks and format checks
-        //e.g That letters are not passed to integer fields and the date is formatted properly for
-        // database storage
-        System.out.println("> Please enter forename");
-        String forename = input.nextLine();
-        System.out.println("> Please enter your surname");
-        String surname = input.nextLine();
-        System.out.println("> Please enter your date of birth in format XXXX-XX-XX");
-        String date_of_birth = input.nextLine();
-        System.out.println("> Please enter your address");
-        String address = input.nextLine();
+            // if the email has been used for register already then break
+            boolean emailAvailable = server.checkEmailAvailable(email_address);
+            if(!emailAvailable) {
+                System.out.println("This email has already been used to register another user. Please try again.");
+                return null;
+            }
 
-        // Register patient
-        if (isPatient) {
-            return new Patient(forename, surname, date_of_birth, address, email_address, "patient");
-        } else {
-            // Register staff
-            System.out.println("> Please enter your role title");
-            String role_title = input.nextLine();
-            System.out.println("> Please enter your phone number");
-            String phone_number = input.nextLine();
-            return new Staff(forename, surname, date_of_birth, address, email_address, "staff", role_title, phone_number);
+            //Note from Paris: Also make sure to do type checks and format checks
+            //e.g That letters are not passed to integer fields and the date is formatted properly for
+            // database storage
+            System.out.println("> Please enter forename");
+            String forename = input.nextLine();
+            System.out.println("> Please enter your surname");
+            String surname = input.nextLine();
+            System.out.println("> Please enter your date of birth in format XXXX-XX-XX");
+            String date_of_birth = input.nextLine();
+            System.out.println("> Please enter your address");
+            String address = input.nextLine();
+
+            // Register patient
+            if (isPatient) {
+                user = new Patient(forename, surname, date_of_birth, address, email_address, "patient");
+            } else {
+                // Register staff
+                System.out.println("> Please enter your role title");
+                String role_title = input.nextLine();
+                System.out.println("> Please enter your phone number");
+                String phone_number = input.nextLine();
+                user = new Staff(forename, surname, date_of_birth, address, email_address, "staff", role_title, phone_number);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
+        return user;
     }
 
     private void login(boolean isPatient) {
