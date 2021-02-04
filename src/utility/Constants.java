@@ -22,7 +22,8 @@ public class Constants {
     public static final String CAPITAL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
     public static final String LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz"; 
     public static final String NUMBERS = "0123456789";
-    //
+    //INPUT CHECK
+    private static final String CONTAIN_DIGIT_REGEX = ".*[0-9].*";
 
     //////////////////////////////////////////////////////////////////////////
     //      LOGGER CONSTANTS
@@ -30,6 +31,8 @@ public class Constants {
 
     //Appended By System
     public static final int USER_ID_SYSTEM = 999999999;
+    //Role
+    public static final String[] ROLE_LIST = new String[]{"patient","staff","regulator","admin"};
 
     //Normal Activity 1--
     public static final int LOG_USER_REGISTERED = 101;

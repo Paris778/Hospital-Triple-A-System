@@ -38,6 +38,31 @@ public class DatabaseConnection {
         return true;
     }
 
+    public boolean checkPrivilege(String email,String request)
+    {
+        lock.lock();
+        try {
+            p = con.prepareStatement("SELECT * FROM users WHERE email= ? ");
+            p.setString(1, email);
+            results = p.executeQuery();
+            String role = results.getString("roles");
+            p = con.prepareStatement("SELECT * FROM roles WHERE role_name = ? ");
+            p.setString(1, role);
+            results = p.executeQuery();
+            if(results.getInt(request)==1)
+                return true;
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return false;
+
+    }
+
     public synchronized void createUser(User user, String plaintext) {
         //Race condition control
         lock.lock();
