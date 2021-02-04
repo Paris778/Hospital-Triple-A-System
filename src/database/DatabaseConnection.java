@@ -24,7 +24,8 @@ public class DatabaseConnection {
     public boolean checkEmailAvailable(String email) {
         lock.lock();
         try {
-            p = con.prepareStatement("SELECT * FROM users WHERE email='" + email + "'");
+            p = con.prepareStatement("SELECT * FROM users WHERE email= ? ");
+            p.setString(1, email);
             results = p.executeQuery();
 
             // Returns false if email is already assigned to a user, else true
@@ -48,9 +49,11 @@ public class DatabaseConnection {
             // TODO: add roles
 
             // Add password and email to users table
-            String statement = "INSERT INTO users(email, password_hash, password_salt) VALUES ('" +
-                    user.getEmail() + "', '" + hashedPassword + "', '" + salt + "');";
+            String statement = "INSERT INTO users(email, password_hash, password_salt) VALUES (?, ?, ?);";
             p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+            p.setString(1, user.getEmail());
+            p.setString(2, hashedPassword);
+            p.setString(3, salt);
             p.executeUpdate();
 
             // Return user id to add foreign key reference in staff/patient table
@@ -62,16 +65,22 @@ public class DatabaseConnection {
 
             // Check if user is patient or staff and add to corresponding table
             if (user instanceof Patient) {
-                statement = "INSERT INTO patients(u_id, forenames, surname, date_of_birth, address) VALUES ('" +
-                        userId + "', '" + user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                        user.getAddress() + "'); ";
-                System.out.println(statement);
+                p = con.prepareStatement("INSERT INTO patients(u_id, forenames, surname, date_of_birth, address) VALUES (?, ?, ?, ?, ?)");
+                p.setInt(1, userId);
+                p.setString(2, user.getForenames());
+                p.setString(3, user.getSurnames());
+                p.setString(4, user.getDoB());
+                p.setString(5, user.getAddress());
             } else {
-                statement = "INSERT INTO staff(u_id, forenames, surname, date_of_birth, address, job_title, phone_number) VALUES ('" +
-                        userId + "', '" + user.getForenames() + "', '" + user.getSurnames() + "', '" + user.getDoB() + "', '" +
-                        user.getAddress() + "', '" + ((Staff) user).getrole_title() + "', '" + ((Staff) user).getphone_number() + "'); ";
+                p = con.prepareStatement("INSERT INTO staff(u_id, forenames, surname, date_of_birth, address, job_title, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                p.setInt(1, userId);
+                p.setString(2, user.getForenames());
+                p.setString(3, user.getSurnames());
+                p.setString(4, user.getDoB());
+                p.setString(5, user.getAddress());
+                p.setString(6, ((Staff) user).getrole_title());
+                p.setString(7, ((Staff) user).getphone_number());
             }
-            p = con.prepareStatement(statement);
             p.executeUpdate();
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -89,7 +98,8 @@ public class DatabaseConnection {
             int id = getUserId(email);
 
             // Prepare SQL query
-            p = con.prepareStatement("SELECT password_hash, password_salt FROM users WHERE u_id=" + id + ";");
+            p = con.prepareStatement("SELECT password_hash, password_salt FROM users WHERE u_id= ?");
+            p.setInt(1, id);
 
             // Get correct password hash and salt for that user
             results = p.executeQuery();
@@ -120,7 +130,8 @@ public class DatabaseConnection {
         lock.lock();
         try {
             // Get user id that corresponds to the email
-            p = con.prepareStatement("SELECT u_id FROM users WHERE email='" + email + "';");
+            p = con.prepareStatement("SELECT u_id FROM users WHERE email= ?");
+            p.setString(1, email);
             results = p.executeQuery();
             return results.getInt("u_id");
         } catch (SQLException e) {
@@ -142,10 +153,12 @@ public class DatabaseConnection {
         lock.lock();
         try {
             // Execute SQL query
-            if (u_id == -1)
+            if (u_id == -1) {
                 p = con.prepareStatement("SELECT * FROM patients");
-            else
-                p = con.prepareStatement("SELECT * FROM patients WHERE u_id = " + u_id);
+            } else {
+                p = con.prepareStatement("SELECT * FROM patients WHERE u_id = ?");
+                p.setInt(1, u_id);
+            }
             results = p.executeQuery();
 
             // Loop through each row and print
@@ -174,10 +187,12 @@ public class DatabaseConnection {
         lock.lock();
         try {
             // Execute SQL query
-            if (u_id == -1)
+            if (u_id == -1) {
                 p = con.prepareStatement("SELECT * FROM staff");
-            else
-                p = con.prepareStatement("SELECT * FROM staff WHERE u_id = " + u_id);
+            } else {
+                p = con.prepareStatement("SELECT * FROM staff WHERE u_id = ?");
+                p.setInt(1, u_id);
+            }
 
             results = p.executeQuery();
 
@@ -204,7 +219,8 @@ public class DatabaseConnection {
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("DELETE FROM patients WHERE u_id = " + u_id);
+            p = con.prepareStatement("DELETE FROM patients WHERE u_id = ?");
+            p.setInt(1, u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -220,7 +236,8 @@ public class DatabaseConnection {
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("DELETE FROM staff WHERE u_id = " + u_id);
+            p = con.prepareStatement("DELETE FROM staff WHERE u_id = ?");
+            p.setInt(1, u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -236,9 +253,10 @@ public class DatabaseConnection {
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("UPDATE patients SET " + command + " WHERE u_id = " + u_id);
+            p = con.prepareStatement("UPDATE patients SET ? WHERE u_id = ?");
+            p.setString(1, command);
+            p.setInt(2, u_id);
             results = p.executeQuery();
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -252,7 +270,9 @@ public class DatabaseConnection {
 
         try {
             // Execute SQL query
-            p = con.prepareStatement("UPDATE patients SET " + command + " WHERE u_id = " + u_id);
+            p = con.prepareStatement("UPDATE patients SET ? WHERE u_id = ?");
+            p.setString(1, command);
+            p.setInt(2, u_id);
             results = p.executeQuery();
 
         } catch (SQLException e) {
@@ -270,19 +290,16 @@ public class DatabaseConnection {
     public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
         //Race Condition Control
         lock.lock();
-        //
         try {
-            String statement = "";
-
-            statement = ("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
-                    + userId + "', '"
-                    + eventType + "', '"
-                    + eventDescription + "', '"
-                    + appendedBy + "'); "
-            );
-
-            // Add to statement
+            String statement = "INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES (?, ?, ?, ?)";
             p = con.prepareStatement(statement);
+
+            // Insert values
+            p.setInt(1, userId);
+            p.setString(2, eventType);
+            p.setString(3, eventDescription);
+            p.setInt(4, appendedBy);
+
             p.executeUpdate();
             results.close();
             p.close();
