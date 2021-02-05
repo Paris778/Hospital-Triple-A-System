@@ -63,7 +63,7 @@ public class DatabaseConnection {
 
     }
 
-    public synchronized void createUser(User user, String plaintext) {
+    public void createUser(User user, String plaintext) {
         //Race condition control
         lock.lock();
         try {
@@ -150,7 +150,7 @@ public class DatabaseConnection {
         return false;
     }
 
-    public synchronized int getUserId(String email) {
+    public int getUserId(String email) {
         //Race condition control
         lock.lock();
         try {
@@ -173,7 +173,7 @@ public class DatabaseConnection {
         viewPatients(-1);
     }
 
-    public synchronized void viewPatients(int u_id) {
+    public void viewPatients(int u_id) {
         //Race condition control
         lock.lock();
         try {
@@ -207,7 +207,7 @@ public class DatabaseConnection {
         viewStaffs(-1);
     }
 
-    public synchronized void viewStaffs(int u_id) {
+    public void viewStaffs(int u_id) {
         //Race condition control
         lock.lock();
         try {
@@ -239,7 +239,7 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void deletePatients(int u_id) {
+    public void deletePatients(int u_id) {
         lock.lock();
 
         try {
@@ -256,7 +256,7 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void deleteStaffs(int u_id) {
+    public void deleteStaffs(int u_id) {
         lock.lock();
 
         try {
@@ -273,7 +273,7 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void updatePatients(int u_id, String command) {
+    public void updatePatients(int u_id, String command) {
         lock.lock();
 
         try {
@@ -290,7 +290,7 @@ public class DatabaseConnection {
         }
     }
 
-    public synchronized void updateStaffs(int u_id, String command) {
+    public void updateStaffs(int u_id, String command) {
         lock.lock();
 
         try {
@@ -312,7 +312,7 @@ public class DatabaseConnection {
     // LOGGER METHODS
     ////////////////////////////////////////////////////////////////////////////////
 
-    public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
+    public void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
         //Race Condition Control
         lock.lock();
         try {
