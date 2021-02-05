@@ -19,6 +19,10 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         logger.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
     }
 
+    public boolean checkPermissions(String email, String request) {
+        return dbConnection.checkPermissions(email, request);
+    }
+
     public void createUser(User user, String plaintext) {
         System.out.println("Creating user in database...");
         dbConnection.createUser(user, plaintext);

@@ -199,16 +199,15 @@ public class Client {
         } else {
             System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
             String identity = input.nextLine();
-            int index = -1 ;
+            int index = -1;
             // Print error message if no valid identity entered
-            for(int i = 0;i<Constants.ROLE_LIST.length;i++)
-            {
-                if(identity.equals(Constants.ROLE_LIST[i])){
-                    index =i;
+            for (int i = 0; i < Constants.ROLE_LIST.length; i++) {
+                if (identity.equals(Constants.ROLE_LIST[i])) {
+                    index = i;
                     break;
                 }
             }
-            if (index==-1) {
+            if (index == -1) {
                 System.out.println("> Please enter an valid identity");
             } else {
                 ////////////////////////////////////////
@@ -352,32 +351,47 @@ public class Client {
     public void updateCommand() {
         if (Authenticcondition > 0) {
             try {
-                System.out.println("What kind of user data do you want to delete? patient/staff");
+
+                System.out.println("What kind of user data do you want to update? patient/staff");
                 String temp = input.nextLine();
                 int id;
                 String command;
                 switch (temp) {
                     case "patient" -> {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewPatients(id);
-                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
-                        command = input.nextLine();
-                        server.updatePatients(id, command);
+                        // Check user has correct permissions before allowing update
+                        if (server.checkPermissions(email_address, "update_patient")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            // TODO: check if ID exists in database
+                            if (id <= 0)
+                                System.out.println("id invalid");
+                            else {
+                                server.viewPatients(id);
+                                System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                                command = input.nextLine();
+                                server.updatePatients(id, command);
+                            }
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
+                        }
                     }
                     case "staff" -> {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewStaffs(id);
-                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
-                        command = input.nextLine();
-                        server.updateStaffs(id, command);
+                        // Check user has correct permissions before allowing update
+                        if (server.checkPermissions(email_address, "update_staff")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            // TODO: check if ID exists in database
+                            if (id <= 0)
+                                System.out.println("id invalid");
+                            else {
+                                server.viewStaffs(id);
+                                System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                                command = input.nextLine();
+                                server.updateStaffs(id, command);
+                            }
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
+                        }
                     }
                 }
             } catch (RemoteException e) {
@@ -399,7 +413,7 @@ public class Client {
 
             // if the email has been used for register already then break
             boolean emailAvailable = server.checkEmailAvailable(email_address);
-            if(!emailAvailable) {
+            if (!emailAvailable) {
                 System.out.println("This email has already been used to register another user. Please try again.");
                 return null;
             }
@@ -421,11 +435,11 @@ public class Client {
                 user = new Patient(forename, surname, date_of_birth, address, email_address, "patient");
             } else {
                 // Register staff
-                System.out.println("> Please enter your role title");
-                String role_title = input.nextLine();
+                System.out.println("> Please enter your sector (clinical or admin)");
+                String sector = input.nextLine();
                 System.out.println("> Please enter your phone number");
                 String phone_number = input.nextLine();
-                user = new Staff(forename, surname, date_of_birth, address, email_address, "staff", role_title, phone_number);
+                user = new Staff(forename, surname, date_of_birth, address, email_address, "staff", sector, phone_number);
             }
         } catch (RemoteException e) {
             e.printStackTrace();

@@ -38,8 +38,7 @@ public class DatabaseConnection {
         return true;
     }
 
-    public boolean checkPrivilege(String email,String request)
-    {
+    public boolean checkPermissions(String email, String request) {
         lock.lock();
         try {
             p = con.prepareStatement("SELECT * FROM users WHERE email= ? ");
@@ -49,18 +48,15 @@ public class DatabaseConnection {
             p = con.prepareStatement("SELECT * FROM roles WHERE role_name = ? ");
             p.setString(1, role);
             results = p.executeQuery();
-            if(results.getInt(request)==1)
-                return true;
-
-
-
+            if (results.next()) {
+                return results.getInt(request) == 1;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             lock.unlock();
         }
         return false;
-
     }
 
     public void createUser(User user, String plaintext) {
@@ -74,11 +70,21 @@ public class DatabaseConnection {
             // TODO: add roles
 
             // Add password and email to users table
-            String statement = "INSERT INTO users(email, password_hash, password_salt) VALUES (?, ?, ?);";
+            String statement = "INSERT INTO users(email, password_hash, password_salt, roles) VALUES (?, ?, ?, ?);";
             p = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
             p.setString(1, user.getEmail());
             p.setString(2, hashedPassword);
             p.setString(3, salt);
+            if (user instanceof Patient) {
+                p.setString(4, "patient");
+            } else {
+                // Check if clinical or admin staff
+                if (((Staff) user).getSector().equals("clinical")) {
+                    p.setString(4, "clinical_staff");
+                } else {
+                    p.setString(4, "admin_staff");
+                }
+            }
             p.executeUpdate();
 
             // Return user id to add foreign key reference in staff/patient table
@@ -97,13 +103,13 @@ public class DatabaseConnection {
                 p.setString(4, user.getDoB());
                 p.setString(5, user.getAddress());
             } else {
-                p = con.prepareStatement("INSERT INTO staff(u_id, forenames, surname, date_of_birth, address, job_title, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                p = con.prepareStatement("INSERT INTO staff(u_id, forenames, surname, date_of_birth, address, sector, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 p.setInt(1, userId);
                 p.setString(2, user.getForenames());
                 p.setString(3, user.getSurnames());
                 p.setString(4, user.getDoB());
                 p.setString(5, user.getAddress());
-                p.setString(6, ((Staff) user).getrole_title());
+                p.setString(6, ((Staff) user).getSector());
                 p.setString(7, ((Staff) user).getphone_number());
             }
             p.executeUpdate();

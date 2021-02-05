@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 public interface ServerInterface extends java.rmi.Remote {
 
+    boolean checkPermissions(String email, String request) throws RemoteException;
+
     void createUser(User user, String password) throws RemoteException;
 
     void viewPatients() throws RemoteException;

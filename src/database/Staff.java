@@ -3,22 +3,17 @@ package database;
 import java.io.Serializable;
 
 public class Staff extends UserImpl implements User, Serializable {
-    private String role_title;
+    private String sector;
     private String phone_number;
 
-    public Staff(String forenames, String surnames, String date_of_birth, String address, String email_address, String identity, String role_title, String phone_number) {
+    public Staff(String forenames, String surnames, String date_of_birth, String address, String email_address, String identity, String sector, String phone_number) {
         super(forenames, surnames, date_of_birth, address, email_address, identity);
-        this.role_title = role_title;
+        this.sector = sector;
         this.phone_number = phone_number;
-
     }
 
-    public String getrole_title() {
-        return role_title;
-    }
-
-    public void setrole_title(String role_title) {
-        this.role_title = role_title;
+    public String getSector() {
+        return sector;
     }
 
     public String getphone_number() {
