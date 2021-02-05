@@ -17,6 +17,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         logger = new Logger(dbConnection);
         logger.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
         //createFakeLogWarning();
+        //();
         //createFakeLogWarning();
         //createFakeLogWarning();
         //
@@ -31,11 +32,20 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         viewLogEntriesErrors();
         System.out.println("\n\n\n\n=======================================================\n\n");
         viewLogEntriesWarningsAndErrors();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        printUserResponsibility();
+
     }
 
     @Override
     public void viewLogEntriesWarningsAndErrors() {
-        dbConnection.viewErrorAndWarningLogEntries();
+        dbConnection.viewErrorAndWarningLogEntries(true);
+    }
+
+
+    @Override
+    public void printUserResponsibility() {
+        Logger.printMap(dbConnection.viewErrorAndWarningLogEntries(false));
     }
 
     public void createUser(User user, String plaintext) {

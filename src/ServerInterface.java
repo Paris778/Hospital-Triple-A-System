@@ -44,4 +44,6 @@ public interface ServerInterface extends java.rmi.Remote {
     void viewLogEntriesErrors() throws RemoteException;
 
     void viewLogEntriesWarningsAndErrors() throws RemoteException;
+
+    void printUserResponsibility() throws RemoteException;
 }

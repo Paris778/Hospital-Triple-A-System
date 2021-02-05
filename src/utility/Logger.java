@@ -2,6 +2,10 @@ package utility;
 
 import database.DatabaseConnection;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+
 public class Logger {
 
     private DatabaseConnection connection;
@@ -9,6 +13,18 @@ public class Logger {
     public Logger(DatabaseConnection connection){
 
         this.connection = connection;
+    }
+
+    public static void printMap(LinkedHashMap<String, LinkedList<Integer>> map) {
+        System.out.println("LOGGER: Trying to print map");
+        int i = 1;
+        System.out.println("\n------------------------------------------------------------------------------------------------------------------");
+        for(String user : map.keySet()){
+            //System.out.println(map.get(user).get(0),map.get(user).get(1));
+            System.out.println(String.format("%3d .  |   USER ID: %-20s |   WARNINGS: %3d  |   ERRORS: %3d   |",i,user,map.get(user).get(0),map.get(user).get(1)));
+            i++;
+        }
+        System.out.println("------------------------------------------------------------------------------------------------------------------\n");
     }
 
 
