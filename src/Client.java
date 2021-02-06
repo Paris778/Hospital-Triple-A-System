@@ -317,27 +317,35 @@ public class Client {
                 int id;
                 switch (temp) {
                     case "patient":
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewPatients(id);
-                        System.out.println("print y to confirm");
-                        if (input.nextLine().equals("y")) {
-                            server.deletePatients(id);
+                        if (server.checkPermissions(email_address, "delete_patient")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            if (id <= 0)
+                                System.out.println("id invalid");
+                            else
+                                server.viewPatients(id);
+                            System.out.println("print y to confirm");
+                            if (input.nextLine().equals("y")) {
+                                server.deletePatients(id);
+                            }
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
                         }
                         break;
                     case "staff":
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewStaffs(id);
-                        System.out.println("print y to confirm");
-                        if (input.nextLine().equals("y")) {
-                            server.deleteStaffs(id);
+                        if (server.checkPermissions(email_address, "delete_staff")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            if (id <= 0)
+                                System.out.println("id invalid");
+                            else
+                                server.viewStaffs(id);
+                            System.out.println("print y to confirm");
+                            if (input.nextLine().equals("y")) {
+                                server.deleteStaffs(id);
+                            }
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
                         }
                         break;
                 }
@@ -400,7 +408,6 @@ public class Client {
         } else
             System.out.println("> Please log out first");
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
