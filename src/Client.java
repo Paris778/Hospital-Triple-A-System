@@ -88,12 +88,21 @@ public class Client {
                     forgotPasswordCommand();
                     break;
 
+                case "test":
+                    System.out.println("test");
+                    registerCommand();
+                    break;
+
                 default:
                     System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                     break;
             }
-            userInput = null;
+            userInput = "";
+
             while(loggedIn){
+                System.out.println("Welcome, Please select from one of the following options");
+                System.out.println("register, logout, view, delete, update");
+                setUserInput();
                 switch(userInput.toLowerCase()) {
                     case "register":
                         System.out.println("register");
@@ -161,6 +170,7 @@ public class Client {
         String password = null;
 
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
+       // String identity = input.nextLine();
         String identity = input.nextLine();
         //Integrity stuff
         identity = identity.toLowerCase();
@@ -229,10 +239,25 @@ public class Client {
         setUserInput();
         String userPassword = userInput;
         try {
-            if (server.verifyPassword(userPassword, email)) {
-                System.out.println("> Logged in successfully.");
-                email_address = email;
-                loggedIn = true;
+
+            // Verify that OTP matches OTP sent by server
+            if (server.verifyPassword(userPassword, email) ) {
+                int verfiy = 1;
+                while(verfiy == 1) {
+
+                    email_address = email;
+                    System.out.print("If your e-mail is valid a OTP will been sent your email, please enter the code: ");
+                    server.sendOTP(email);
+                    Integer otp = new Scanner(System.in).nextInt();
+                    if (server.verifyOTP(email_address, otp)) {
+
+                        loggedIn = true;
+                        verfiy = 0;
+                        System.out.println("> Logged in successfully.");
+                    } else {
+                        System.out.println("OTP incorrect, please try again");
+                    }
+                }
             } else {
                 System.out.println("> Incorrect. Please try again.");
                 loggedIn = false;
