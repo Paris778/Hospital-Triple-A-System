@@ -14,6 +14,7 @@ public class Client {
     private final String host = "localhost";
     private final int port = 1099; // default port
     private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
+    private int tlsAuth; // condition of authentication ,1 means authentication completed,using
     // int can expand more options
     private String email_address;
     private String identity;
@@ -26,11 +27,19 @@ public class Client {
     //////////////////////////////////////////////////
     //Main Method
     public static void main(String[] args) {
-        Client client = new Client();
-        client.runUserInterface();
+        new Client();
     }
 
-    private void connectToServer() throws Exception {
+    public Client(){
+
+
+        connectToServer();
+        runUserInterface();
+
+
+    }
+
+    private void connectToServer(){
 
         System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
@@ -38,8 +47,9 @@ public class Client {
         try {
             registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
             server = (ServerInterface) registry.lookup("HelloServer");
-            System.out.println("Connected");
+            tlsAuth = 1;
         } catch (Exception e) {
+            tlsAuth = 0;
             System.out.println(e);
         }
     }
@@ -47,27 +57,19 @@ public class Client {
     ////////////////////////////////////////////////
     //This method runs the main user interface
     private void runUserInterface() {
-        String op = "";// record the command
-        byte[] hash = null;
-
+        String userInput;
         try {
             // link to server
-            connectToServer();
-            System.out.println("> Connected to server successfully");
 
-            server.viewPatients(); //Just a test thingy
-
-            System.out.println("> Welcome to  the Hospital Service System");
-            System.out.println("> If you don't have an account,use command 'register'.");
-            System.out.println("> If you already have an account,use command 'login' to login as stuff/admin/patient");
-            System.out.println("> Type 'help' to see all available commands.");
-
-            while (true) {
-                op = input.nextLine();
+            while (tlsAuth == 1) {
+                System.out.println("> Welcome to  the Hospital Service System");
+                System.out.println("> If you already have an account,use command 'login'");
+                System.out.println("> Otherwise type 'help' to see all available commands.");
+                userInput = input.nextLine();
                 //Input integrity thing
                 //////////////////////////////////////
                 //Help Command
-                switch(op.toLowerCase()){
+                switch(userInput.toLowerCase()){
                     case "login":
                         System.out.println("login");
                         loginCommand();
@@ -112,8 +114,13 @@ public class Client {
                         System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                         break;
                 }
-
+                userInput = null;
             }
+            if(tlsAuth == 0){
+                System.out.println("unable to connect to server, GoodBye!");
+                System.exit(0);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
