@@ -207,48 +207,25 @@ public class Client {
     // Login command function
     //////////////////////////////////////
     public void loginCommand() {
-        if (Authenticcondition > 0) {
-            System.out.println("> Please log out first");
-        } else {
-            System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
-            String identity = input.nextLine();
-            int index = -1;
-            // Print error message if no valid identity entered
-            for (int i = 0; i < Constants.ROLE_LIST.length; i++) {
-                if (identity.equals(Constants.ROLE_LIST[i])) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                System.out.println("> Please enter an valid identity");
-            } else {
-                ////////////////////////////////////////
-                //need to be updated
-                login(identity.equals("patient"));
-                ///////////////////////////////////////
+
+        System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
+        setUserInput();
+        int index = -1;
+
+        for (int i = 0; i < Constants.ROLE_LIST.length; i++) {
+            if (userInput.equals(Constants.ROLE_LIST[i])) {
+                index = i;
+                break;
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if (index == -1) {
+            System.out.println("> Please enter an valid identity");
+        } else {
+            ////////////////////////////////////////
+            //need to be updated
+            login(userInput.equals("patient"));
+            ///////////////////////////////////////
+        }
     }
 
     private void loginUI(){
