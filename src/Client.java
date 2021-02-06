@@ -15,6 +15,7 @@ public class Client {
     private final int port = 1099; // default port
     private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
     private int tlsAuth; // condition of authentication ,1 means authentication completed,using
+    private String userVerifiedRole;
     // int can expand more options
     private String email_address;
     private String userInput;
@@ -29,7 +30,7 @@ public class Client {
         new Client();
     }
 
-    public Client(){
+    public Client() {
 
 
         connectToServer();
@@ -38,7 +39,7 @@ public class Client {
 
     }
 
-    private void connectToServer(){
+    private void connectToServer() {
 
         System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
@@ -52,22 +53,40 @@ public class Client {
             System.out.println(e);
         }
     }
-    private void setUserInput(){
+
+    private void setUserInput() {
 
         userInput = new Scanner(System.in).nextLine();
 
     }
+
     ////////////////////////////////////////////////
     //This method runs the main user interface
     private void runUserInterface() {
 
         while (tlsAuth == 1) {
-                System.out.println("> Welcome to  the Hospital Service System");
-                System.out.println("> If you already have an account,use command 'login'");
-                System.out.println("> Otherwise type 'help' to see all available commands.");
+            System.out.println("> Welcome to  the Hospital Service System");
+            System.out.println("> If you already have an account,use command 'login'");
+            System.out.println("> Otherwise type 'help' to see all available commands.");
 
-                setUserInput();
+            setUserInput();
 
+            switch (userInput.toLowerCase()) {
+                case "login":
+                    System.out.println("login");
+                    loginCommand();
+                    break;
+
+                case "help":
+                    System.out.println("help");
+                    helpCommand();
+                    break;
+
+                case "forgotpw":
+                    System.out.println("forgot pw");
+                    forgotPasswordCommand();
+                    break;
+              /*  }
                 switch(userInput.toLowerCase()){
                     case "login":
                         System.out.println("login");
@@ -107,18 +126,18 @@ public class Client {
                     case "update":
                         System.out.println("update");
                         updateCommand();
-                        break;
+                        break;*/
 
-                    default:
-                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
-                        break;
-                }
-                userInput = null;
+                default:
+                    System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                    break;
             }
-            if(tlsAuth == 0){
-                System.out.println("unable to connect to server, GoodBye!");
-                System.exit(0);
-            }
+            userInput = null;
+        }
+        if (tlsAuth == 0) {
+            System.out.println("unable to connect to server, GoodBye!");
+            System.exit(0);
+        }
 
     }
 
@@ -207,34 +226,26 @@ public class Client {
     // Login command function
     //////////////////////////////////////
     public void loginCommand() {
-
-        System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
+        System.out.print("> Please enter your e-mail:  ");
         setUserInput();
-        int index = -1;
-
-        for (int i = 0; i < Constants.ROLE_LIST.length; i++) {
-            if (userInput.equals(Constants.ROLE_LIST[i])) {
-                index = i;
-                break;
+        String email = userInput;
+        System.out.print("> Please enter your password:  ");
+        setUserInput();
+        String userPassword = userInput;
+        try {
+            if (server.verifyPassword(userPassword, email)) {
+                System.out.println("> Logged in successfully.");
+                email_address = email;
+            } else {
+                System.out.println("> Incorrect. Please try again.");
             }
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        if (index == -1) {
-            System.out.println("> Please enter an valid identity");
-        } else {
-            ////////////////////////////////////////
-            //need to be updated
-            login(userInput.equals("patient"));
-            ///////////////////////////////////////
-        }
-    }
-
-    private void loginUI(){
-
-        System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
 
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

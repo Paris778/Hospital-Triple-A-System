@@ -1,8 +1,3 @@
-import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Random;
-
 import database.DatabaseConnection;
 import database.User;
 import utility.Constants;
@@ -11,6 +6,10 @@ import utility.Logger;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Random;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;

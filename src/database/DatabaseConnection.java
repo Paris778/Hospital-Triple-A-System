@@ -44,7 +44,7 @@ public class DatabaseConnection {
             p = con.prepareStatement("SELECT * FROM users WHERE email= ? ");
             p.setString(1, email);
             results = p.executeQuery();
-            String role = results.getString("roles");
+            String role = results.getString("roles"); //gets role
             p = con.prepareStatement("SELECT * FROM roles WHERE role_name = ? ");
             p.setString(1, role);
             results = p.executeQuery();
