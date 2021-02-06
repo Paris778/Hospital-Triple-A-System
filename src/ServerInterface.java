@@ -16,19 +16,19 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void viewStaffs(int s_id) throws RemoteException;
 
-    void deletePatients(int p_id) throws  RemoteException;
+    void deletePatients(int p_id) throws RemoteException;
 
     void deleteStaffs(int s_id) throws RemoteException;
 
-    void updatePatients(int p_id,String command) throws RemoteException;
+    void updatePatients(int p_id, String command) throws RemoteException;
 
-    void updateStaffs(int s_id,String command) throws RemoteException;
+    void updateStaffs(int s_id, String command) throws RemoteException;
 
     void sendOTP(String email_address) throws RemoteException;
 
     boolean verifyOTP(String email, Integer attempt) throws RemoteException;
 
-    int getUserId(String email_address) throws  RemoteException;
+    int getUserId(String email_address) throws RemoteException;
 
     boolean verifyPassword(String plaintext, String email) throws RemoteException;
 

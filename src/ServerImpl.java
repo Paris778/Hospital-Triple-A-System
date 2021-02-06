@@ -1,10 +1,16 @@
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.Properties;
+import java.util.Random;
 
 import database.DatabaseConnection;
 import database.User;
 import utility.Constants;
 import utility.Logger;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements ServerInterface {
     private static final long serialVersionUID = 1L;
@@ -28,40 +34,40 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createUser(user, plaintext);
     }
 
-    public void viewPatients() throws RemoteException {
+    public void viewPatients() {
         dbConnection.viewPatients(-1);
     }
 
-    public void viewPatients(int s_id) throws RemoteException {
+    public void viewPatients(int s_id) {
         dbConnection.viewPatients(s_id);
     }
 
     @Override
-    public void viewStaffs() throws RemoteException {
+    public void viewStaffs() {
         dbConnection.viewStaffs(-1);
     }
 
     @Override
-    public void viewStaffs(int s_id) throws RemoteException {
+    public void viewStaffs(int s_id) {
         dbConnection.viewStaffs(s_id);
     }
 
-    public void deletePatients(int p_id) throws RemoteException {
+    public void deletePatients(int p_id) {
         dbConnection.deletePatients(p_id);
     }
 
     @Override
-    public void deleteStaffs(int s_id) throws RemoteException {
+    public void deleteStaffs(int s_id) {
         dbConnection.deletePatients(s_id);
     }
 
     @Override
-    public void updatePatients(int p_id, String command) throws RemoteException {
+    public void updatePatients(int p_id, String command) {
         dbConnection.updatePatients(p_id, command);
     }
 
     @Override
-    public void updateStaffs(int s_id, String command) throws RemoteException {
+    public void updateStaffs(int s_id, String command) {
         dbConnection.updateStaffs(s_id, command);
     }
 
@@ -70,8 +76,48 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         return dbConnection.verifyPassword(plaintext, email);
     }
 
-    public void sendOTP(String email_address) {
-        otpTable.put(email_address, SendEmail.send(email_address));
+    public void sendOTP(String email) {
+        final String username = "scc363auth@gmail.com";
+        final String password = "SCC363auth!";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+        // Authenticate email
+        Authenticator auth = new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        };
+
+        // Create session
+        Session session = Session.getInstance(props, auth);
+        try {
+            // Generate random 6 digit number
+            int code = new Random().nextInt(900000) + 100000;
+            String text = "Your verification code is: " + code;
+
+            // Store code in hashmap for verification later on
+            otpTable.put(email, code);
+
+            // Create email message
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("scc363auth@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            message.setSubject("Verification code");
+            message.setText(text);
+
+            // Send message
+            Transport.send(message);
+            System.out.println("Email sent successfully");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean verifyOTP(String email, Integer attempt) {
@@ -80,8 +126,8 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public int getUserId(String email_address) {
-        return dbConnection.getUserId(email_address);
+    public int getUserId(String email) {
+        return dbConnection.getUserId(email);
     }
 
     public boolean checkEmailAvailable(String email) {
