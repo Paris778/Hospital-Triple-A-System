@@ -58,17 +58,13 @@ public class Client {
     //This method runs the main user interface
     private void runUserInterface() {
         String userInput;
-        try {
-            // link to server
-
-            while (tlsAuth == 1) {
+        while (tlsAuth == 1) {
                 System.out.println("> Welcome to  the Hospital Service System");
                 System.out.println("> If you already have an account,use command 'login'");
                 System.out.println("> Otherwise type 'help' to see all available commands.");
+
                 userInput = input.nextLine();
-                //Input integrity thing
-                //////////////////////////////////////
-                //Help Command
+
                 switch(userInput.toLowerCase()){
                     case "login":
                         System.out.println("login");
@@ -121,9 +117,6 @@ public class Client {
                 System.exit(0);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
