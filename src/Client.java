@@ -17,11 +17,10 @@ public class Client {
     private int tlsAuth; // condition of authentication ,1 means authentication completed,using
     // int can expand more options
     private String email_address;
-    private String identity;
+    private String userInput;
     private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
-    private Registry registry;
 
 
     //////////////////////////////////////////////////
@@ -45,7 +44,7 @@ public class Client {
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
 
         try {
-            registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
             server = (ServerInterface) registry.lookup("HelloServer");
             tlsAuth = 1;
         } catch (Exception e) {
@@ -53,17 +52,21 @@ public class Client {
             System.out.println(e);
         }
     }
+    private void setUserInput(){
 
+        userInput = new Scanner(System.in).nextLine();
+
+    }
     ////////////////////////////////////////////////
     //This method runs the main user interface
     private void runUserInterface() {
-        String userInput;
+
         while (tlsAuth == 1) {
                 System.out.println("> Welcome to  the Hospital Service System");
                 System.out.println("> If you already have an account,use command 'login'");
                 System.out.println("> Otherwise type 'help' to see all available commands.");
 
-                userInput = input.nextLine();
+                setUserInput();
 
                 switch(userInput.toLowerCase()){
                     case "login":
@@ -226,6 +229,32 @@ public class Client {
                 ///////////////////////////////////////
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private void loginUI(){
+
+        System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -490,7 +519,7 @@ public class Client {
                     System.out.println("> Logged in successfully.");
                     Authenticcondition = 1;
                     this.email_address = email_address;
-                    this.identity = (isPatient) ? "patient" : "staff";
+                    String identity = (isPatient) ? "patient" : "staff";
                 } else {
                     System.out.println("> Incorrect. Please try again.");
                 }
