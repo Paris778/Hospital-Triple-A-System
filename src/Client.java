@@ -65,44 +65,54 @@ public class Client {
             while (true) {
                 op = input.nextLine();
                 //Input integrity thing
-                op = op.toLowerCase();
-
                 //////////////////////////////////////
                 //Help Command
-                if (op.contains("help")) {
-                    helpCommand();
+                switch(op.toLowerCase()){
+                    case "login":
+                        System.out.println("login");
+                        loginCommand();
+                        break;
+
+                    case "help":
+                        System.out.println("help");
+                        helpCommand();
+                        break;
+
+                    case "register":
+                        System.out.println("register");
+                        registerCommand();
+                        break;
+
+                    case "logout":
+                        System.out.println("logout");
+                        logoutCommand();
+                        break;
+
+                    case "forgotpw":
+                        System.out.println("forgot pw");
+                        forgotPasswordCommand();
+                        break;
+
+                    case "view":
+                        System.out.println("view");
+                        viewCommand();
+                        break;
+
+                    case "delete":
+                        System.out.println("delete");
+                        deleteCommand();
+                        break;
+
+                    case "update":
+                        System.out.println("update");
+                        updateCommand();
+                        break;
+
+                    default:
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                        break;
                 }
-                //////////////////////////////////////
-                //Register command
-                else if (op.contains("register")) {
-                    registerCommand();
-                }
-                //////////////////////////////////////
-                //Login command
-                else if (op.contains("login")) {
-                    loginCommand();
-                }
-                //////////////////////////////////////
-                //Logout command
-                else if (op.contains("logout")) {
-                    logoutCommand();
-                }
-                //////////////////////////////////////
-                //Forgot Password command
-                else if (op.contains("forgotpw") || op.contains("forgot")) {
-                    forgotPasswordCommand();
-                } else if (op.contains("view")) {
-                    viewCommand();
-                } else if (op.contains("delete")) {
-                    deleteCommand();
-                } else if (op.contains("update")) {
-                    updateCommand();
-                }
-                /////////////////////////////////////
-                // Unrecognised Command
-                else {
-                    System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
-                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
