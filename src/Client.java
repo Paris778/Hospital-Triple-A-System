@@ -251,14 +251,16 @@ public class Client {
     // Logout command function
     //////////////////////////////////////
     public void logoutCommand() {
+
         loggedIn = false;
+
     }
 
     //////////////////////////////////////
     // Forgot Password command function
     //////////////////////////////////////
     public void forgotPasswordCommand() {
-        if (Authenticcondition < 0) {
+
 
             System.out.println("> Please enter your email address and a one time password (OTP) will be sent");
             String email_address = input.nextLine();
@@ -291,13 +293,10 @@ public class Client {
                     System.out.println("> The received password is different from the previous one.");
                 }
             }
-        } else {
-            System.out.println("> Please log out first");
-        }
     }
 
     public void viewCommand() {
-        if (Authenticcondition > 0) {
+
             try {
                 System.out.println("What type of data do you want to view? myprofile/patient/staff");
                 String temp = input.nextLine();
@@ -334,12 +333,11 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     public void deleteCommand() {
-        if (Authenticcondition > 0) {
+
             try {
                 System.out.println("What kind of user data do you want to delete? patient/staff");
                 String temp = input.nextLine();
@@ -381,12 +379,11 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     public void updateCommand() {
-        if (Authenticcondition > 0) {
+
             try {
 
                 System.out.println("What kind of user data do you want to update? patient/staff");
@@ -434,8 +431,7 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
