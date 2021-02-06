@@ -14,99 +14,137 @@ public class Client {
     private final String host = "localhost";
     private final int port = 1099; // default port
     private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
+    private int tlsAuth; // condition of authentication ,1 means authentication completed,using
+    private boolean loggedIn = false;
+    private String userVerifiedRole;
     // int can expand more options
     private String email_address;
-    private String identity;
+    private String userInput;
     private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
-    private Registry registry;
 
 
     //////////////////////////////////////////////////
     //Main Method
     public static void main(String[] args) {
-        Client client = new Client();
-        client.runUserInterface();
+        new Client();
     }
 
-    private void connectToServer() throws Exception {
+    public Client() {
+
+
+        connectToServer();
+        runUserInterface();
+
+
+    }
+
+    private void connectToServer() {
 
         System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
 
         try {
-            registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099, new SslRMIClientSocketFactory());
             server = (ServerInterface) registry.lookup("HelloServer");
-            System.out.println("Connected");
+            tlsAuth = 1;
         } catch (Exception e) {
+            tlsAuth = 0;
             System.out.println(e);
         }
+    }
+
+    private void setUserInput() {
+
+        userInput = new Scanner(System.in).nextLine();
+
     }
 
     ////////////////////////////////////////////////
     //This method runs the main user interface
     private void runUserInterface() {
-        String op = "";// record the command
-        byte[] hash = null;
 
-        try {
-            // link to server
-            connectToServer();
-            System.out.println("> Connected to server successfully");
-
-            server.viewPatients(); //Just a test thingy
-
+        while (tlsAuth == 1) {
             System.out.println("> Welcome to  the Hospital Service System");
-            System.out.println("> If you don't have an account,use command 'register'.");
-            System.out.println("> If you already have an account,use command 'login' to login as stuff/admin/patient");
-            System.out.println("> Type 'help' to see all available commands.");
+            System.out.println("> If you already have an account,use command 'login'");
+            System.out.println("> Otherwise type 'help' to see all available commands.");
 
-            while (true) {
-                op = input.nextLine();
-                //Input integrity thing
-                op = op.toLowerCase();
+            setUserInput();
 
-                //////////////////////////////////////
-                //Help Command
-                if (op.contains("help")) {
-                    helpCommand();
-                }
-                //////////////////////////////////////
-                //Register command
-                else if (op.contains("register")) {
-                    registerCommand();
-                }
-                //////////////////////////////////////
-                //Login command
-                else if (op.contains("login")) {
+            switch (userInput.toLowerCase()) {
+                case "login":
+                    System.out.println("login");
                     loginCommand();
-                }
-                //////////////////////////////////////
-                //Logout command
-                else if (op.contains("logout")) {
-                    logoutCommand();
-                }
-                //////////////////////////////////////
-                //Forgot Password command
-                else if (op.contains("forgotpw") || op.contains("forgot")) {
+                    break;
+
+                case "help":
+                    System.out.println("help");
+                    helpCommand();
+                    break;
+
+                case "forgotpw":
+                    System.out.println("forgot pw");
                     forgotPasswordCommand();
-                } else if (op.contains("view")) {
-                    viewCommand();
-                } else if (op.contains("delete")) {
-                    deleteCommand();
-                } else if (op.contains("update")) {
-                    updateCommand();
-                }
-                /////////////////////////////////////
-                // Unrecognised Command
-                else {
+                    break;
+
+                case "test":
+                    System.out.println("test");
+                    registerCommand();
+                    break;
+
+                default:
                     System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                    break;
+            }
+            userInput = "";
+
+            while(loggedIn){
+                System.out.println("Welcome, Please select from one of the following options");
+                System.out.println("register, logout, view, delete, update");
+                setUserInput();
+                switch(userInput.toLowerCase()) {
+                    case "register":
+                        System.out.println("register");
+                        registerCommand();
+                        break;
+
+                    case "logout":
+                        System.out.println("logout");
+                        logoutCommand();
+                        break;
+
+                    case "view":
+                        System.out.println("view");
+                        viewCommand();
+                        break;
+
+                    case "delete":
+                        System.out.println("delete");
+                        deleteCommand();
+                        break;
+
+                    case "update":
+                        System.out.println("update");
+                        updateCommand();
+                        break;
+
+                    default:
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                        break;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+
+
+
+
+        if (tlsAuth == 0) {
+            System.out.println("unable to connect to server, GoodBye!");
+            System.exit(0);
+        }
+
     }
 
 
@@ -130,95 +168,107 @@ public class Client {
     //////////////////////////////////////
     private void registerCommand() {
         String password = null;
-        if (Authenticcondition < 0) {
-            System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
-            String identity = input.nextLine();
-            //Integrity stuff
-            identity = identity.toLowerCase();
-            User user = null;
 
-            // Print error message if no valid identity entered
-            if (!identity.equals("patient") && !identity.equals("staff")) {
-                System.out.println("> Please enter an valid identity");
-            } else {
-                user = register(identity.equals("patient"));
-            }
+        System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
+       // String identity = input.nextLine();
+        String identity = input.nextLine();
+        //Integrity stuff
+        identity = identity.toLowerCase();
+        User user = null;
 
-            // if information all valid
-            if (user != null) {
-                // generate private keys and public key for user
-                // ---------------------------------------------
+        // Print error message if no valid identity entered
+        if (!identity.equals("patient") && !identity.equals("staff")) {
+            System.out.println("> Please enter an valid identity");
+        } else {
+            user = register(identity.equals("patient"));
+        }
+
+        // if information all valid
+        if (user != null) {
+            // generate private keys and public key for user
+            // ---------------------------------------------
 
 
-                //Register and validate password
-                while (true) {
-                    boolean passwordEval = false;
-                    while (!passwordEval) {
-                        System.out.println("> Please set your password");
-                        System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-                        password = input.nextLine();
-                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
-                        // password evaluation
-                        if (passwordEval) {
-                            System.out.println("> Strong Password !");
-                            break;
-                        } else {
-                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
-                            System.out.println("> Suggested strong password: " + passwordHandler.getStrongPassword());
-                        }
-                    }
-                    //
-                    System.out.println("> Please confirm your password (type again)");
-                    String temp2 = input.nextLine();
-                    // Satisfy password requirements
-                    if (password.equals(temp2)) {
-                        System.out.println("> Password Confirmed !!!!");
-                        // Create user and store hashed password in DB
-                        try {
-                            server.createUser(user, password);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                        password = null; //Safety stuff
-                        temp2 = null; //Safety stuff
+            //Register and validate password
+            while (true) {
+                boolean passwordEval = false;
+                while (!passwordEval) {
+                    System.out.println("> Please set your password");
+                    System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                    password = input.nextLine();
+                    passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
+                    // password evaluation
+                    if (passwordEval) {
+                        System.out.println("> Strong Password !");
                         break;
-                    } else
-                        System.out.println("> The received password is different from the previous one.");
+                    } else {
+                        passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
+                        System.out.println("> Suggested strong password: " + passwordHandler.getStrongPassword());
+                    }
                 }
+                //
+                System.out.println("> Please confirm your password (type again)");
+                String temp2 = input.nextLine();
+                // Satisfy password requirements
+                if (password.equals(temp2)) {
+                    System.out.println("> Password Confirmed !!!!");
+                    // Create user and store hashed password in DB
+                    try {
+                        server.createUser(user, password);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    password = null; //Safety stuff
+                    temp2 = null; //Safety stuff
+                    break;
+                } else
+                    System.out.println("> The received password is different from the previous one.");
             }
-        } else
-            System.out.println("> Please log out first");
+        }
+
     }
 
     //////////////////////////////////////
     // Login command function
     //////////////////////////////////////
     public void loginCommand() {
-        if (Authenticcondition > 0) {
-            System.out.println("> Please log out first");
-        } else {
-            System.out.println("> Choose what identity you want to login as  (staff/patient/regulator/admin)");
-            String identity = input.nextLine();
-            int index = -1;
-            // Print error message if no valid identity entered
-            for (int i = 0; i < Constants.ROLE_LIST.length; i++) {
-                if (identity.equals(Constants.ROLE_LIST[i])) {
-                    index = i;
-                    break;
+        System.out.print("> Please enter your e-mail:  ");
+        setUserInput();
+        String email = userInput;
+        System.out.print("> Please enter your password:  ");
+        setUserInput();
+        String userPassword = userInput;
+        try {
+
+            // Verify that OTP matches OTP sent by server
+            if (server.verifyPassword(userPassword, email) ) {
+                int verfiy = 1;
+                while(verfiy == 1) {
+
+                    email_address = email;
+                    System.out.print("If your e-mail is valid a OTP will been sent your email, please enter the code: ");
+                    server.sendOTP(email);
+                    Integer otp = new Scanner(System.in).nextInt();
+                    if (server.verifyOTP(email_address, otp)) {
+
+                        loggedIn = true;
+                        verfiy = 0;
+                        System.out.println("> Logged in successfully.");
+                    } else {
+                        System.out.println("OTP incorrect, please try again");
+                    }
                 }
-            }
-            if (index == -1) {
-                System.out.println("> Please enter an valid identity");
             } else {
-                ////////////////////////////////////////
-                //need to be updated
-                login(identity.equals("patient"));
-                ///////////////////////////////////////
+                System.out.println("> Incorrect. Please try again.");
+                loggedIn = false;
             }
+        } catch (Exception e) {
+            System.out.println(e);
         }
+
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -226,18 +276,16 @@ public class Client {
     // Logout command function
     //////////////////////////////////////
     public void logoutCommand() {
-        if (Authenticcondition > 0) {
-            Authenticcondition = -1;
-        } else {
-            System.out.println("> Please log in first");
-        }
+
+        loggedIn = false;
+
     }
 
     //////////////////////////////////////
     // Forgot Password command function
     //////////////////////////////////////
     public void forgotPasswordCommand() {
-        if (Authenticcondition < 0) {
+
 
             System.out.println("> Please enter your email address and a one time password (OTP) will be sent");
             String email_address = input.nextLine();
@@ -270,13 +318,10 @@ public class Client {
                     System.out.println("> The received password is different from the previous one.");
                 }
             }
-        } else {
-            System.out.println("> Please log out first");
-        }
     }
 
     public void viewCommand() {
-        if (Authenticcondition > 0) {
+
             try {
                 System.out.println("What type of data do you want to view? myprofile/patient/staff");
                 String temp = input.nextLine();
@@ -313,12 +358,11 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     public void deleteCommand() {
-        if (Authenticcondition > 0) {
+
             try {
                 System.out.println("What kind of user data do you want to delete? patient/staff");
                 String temp = input.nextLine();
@@ -360,12 +404,11 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     public void updateCommand() {
-        if (Authenticcondition > 0) {
+
             try {
 
                 System.out.println("What kind of user data do you want to update? patient/staff");
@@ -413,8 +456,7 @@ public class Client {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else
-            System.out.println("> Please log out first");
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,42 +503,5 @@ public class Client {
         }
         return user;
     }
-
-    private void login(boolean isPatient) {
-        try {
-            System.out.println("> Please enter your e-mail. ");
-            String email_address = input.nextLine();
-            System.out.println("> Do you want to log in with an email verification code? (Type 'y' to use OTP / type 'n' to use password)");
-            if (input.nextLine().toLowerCase().equals("y")) {
-                // Send OTP email
-                server.sendOTP(email_address);
-
-                System.out.println("> Enter your verification code");
-                Integer otp = input.nextInt();
-                // Verify that OTP matches OTP sent by server
-                if (server.verifyOTP(email_address, otp)) {
-                    System.out.println("OTP verified!");
-                } else {
-                    System.out.println("The OTP you entered does not match the one sent to your email address");
-                }
-            } else {
-                System.out.println("> Enter your password");
-                String password = input.nextLine();
-
-                // Check password matches password hash in database
-                if (server.verifyPassword(password, email_address)) {
-                    System.out.println("> Logged in successfully.");
-                    Authenticcondition = 1;
-                    this.email_address = email_address;
-                    this.identity = (isPatient) ? "patient" : "staff";
-                } else {
-                    System.out.println("> Incorrect. Please try again.");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
 }
