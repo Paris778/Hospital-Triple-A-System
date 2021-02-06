@@ -243,11 +243,6 @@ public class Client {
 
     }
 
-    public void loggedInUi(){
-        System.out.println("Please enter help");
-
-    }
-
      ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,11 +251,7 @@ public class Client {
     // Logout command function
     //////////////////////////////////////
     public void logoutCommand() {
-        if (Authenticcondition > 0) {
-            Authenticcondition = -1;
-        } else {
-            System.out.println("> Please log in first");
-        }
+        loggedIn = false;
     }
 
     //////////////////////////////////////
