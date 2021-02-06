@@ -23,7 +23,7 @@ public class Client {
     private Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
-
+    private Registry registry;
 
     //////////////////////////////////////////////////
     //Main Method
