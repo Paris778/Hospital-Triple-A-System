@@ -303,20 +303,28 @@ public class Client {
                         server.viewPatients(id);
                         break;
                     case "patient":
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            server.viewPatients();
-                        else
-                            server.viewPatients(id);
+                        if (server.checkPermissions(email_address, "view_patient")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            if (id <= 0)
+                                server.viewPatients();
+                            else
+                                server.viewPatients(id);
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
+                        }
                         break;
                     case "staff":
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            server.viewStaffs();
-                        else
-                            server.viewStaffs(id);
+                        if (server.checkPermissions(email_address, "view_staff")) {
+                            System.out.println("Enter a valid id to view patient information or type");
+                            id = input.nextInt();
+                            if (id <= 0)
+                                server.viewStaffs();
+                            else
+                                server.viewStaffs(id);
+                        } else {
+                            System.out.println("You do not have the correct permissions to do that.");
+                        }
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
