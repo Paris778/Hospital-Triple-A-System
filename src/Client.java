@@ -504,41 +504,4 @@ public class Client {
         return user;
     }
 
-    private void login(boolean isPatient) {
-        try {
-            System.out.println("> Please enter your e-mail. ");
-            String email_address = input.nextLine();
-            System.out.println("> Do you want to log in with an email verification code? (Type 'y' to use OTP / type 'n' to use password)");
-            if (input.nextLine().toLowerCase().equals("y")) {
-                // Send OTP email
-                server.sendOTP(email_address);
-
-                System.out.println("> Enter your verification code");
-                Integer otp = input.nextInt();
-                // Verify that OTP matches OTP sent by server
-                if (server.verifyOTP(email_address, otp)) {
-                    System.out.println("OTP verified!");
-                } else {
-                    System.out.println("The OTP you entered does not match the one sent to your email address");
-                }
-            } else {
-                System.out.println("> Enter your password");
-                String password = input.nextLine();
-
-                // Check password matches password hash in database
-                if (server.verifyPassword(password, email_address)) {
-                    System.out.println("> Logged in successfully.");
-                    Authenticcondition = 1;
-                    this.email_address = email_address;
-                    String identity = (isPatient) ? "patient" : "staff";
-                } else {
-                    System.out.println("> Incorrect. Please try again.");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
