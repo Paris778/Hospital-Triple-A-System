@@ -33,22 +33,22 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createUser(user, plaintext);
     }
 
-    public void viewPatients() {
-        dbConnection.viewPatients(-1);
+    public String viewPatients() {
+        return dbConnection.viewPatients(-1);
     }
 
-    public void viewPatients(int s_id) {
-        dbConnection.viewPatients(s_id);
-    }
-
-    @Override
-    public void viewStaffs() {
-        dbConnection.viewStaffs(-1);
+    public String viewPatients(int s_id) {
+        return dbConnection.viewPatients(s_id);
     }
 
     @Override
-    public void viewStaffs(int s_id) {
-        dbConnection.viewStaffs(s_id);
+    public String viewStaffs() {
+        return dbConnection.viewStaffs(-1);
+    }
+
+    @Override
+    public String viewStaffs(int s_id) {
+        return dbConnection.viewStaffs(s_id);
     }
 
     public void deletePatients(int p_id) {

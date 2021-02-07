@@ -175,11 +175,11 @@ public class DatabaseConnection {
     }
 
     //overload to give default parameters
-    public void viewPatients() {
-        viewPatients(-1);
+    public String viewPatients() {
+        return viewPatients(-1);
     }
 
-    public void viewPatients(int u_id) {
+    public String viewPatients(int u_id) {
         //Race condition control
         lock.lock();
         try {
@@ -191,6 +191,7 @@ public class DatabaseConnection {
                 p.setInt(1, u_id);
             }
             results = p.executeQuery();
+            String returnString = String.format("%15s %15s %15s %15s %15s %n", "Patient ID", "Forename(s)", "Surname", "Date of Birth", "Primary Doctor ID");
 
             // Loop through each row and print
             while (results.next()) {
@@ -198,22 +199,25 @@ public class DatabaseConnection {
                 String forename = results.getString("forenames");
                 String surname = results.getString("surname");
                 String dob = results.getString("date_of_birth");
-                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob);
+                String primaryDoctor = results.getString("primary_doctor");
+                returnString = returnString.concat(String.format("%15d %15s %15s %15s %15s %n", id, forename, surname, dob, primaryDoctor));
             }
+            return returnString;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "No results found for this query";
     }
 
     //overload to give default parameters
-    public void viewStaffs() {
-        viewStaffs(-1);
+    public String viewStaffs() {
+        return viewStaffs(-1);
     }
 
-    public void viewStaffs(int u_id) {
+    public String viewStaffs(int u_id) {
         //Race condition control
         lock.lock();
         try {
@@ -224,25 +228,26 @@ public class DatabaseConnection {
                 p = con.prepareStatement("SELECT * FROM staff WHERE u_id = ?");
                 p.setInt(1, u_id);
             }
-
             results = p.executeQuery();
+            String returnString = String.format("%15s %15s %15s %15s %15s %n", "Patient ID", "Forename(s)", "Surname", "Date of Birth", "Job Sector");
 
-            // Loop through each row and print
+            // Loop through each row and add to return string
             while (results.next()) {
                 int id = results.getInt("u_id");
                 String forename = results.getString("forenames");
                 String surname = results.getString("surname");
                 String dob = results.getString("date_of_birth");
-                String job_title = results.getString("job_title");
-                System.out.println(id + "\t\t" + forename + "\t\t" + surname + "\t\t" + dob + "\t\t" + job_title);
+                String sector = results.getString("sector");
+                returnString = returnString.concat(String.format("%15d %15s %15s %15s %15s %n", id, forename, surname, dob, sector));
             }
-
+            return returnString;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "No results found for this query";
     }
 
     public void deletePatients(int u_id) {

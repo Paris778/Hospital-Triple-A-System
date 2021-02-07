@@ -8,13 +8,13 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void createUser(User user, String password) throws RemoteException;
 
-    void viewPatients() throws RemoteException;
+    String viewPatients() throws RemoteException;
 
-    void viewPatients(int s_id) throws RemoteException;
+    String viewPatients(int s_id) throws RemoteException;
 
-    void viewStaffs() throws RemoteException;
+    String viewStaffs() throws RemoteException;
 
-    void viewStaffs(int s_id) throws RemoteException;
+    String viewStaffs(int s_id) throws RemoteException;
 
     void deletePatients(int p_id) throws RemoteException;
 
