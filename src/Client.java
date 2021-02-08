@@ -19,6 +19,7 @@ public class Client {
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
 
+
     //////////////////////////////////////////////////
     //Main Method
     public static void main(String[] args) {
@@ -87,8 +88,16 @@ public class Client {
             userInput = "";
 
             while (loggedIn) {
-                System.out.println("Welcome, Please select from one of the following options");
-                System.out.println("register, logout, view, delete, update");
+                try {
+                    System.out.println("> Logged in as: " +  server.getRole(email_address));
+                    if(server.userIsAdmin(email_address)){
+                        System.out.println("> You have been verified as SYSTEM ADMIN");
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("> Welcome, Please select from one of the following options");
+                System.out.println(">   register, logout, view, delete, update");
                 setUserInput();
                 switch (userInput.toLowerCase()) {
                     case "register":
@@ -228,11 +237,10 @@ public class Client {
                 while (verfiy == 1) {
 
                     email_address = email;
-                    System.out.print("If your e-mail is valid a OTP will been sent your email, please enter the code: ");
+                    System.out.print("If your e-mail is valid an OTP will been sent your email, please enter the code: ");
                     server.sendOTP(email);
                     Integer otp = new Scanner(System.in).nextInt();
                     if (server.verifyOTP(email_address, otp)) {
-
                         loggedIn = true;
                         verfiy = 0;
                         System.out.println("> Logged in successfully.");

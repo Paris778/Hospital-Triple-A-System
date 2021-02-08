@@ -35,4 +35,8 @@ public interface ServerInterface extends java.rmi.Remote {
     boolean checkEmailAvailable(String email) throws RemoteException;
 
     String updateRole(String adminEmail, int userId, String role) throws RemoteException;
+
+    String getRole(String email_address) throws RemoteException;
+
+    boolean userIsAdmin(String email) throws RemoteException;
 }

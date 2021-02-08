@@ -5,3 +5,11 @@ https://livelancsac-my.sharepoint.com/:w:/g/personal/patelav_lancaster_ac_uk/EdZ
 
 class diagram:
 https://livelancsac-my.sharepoint.com/:w:/g/personal/patelav_lancaster_ac_uk/ER1v8fNb-M1BitC9Hm0lJvkBpE5wORYzZZvZHer4RQ0x1Q?e=APjorW&fbclid=IwAR2KY_Qsrf9G9_2GF3EXO9wd_okLXl-CPTpG-zG0Xrv6gmg9TN22kj4Onl0
+
+
+==========================================
+           ADMIN CREDENTIALS
+==========================================
+(provided just for marking)
+email: zackmartin591@gmail.com
+Password : The_best_admin_ever123!

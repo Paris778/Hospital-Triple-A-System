@@ -99,6 +99,16 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         return dbConnection.verifyPassword(plaintext, email);
     }
 
+    @Override
+    public String getRole( String email) {
+        return dbConnection.getUserRole(email);
+    }
+
+    @Override
+    public boolean userIsAdmin(String email){
+        return (dbConnection.userIsAdmin(email));
+    }
+
     public void sendOTP(String email) {
         final String username = "scc363auth@gmail.com";
         final String password = "SCC363auth!";
@@ -147,6 +157,54 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         Integer otp = otpTable.get(email);
         return attempt.equals(otp);
     }
+
+    ///////////////////
+    public void sendWarningEmail(String email) {
+        final String username = "scc363auth@gmail.com";
+        final String password = "SCC363auth!";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+        // Authenticate email
+        Authenticator auth = new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        };
+
+        // Create session
+        Session session = Session.getInstance(props, auth);
+        try {
+            String text = "Your verification code is: " ;
+
+
+            // Create email message
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("scc363auth@gmail.com"));
+            //
+
+            //
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            message.setSubject("System Warning");
+            message.setText(text);
+
+            // Send message
+            Transport.send(message);
+            System.out.println("Email sent successfully");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    ///////////////////
 
     @Override
     public int getUserId(String email) {

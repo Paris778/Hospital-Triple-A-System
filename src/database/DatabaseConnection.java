@@ -1,5 +1,6 @@
 package database;
 
+import utility.Constants;
 import utility.PasswordHandler;
 
 import java.security.NoSuchAlgorithmException;
@@ -185,6 +186,26 @@ public class DatabaseConnection {
         return false;
     }
 
+    public boolean userIsAdmin(String email) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Get user id that corresponds to the email
+            //p = con.prepareStatement("SELECT a_id FROM admins WHERE u_id=(SELECT ?");
+            //p = con.prepareStatement("SELECT EXISTS(SELECT a_id FROM admins WHERE u_id= ?");
+            p = con.prepareStatement("SELECT a_id FROM admins WHERE u_id= ?");
+            p.setString(1, String.valueOf(getUserId(email)));
+            results = p.executeQuery();
+            return (results.next());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
     public int getUserId(String email) {
         //Race condition control
         lock.lock();
@@ -197,6 +218,24 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public String getUserRole(String email) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Get user id that corresponds to the email
+            p = con.prepareStatement("SELECT roles FROM users WHERE email= ?");
+            p.setString(1, email);
+            results = p.executeQuery();
+            return results.getString("roles");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
         } finally {
             //Race condition control
             lock.unlock();
