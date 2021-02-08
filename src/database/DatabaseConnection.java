@@ -38,6 +38,21 @@ public class DatabaseConnection {
         return true;
     }
 
+    public String lockAccount(int id) {
+        lock.lock();
+        try {
+            p = con.prepareStatement("UPDATE users SET account_locked=1 WHERE u_id= ?");
+            p.setInt(1, id);
+            p.executeUpdate();
+            return "User #" + id + "'s account has been successfully locked.";
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return "Error in locking account of User #" + id;
+    }
+
     public boolean checkPermissions(String email, String request) {
         lock.lock();
         try {
@@ -66,8 +81,6 @@ public class DatabaseConnection {
             // Hash and salt user password
             String salt = passwordHandler.generateSalt();
             String hashedPassword = passwordHandler.hashPassword(plaintext, salt.getBytes());
-
-            // TODO: add roles
 
             // Add password and email to users table
             String statement = "INSERT INTO users(email, password_hash, password_salt, roles) VALUES (?, ?, ?, ?);";

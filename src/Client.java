@@ -11,19 +11,13 @@ import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Client {
-    private final String host = "localhost";
-    private final int port = 1099; // default port
-    private int Authenticcondition = -1; // condition of authentication ,1 means authentication completed,using
     private int tlsAuth; // condition of authentication ,1 means authentication completed,using
     private boolean loggedIn = false;
-    private String userVerifiedRole;
-    // int can expand more options
     private String email_address;
     private String userInput;
-    private Scanner input = new Scanner(System.in);
+    private final Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
-    private Registry registry;
 
     //////////////////////////////////////////////////
     //Main Method
@@ -32,16 +26,11 @@ public class Client {
     }
 
     public Client() {
-
-
         connectToServer();
         runUserInterface();
-
-
     }
 
     private void connectToServer() {
-
         System.setProperty("javax.net.ssl.trustStore", "client_truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
 
@@ -51,14 +40,12 @@ public class Client {
             tlsAuth = 1;
         } catch (Exception e) {
             tlsAuth = 0;
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
     private void setUserInput() {
-
         userInput = new Scanner(System.in).nextLine();
-
     }
 
     ////////////////////////////////////////////////
@@ -136,12 +123,10 @@ public class Client {
             }
         }
 
-
         if (tlsAuth == 0) {
             System.out.println("unable to connect to server, GoodBye!");
             System.exit(0);
         }
-
     }
 
 
@@ -260,7 +245,7 @@ public class Client {
                 loggedIn = false;
             }
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
     }
@@ -273,17 +258,13 @@ public class Client {
     // Logout command function
     //////////////////////////////////////
     public void logoutCommand() {
-
         loggedIn = false;
-
     }
 
     //////////////////////////////////////
     // Forgot Password command function
     //////////////////////////////////////
     public void forgotPasswordCommand() {
-
-
         System.out.println("> Please enter your email address and a one time password (OTP) will be sent");
         String email_address = input.nextLine();
         // sent email
@@ -296,7 +277,6 @@ public class Client {
         String otp = input.nextLine();
         // verify the otp
         // --------------
-
 
         while (true) {
             System.out.println("> Please set your password");
@@ -400,7 +380,6 @@ public class Client {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
     }
 
     public void updateCommand() {
@@ -452,7 +431,6 @@ public class Client {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,5 +477,4 @@ public class Client {
         }
         return user;
     }
-
 }

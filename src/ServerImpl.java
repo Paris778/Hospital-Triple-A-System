@@ -132,4 +132,12 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     public boolean checkEmailAvailable(String email) {
         return dbConnection.checkEmailAvailable(email);
     }
+
+    public String lockAccount(String adminEmail, int accountToLock) {
+        // Check user is a system admin before locking account
+        if (dbConnection.checkPermissions(adminEmail, "lock_accounts")) {
+            return dbConnection.lockAccount(accountToLock);
+        }
+        return "You do not have the correct permissions to do that.";
+    }
 }
