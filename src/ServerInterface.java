@@ -8,21 +8,21 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void createUser(User user, String password) throws RemoteException;
 
-    String viewPatients() throws RemoteException;
+    String viewPatients(String email) throws RemoteException;
 
-    String viewPatients(int s_id) throws RemoteException;
+    String viewPatients(String email, int s_id) throws RemoteException;
 
-    String viewStaffs() throws RemoteException;
+    String viewStaffs(String email) throws RemoteException;
 
-    String viewStaffs(int s_id) throws RemoteException;
+    String viewStaffs(String email, int s_id) throws RemoteException;
 
-    void deletePatients(int p_id) throws RemoteException;
+    String deletePatients(String email, int p_id) throws RemoteException;
 
-    void deleteStaffs(int s_id) throws RemoteException;
+    String deleteStaffs(String email, int s_id) throws RemoteException;
 
-    void updatePatients(int p_id, String command) throws RemoteException;
+    String updatePatients(String email, int p_id, String command) throws RemoteException;
 
-    void updateStaffs(int s_id, String command) throws RemoteException;
+    String updateStaffs(String email, int s_id, String command) throws RemoteException;
 
     void sendOTP(String email_address) throws RemoteException;
 
@@ -33,4 +33,6 @@ public interface ServerInterface extends java.rmi.Remote {
     boolean verifyPassword(String plaintext, String email) throws RemoteException;
 
     boolean checkEmailAvailable(String email) throws RemoteException;
+
+    String updateRole(String adminEmail, int userId, String role) throws RemoteException;
 }

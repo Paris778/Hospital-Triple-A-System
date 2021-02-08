@@ -33,41 +33,65 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         dbConnection.createUser(user, plaintext);
     }
 
-    public String viewPatients() {
-        return dbConnection.viewPatients(-1);
+    public String viewPatients(String email) {
+        if (dbConnection.checkPermissions(email, "view_patient")) {
+            return dbConnection.viewPatients(-1);
+        }
+        return "You do not have the correct permissions to do that.";
     }
 
-    public String viewPatients(int s_id) {
-        return dbConnection.viewPatients(s_id);
-    }
-
-    @Override
-    public String viewStaffs() {
-        return dbConnection.viewStaffs(-1);
-    }
-
-    @Override
-    public String viewStaffs(int s_id) {
-        return dbConnection.viewStaffs(s_id);
-    }
-
-    public void deletePatients(int p_id) {
-        dbConnection.deletePatients(p_id);
+    public String viewPatients(String email, int s_id) {
+        if (dbConnection.checkPermissions(email, "view_patient")) {
+            return dbConnection.viewPatients(s_id);
+        }
+        return "You do not have the correct permissions to do that.";
     }
 
     @Override
-    public void deleteStaffs(int s_id) {
-        dbConnection.deletePatients(s_id);
+    public String viewStaffs(String email) {
+        if (dbConnection.checkPermissions(email, "view_staff")) {
+            return dbConnection.viewStaffs(-1);
+        }
+        return "You do not have the correct permissions to do that.";
     }
 
     @Override
-    public void updatePatients(int p_id, String command) {
-        dbConnection.updatePatients(p_id, command);
+    public String viewStaffs(String email, int s_id) {
+        if (dbConnection.checkPermissions(email, "view_staff")) {
+            return dbConnection.viewStaffs(s_id);
+        }
+        return "You do not have the correct permissions to do that.";
+    }
+
+    public String deletePatients(String email, int p_id) {
+        if (dbConnection.checkPermissions(email, "delete_patient")) {
+            return dbConnection.deletePatients(p_id);
+        }
+        return "You do not have the correct permissions to do that.";
     }
 
     @Override
-    public void updateStaffs(int s_id, String command) {
-        dbConnection.updateStaffs(s_id, command);
+    public String deleteStaffs(String email, int s_id) {
+        if (dbConnection.checkPermissions(email, "delete_staff")) {
+            return dbConnection.deletePatients(s_id);
+        }
+        return "You do not have the correct permissions to do that.";
+    }
+
+    @Override
+    public String updatePatients(String email, int p_id, String command) {
+        if (dbConnection.checkPermissions(email, "update_patient")) {
+            dbConnection.updatePatients(p_id, command);
+        }
+        return "You do not have the correct permissions to do that.";
+    }
+
+    @Override
+    public String updateStaffs(String email, int s_id, String command) {
+        if (dbConnection.checkPermissions(email, "update_staff")) {
+            return dbConnection.updateStaffs(s_id, command);
+        }
+        return "You do not have the correct permissions to do that.";
     }
 
     @Override
@@ -137,6 +161,14 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         // Check user is a system admin before locking account
         if (dbConnection.checkPermissions(adminEmail, "lock_accounts")) {
             return dbConnection.lockAccount(accountToLock);
+        }
+        return "You do not have the correct permissions to do that.";
+    }
+
+    public String updateRole(String adminEmail, int userId, String role) {
+        // Check user is a system admin before locking account
+        if (dbConnection.checkPermissions(adminEmail, "lock_accounts")) {
+            return dbConnection.updateRole(userId, role);
         }
         return "You do not have the correct permissions to do that.";
     }

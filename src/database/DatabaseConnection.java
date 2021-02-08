@@ -12,14 +12,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseConnection {
-    private static final String JDBC_DRIVER = "org.sqlite.JDBC";
-    private static final String DATABASE_LOCATION = "jdbc:sqlite:";
-    private static String dbName = "new-database.db";
-    private static Connection con = null;
-    private static PreparedStatement p = null;
-    private static ResultSet results = null;
+    private final String JDBC_DRIVER = "org.sqlite.JDBC";
+    private final String DATABASE_LOCATION = "jdbc:sqlite:";
+    private String dbName = "new-database.db";
+    private Connection con = null;
+    private PreparedStatement p = null;
+    private ResultSet results = null;
     private PasswordHandler passwordHandler = new PasswordHandler();
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public boolean checkEmailAvailable(String email) {
         lock.lock();
@@ -51,6 +51,22 @@ public class DatabaseConnection {
             lock.unlock();
         }
         return "Error in locking account of User #" + id;
+    }
+
+    public String updateRole(int u_id, String newRole) {
+        lock.lock();
+        try {
+            p = con.prepareStatement("UPDATE users SET role= ? WHERE u_id= ?");
+            p.setString(1, newRole);
+            p.setInt(2, u_id);
+            p.executeUpdate();
+            return "User #" + u_id + "'s role has successfully been updated to " + newRole + ".";
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return "Error in updating role of User #" + u_id;
     }
 
     public boolean checkPermissions(String email, String request) {
@@ -263,7 +279,7 @@ public class DatabaseConnection {
         return "No results found for this query";
     }
 
-    public void deletePatients(int u_id) {
+    public String deletePatients(int u_id) {
         lock.lock();
 
         try {
@@ -271,16 +287,17 @@ public class DatabaseConnection {
             p = con.prepareStatement("DELETE FROM patients WHERE u_id = ?");
             p.setInt(1, u_id);
             results = p.executeQuery();
-
+            return "User #" + u_id + " (staff) has been successfully deleted.";
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "Error in deleting user #" + u_id;
     }
 
-    public void deleteStaffs(int u_id) {
+    public String deleteStaffs(int u_id) {
         lock.lock();
 
         try {
@@ -288,48 +305,50 @@ public class DatabaseConnection {
             p = con.prepareStatement("DELETE FROM staff WHERE u_id = ?");
             p.setInt(1, u_id);
             results = p.executeQuery();
-
+            return "User #" + u_id + " (staff) has been successfully deleted.";
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "Error in deleting user #" + u_id;
     }
 
-    public void updatePatients(int u_id, String command) {
+    public String updatePatients(int u_id, String command) {
         lock.lock();
-
         try {
             // Execute SQL query
             p = con.prepareStatement("UPDATE patients SET ? WHERE u_id = ?");
             p.setString(1, command);
             p.setInt(2, u_id);
             results = p.executeQuery();
+            return "User #" + u_id + "has been successfully updated.";
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "Error in updating user #" + u_id;
     }
 
-    public void updateStaffs(int u_id, String command) {
+    public String updateStaffs(int u_id, String command) {
         lock.lock();
-
         try {
             // Execute SQL query
             p = con.prepareStatement("UPDATE patients SET ? WHERE u_id = ?");
             p.setString(1, command);
             p.setInt(2, u_id);
             results = p.executeQuery();
-
+            return "User #" + u_id + "has been successfully updated.";
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return "Error in updating user #" + u_id;
     }
 
     ////////////////////////////////////////////////////////////////////////////////

@@ -306,31 +306,23 @@ public class Client {
             switch (temp) {
                 case "myprofile":
                     id = server.getUserId(email_address);
-                    server.viewPatients(id);
+                    System.out.println(server.viewPatients(email_address, id));
                     break;
                 case "patient":
-                    if (server.checkPermissions(email_address, "view_patient")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println(server.viewPatients());
-                        else
-                            System.out.println(server.viewPatients(id));
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
-                    }
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    if (id <= 0)
+                        System.out.println(server.viewPatients(email_address));
+                    else
+                        System.out.println(server.viewPatients(email_address, id));
                     break;
                 case "staff":
-                    if (server.checkPermissions(email_address, "view_staff")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println(server.viewStaffs());
-                        else
-                            System.out.println(server.viewStaffs(id));
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
-                    }
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    if (id <= 0)
+                        System.out.println(server.viewStaffs(email_address));
+                    else
+                        System.out.println(server.viewStaffs(email_address, id));
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -345,35 +337,27 @@ public class Client {
             int id;
             switch (temp) {
                 case "patient":
-                    if (server.checkPermissions(email_address, "delete_patient")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewPatients(id);
-                        System.out.println("print y to confirm");
-                        if (input.nextLine().equals("y")) {
-                            server.deletePatients(id);
-                        }
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    if (id <= 0)
+                        System.out.println("id invalid");
+                    else
+                        System.out.println(server.viewPatients(email_address, id));
+                    System.out.println("print y to confirm");
+                    if (input.nextLine().equals("y")) {
+                        System.out.println(server.deletePatients(email_address, id));
                     }
                     break;
                 case "staff":
-                    if (server.checkPermissions(email_address, "delete_staff")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else
-                            server.viewStaffs(id);
-                        System.out.println("print y to confirm");
-                        if (input.nextLine().equals("y")) {
-                            server.deleteStaffs(id);
-                        }
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    if (id <= 0)
+                        System.out.println("id invalid");
+                    else
+                        System.out.println(server.viewStaffs(email_address, id));
+                    System.out.println("print y to confirm");
+                    if (input.nextLine().equals("y")) {
+                        System.out.println(server.deleteStaffs(email_address, id));
                     }
                     break;
             }
@@ -385,46 +369,47 @@ public class Client {
     public void updateCommand() {
 
         try {
-
-            System.out.println("What kind of user data do you want to update? patient/staff");
+            System.out.println("What kind of user data do you want to update? patient/staff/roles");
             String temp = input.nextLine();
             int id;
             String command;
             switch (temp) {
                 case "patient" -> {
-                    // Check user has correct permissions before allowing update
-                    if (server.checkPermissions(email_address, "update_patient")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        // TODO: check if ID exists in database
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else {
-                            server.viewPatients(id);
-                            System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
-                            command = input.nextLine();
-                            server.updatePatients(id, command);
-                        }
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    // TODO: check if ID exists in database
+                    if (id <= 0)
+                        System.out.println("id invalid");
+                    else {
+                        System.out.println(server.viewPatients(email_address, id));
+                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                        command = input.nextLine();
+                        System.out.println(server.updatePatients(email_address, id, command));
                     }
                 }
                 case "staff" -> {
-                    // Check user has correct permissions before allowing update
-                    if (server.checkPermissions(email_address, "update_staff")) {
-                        System.out.println("Enter a valid id to view patient information or type");
-                        id = input.nextInt();
-                        // TODO: check if ID exists in database
-                        if (id <= 0)
-                            System.out.println("id invalid");
-                        else {
-                            server.viewStaffs(id);
-                            System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
-                            command = input.nextLine();
-                            server.updateStaffs(id, command);
-                        }
-                    } else {
-                        System.out.println("You do not have the correct permissions to do that.");
+                    System.out.println("Enter a valid id to view patient information or type");
+                    id = input.nextInt();
+                    // TODO: check if ID exists in database
+                    if (id <= 0)
+                        System.out.println("id invalid");
+                    else {
+                        System.out.println(server.viewStaffs(email_address, id));
+                        System.out.println("enter valid command to update the information e.g. forename = 'a',surname = 'b'");
+                        command = input.nextLine();
+                        System.out.println(server.updateStaffs(email_address, id, command));
+                    }
+                }
+                case "roles" -> {
+                    System.out.println("Enter a valid id of the user whose role you want to change");
+                    id = input.nextInt();
+                    // TODO: check if ID exists in database
+                    if (id <= 0)
+                        System.out.println("Id invalid");
+                    else {
+                        System.out.println("Enter the role you want to assign to this user");
+                        String role = input.nextLine();
+                        System.out.println(server.updateRole(email_address, id, role));
                     }
                 }
             }
