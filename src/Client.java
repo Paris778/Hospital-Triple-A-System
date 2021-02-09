@@ -49,25 +49,86 @@ public class Client {
         }
     }
 
-    private void setUserInput() {
+    private String setUserInput() {
         userInput = new Scanner(System.in).nextLine();
+        return userInput;
+    }
+
+    private String setUserInput(String s){
+        String test;
+        String nameRegex = "^[a-zA-Z]+$";
+        String wordRegex = "^[a-zA-Z]+$";
+        String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+
+
+        switch (s) {
+            case "word":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(wordRegex)){
+                    userInput = test;
+                    return test;
+                }else{
+                    System.out.println("Incorrect Input - Only letters are accepted.");
+                    userInput = "incorrect input";
+                    return "";
+                }
+
+
+
+            case "email":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(emailRegex)){
+                    userInput = test;
+                    return test;
+                }else{
+                    System.out.println("Incorrect Input - Only E-mail addresses are accepted.");
+                    userInput = "incorrect input";
+                    return "";
+                }
+
+
+
+            case "name":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(nameRegex)){
+                    userInput = test;
+                    return test;
+                }else{
+                    System.out.println("Incorrect Input - Only letters are accepted.");
+                    userInput = "incorrect input";
+                    return "";
+                }
+
+
+
+            default:
+                System.out.println("NO regex found - testing");
+                return "";
+
+        }
+
     }
 
     ////////////////////////////////////////////////
     //This method runs the main user interface
+<<<<<<< HEAD
     private void runUserInterface() throws RemoteException {
 
+=======
+    private void runUserInterface() {
+        System.out.println("=========================================================");
+        System.out.println("     Welcome to  the Hospital Service System");
+        System.out.println("=========================================================");
+>>>>>>> 2c6732d7bcacf7cd6b83a873043a2af4e04b8aee
         while (tlsAuth == 1) {
-            System.out.println("=========================================================");
-            System.out.println("     Welcome to  the Hospital Service System");
             System.out.println("=========================================================");
             System.out.println("> If you already have an account,use command 'login'");
             System.out.println("> Otherwise type 'help' to see all available commands.");
             System.out.println("=========================================================");
 
-            setUserInput();
 
-            switch (userInput.toLowerCase()) {
+
+            switch (setUserInput("word").toLowerCase()) {
                 case "login":
                     System.out.println("login");
                     loginCommand();
@@ -106,8 +167,8 @@ public class Client {
                 System.out.println("-----------------------------------------------");
                 System.out.println("|  register | logout | view | delete | update |");
                 System.out.println("-----------------------------------------------");
-                System.out.println("> Otherwise type 'helpme' to see all available commands.");
-                setUserInput();
+                System.out.println("> Otherwise type 'help' to see all available commands.");
+                setUserInput("word");
                 switch (userInput.toLowerCase()) {
                     case "register":
                         System.out.println("register");
@@ -134,7 +195,7 @@ public class Client {
                         updateCommand();
                         break;
 
-                    case "helpme":
+                    case "help":
                         helpMeCommand(email_address);
                         break;
 
@@ -310,9 +371,8 @@ public class Client {
     //////////////////////////////////////
     private void helpCommand() {
         System.out.println("=========================================================");
-        System.out.println("> Use command 'register' if you're a new user.");
         System.out.println("> Use command 'login' if you're already registered.");
-        System.out.println("> Use command 'logout' to logout.");
+        System.out.println("> Use command 'help' to find this page.");
         System.out.println("> Use command 'forgotpw' to reset your password.");
         System.out.println("=========================================================");
     }
@@ -360,7 +420,8 @@ public class Client {
 
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
         // String identity = input.nextLine();
-        String identity = input.nextLine();
+        setUserInput("word");
+        String identity = userInput;
         //Integrity stuff
         identity = identity.toLowerCase();
         User user = null;
@@ -422,13 +483,17 @@ public class Client {
     //////////////////////////////////////
     public void loginCommand() {
         System.out.print("> Please enter your e-mail:  ");
-        setUserInput();
-        String email = userInput;
-        System.out.print("> Please enter your password:  ");
-        setUserInput();
-        String userPassword = userInput;
-        try {
+        String email = setUserInput("email");
+        String userPassword;
+        if(email ==""){
+            userPassword = "";
 
+        }else{
+            System.out.print("> Please enter your password:  ");
+            userPassword = setUserInput();
+        }
+
+        try {
             // Verify that OTP matches OTP sent by server
             if (server.verifyPassword(userPassword, email)) {
                 int verfiy = 1;
@@ -471,36 +536,64 @@ public class Client {
     // Forgot Password command function
     //////////////////////////////////////
     public void forgotPasswordCommand() {
+
         System.out.println("> Please enter your email address and a one time password (OTP) will be sent");
-        String email_address = input.nextLine();
+        String email = setUserInput("email");
+        String password = null;
         // sent email
         try {
-            server.sendOTP(email_address);
+            server.sendOTP(email);
+            System.out.print("If your e-mail is valid an OTP will been sent your email, please enter the code: ");
+            Integer otp = new Scanner(System.in).nextInt();
+            if (server.verifyOTP(email, otp)) {
+                System.out.println("> OTP Correct - You can now change reset your password");
+
+                while (true) {
+                    boolean passwordEval = false;
+                    while (!passwordEval) {
+                        System.out.println("> Please set your password");
+                        System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                        password = input.nextLine();
+                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
+                        // password evaluation
+                        if (passwordEval) {
+                            System.out.println("> Strong Password !");
+                            break;
+                        } else {
+                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
+                            System.out.println("> Suggested strong password: " + passwordHandler.getStrongPassword());
+                        }
+                    }
+                    //
+                    System.out.println("> Please confirm your password (type again)");
+                    String temp2 = input.nextLine();
+                    // Satisfy password requirements
+                    if (password.equals(temp2)) {
+                        System.out.println("> Password Confirmed !!!!");
+                        // Create user and store hashed password in DB
+                        try {
+                            System.out.println("needs method for updating password");
+                            //need method to update user password.
+                            //
+                            //
+                            //
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        password = null; //Safety stuff
+                        temp2 = null; //Safety stuff
+                        break;
+                    } else
+                        System.out.println("> The received password is different from the previous one.");
+                }
+            } else {
+                System.out.println("OTP incorrect, please try again");
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        System.out.println("> Please enter your one time password (OTP)");
-        String otp = input.nextLine();
-        // verify the otp
-        // --------------
 
-        while (true) {
-            System.out.println("> Please set your password");
-            System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-            String temp1 = input.nextLine();
-
-            // password evaluation
-            // -------------------
-
-            System.out.println("> Confirm your password");
-            String temp2 = input.nextLine();
-            if (temp1.equals(temp2))// &&satisfy password requirements
-            {
-                break;
-            } else {
-                System.out.println("> The received password is different from the previous one.");
-            }
-        }
     }
 
     public void viewCommand() {
