@@ -49,19 +49,68 @@ public class Client {
         userInput = new Scanner(System.in).nextLine();
     }
 
+    private void setUserInput(String s){
+        String test;
+        String nameRegex = "^[a-zA-Z]+$";
+        String wordRegex = "^[a-zA-Z]+$";
+        String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+
+
+        switch (s) {
+            case "word":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(wordRegex)){
+                    userInput = test;
+                }else{
+                    System.out.println("Incorrect Input - Only letters are accepted.");
+                    userInput = "incorrect input";
+                }
+
+                break;
+
+            case "email":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(emailRegex)){
+                    userInput = test;
+                }else{
+                    System.out.println("Incorrect Input - Only E-mail addresses are accepted.");
+                    userInput = "incorrect input";
+                }
+
+                break;
+
+            case "name":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(nameRegex)){
+                    userInput = test;
+                }else{
+                    System.out.println("Incorrect Input - Only letters are accepted.");
+                    userInput = "incorrect input";
+                }
+
+                break;
+
+            default:
+                System.out.println("NO regex found - testing");
+                break;
+        }
+
+
+    }
+
     ////////////////////////////////////////////////
     //This method runs the main user interface
     private void runUserInterface() {
-
+        System.out.println("=========================================================");
+        System.out.println("     Welcome to  the Hospital Service System");
+        System.out.println("=========================================================");
         while (tlsAuth == 1) {
-            System.out.println("=========================================================");
-            System.out.println("     Welcome to  the Hospital Service System");
             System.out.println("=========================================================");
             System.out.println("> If you already have an account,use command 'login'");
             System.out.println("> Otherwise type 'help' to see all available commands.");
             System.out.println("=========================================================");
 
-            setUserInput();
+            setUserInput("word");
 
             switch (userInput.toLowerCase()) {
                 case "login":
@@ -107,8 +156,8 @@ public class Client {
                 System.out.println("-----------------------------------------------");
                 System.out.println("|  register | logout | view | delete | update |");
                 System.out.println("-----------------------------------------------");
-                System.out.println("> Otherwise type 'helpme' to see all available commands.");
-                setUserInput();
+                System.out.println("> Otherwise type 'help' to see all available commands.");
+                setUserInput("word");
                 switch (userInput.toLowerCase()) {
                     case "register":
                         System.out.println("register");
@@ -135,7 +184,7 @@ public class Client {
                         updateCommand();
                         break;
 
-                    case "helpme":
+                    case "help":
                         helpMeCommand(email_address);
                         break;
 
@@ -163,9 +212,8 @@ public class Client {
     //////////////////////////////////////
     private void helpCommand() {
         System.out.println("=========================================================");
-        System.out.println("> Use command 'register' if you're a new user.");
         System.out.println("> Use command 'login' if you're already registered.");
-        System.out.println("> Use command 'logout' to logout.");
+        System.out.println("> Use command 'help' to find this page.");
         System.out.println("> Use command 'forgotpw' to reset your password.");
         System.out.println("=========================================================");
     }
@@ -204,6 +252,7 @@ public class Client {
 
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
         // String identity = input.nextLine();
+        setUserInput("word");
         String identity = input.nextLine();
         //Integrity stuff
         identity = identity.toLowerCase();
