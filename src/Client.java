@@ -146,19 +146,20 @@ public class Client {
             }
             userInput = "";
 
-            while (loggedIn) {
-                try {
-                    System.out.println("> Logged in as: " +  server.getRole(email_address));
-                    if(server.userIsAdmin(email_address)){
-                        System.out.println("=========================================================");
-                        System.out.println("> You have been verified as SYSTEM ADMIN");
-                        System.out.println("> Type 'help' to see all additional admin-only commands");
-                        System.out.println("=========================================================");
+            try {
+                System.out.println("> Logged in as: " +  server.getRole(email_address));
+                if(server.userIsAdmin(email_address)){
+                    System.out.println("=========================================================");
+                    System.out.println("> You have been verified as SYSTEM ADMIN");
+                    System.out.println("> Type 'help' to see all additional admin-only commands");
+                    System.out.println("=========================================================");
 
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
                 }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            while (loggedIn) {
+
                 System.out.println("> Welcome, Please select and type one of the following options");
                 System.out.println("-----------------------------------------------");
                 System.out.println("|  register | logout | view | delete | update |");
@@ -259,8 +260,8 @@ public class Client {
 
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
         // String identity = input.nextLine();
-        setUserInput("word");
-        String identity = userInput;
+
+        String identity = setUserInput("word");;
         //Integrity stuff
         identity = identity.toLowerCase();
         User user = null;
@@ -274,9 +275,6 @@ public class Client {
 
         // if information all valid
         if (user != null) {
-            // generate private keys and public key for user
-            // ---------------------------------------------
-
 
             //Register and validate password
             while (true) {
@@ -313,6 +311,8 @@ public class Client {
                 } else
                     System.out.println("> The received password is different from the previous one.");
             }
+        }else{
+            System.out.println("Registration failed - Please try again");
         }
 
     }
@@ -563,14 +563,20 @@ public class Client {
         User user = null;
         try {
             System.out.println("> Please enter your email to register");
-            String email_address = input.nextLine();
+            String email_address = setUserInput("email");
 
-            // if the email has been used for register already then break
-            boolean emailAvailable = server.checkEmailAvailable(email_address);
-            if (!emailAvailable) {
-                System.out.println("This email has already been used to register another user. Please try again.");
+            if(email_address ==""){
                 return null;
+            }else{
+
+                if (!server.checkEmailAvailable(email_address)) {
+                    System.out.println("This email has already been used to register another user. Please try again.");
+                    return null;
+                }
+
             }
+            // if the email has been used for register already then break
+
 
             //Note from Paris: Also make sure to do type checks and format checks
             //e.g That letters are not passed to integer fields and the date is formatted properly for
