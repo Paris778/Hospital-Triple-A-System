@@ -45,8 +45,9 @@ public class Client {
         }
     }
 
-    private void setUserInput() {
+    private String setUserInput() {
         userInput = new Scanner(System.in).nextLine();
+        return userInput;
     }
 
     private String setUserInput(String s){
@@ -321,13 +322,17 @@ public class Client {
     //////////////////////////////////////
     public void loginCommand() {
         System.out.print("> Please enter your e-mail:  ");
-        setUserInput();
-        String email = userInput;
-        System.out.print("> Please enter your password:  ");
-        setUserInput();
-        String userPassword = userInput;
-        try {
+        String email = setUserInput("email");
+        String userPassword;
+        if(email ==""){
+            userPassword = "";
 
+        }else{
+            System.out.print("> Please enter your password:  ");
+            userPassword = setUserInput();
+        }
+
+        try {
             // Verify that OTP matches OTP sent by server
             if (server.verifyPassword(userPassword, email)) {
                 int verfiy = 1;
