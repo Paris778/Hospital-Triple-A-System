@@ -49,7 +49,7 @@ public class Client {
         userInput = new Scanner(System.in).nextLine();
     }
 
-    private void setUserInput(String s){
+    private String setUserInput(String s){
         String test;
         String nameRegex = "^[a-zA-Z]+$";
         String wordRegex = "^[a-zA-Z]+$";
@@ -61,40 +61,46 @@ public class Client {
                 test = new Scanner(System.in).nextLine();
                 if(test.matches(wordRegex)){
                     userInput = test;
+                    return test;
                 }else{
                     System.out.println("Incorrect Input - Only letters are accepted.");
                     userInput = "incorrect input";
+                    return "";
                 }
 
-                break;
+
 
             case "email":
                 test = new Scanner(System.in).nextLine();
                 if(test.matches(emailRegex)){
                     userInput = test;
+                    return test;
                 }else{
                     System.out.println("Incorrect Input - Only E-mail addresses are accepted.");
                     userInput = "incorrect input";
+                    return "";
                 }
 
-                break;
+
 
             case "name":
                 test = new Scanner(System.in).nextLine();
                 if(test.matches(nameRegex)){
                     userInput = test;
+                    return test;
                 }else{
                     System.out.println("Incorrect Input - Only letters are accepted.");
                     userInput = "incorrect input";
+                    return "";
                 }
 
-                break;
+
 
             default:
                 System.out.println("NO regex found - testing");
-                break;
-        }
+                return "";
 
+        }
 
     }
 
@@ -110,9 +116,9 @@ public class Client {
             System.out.println("> Otherwise type 'help' to see all available commands.");
             System.out.println("=========================================================");
 
-            setUserInput("word");
 
-            switch (userInput.toLowerCase()) {
+
+            switch (setUserInput("word").toLowerCase()) {
                 case "login":
                     System.out.println("login");
                     loginCommand();
@@ -253,7 +259,7 @@ public class Client {
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
         // String identity = input.nextLine();
         setUserInput("word");
-        String identity = input.nextLine();
+        String identity = userInput;
         //Integrity stuff
         identity = identity.toLowerCase();
         User user = null;
