@@ -1,6 +1,7 @@
 package database;
 
 import utility.Constants;
+import utility.Logger;
 import utility.PasswordHandler;
 
 import java.security.NoSuchAlgorithmException;
@@ -9,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,6 +24,285 @@ public class DatabaseConnection {
     private ResultSet results = null;
     private PasswordHandler passwordHandler = new PasswordHandler();
     private final Lock lock = new ReentrantLock();
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    // LOGGER METHODS
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    // This method appends a log entry to the event_logs table of the database
+    public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
+        //Race Condition Control
+        lock.lock();
+        //
+        try {
+            String statement = "";
+
+            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
+                    + userId + "', '"
+                    + eventType + "', '"
+                    + eventDescription + "', '"
+                    + appendedBy + "'); "
+            );
+
+            // Add to statement
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+            results.close();
+            p.close();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //Race Condition Control
+        lock.unlock();
+        //
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Creates a fake log in order to test functionality
+    //JUST FOR TESTING
+    public synchronized void createFakeLog(int userId, String eventType,String appendedBy) {
+        //Race Condition Control
+        lock.lock();
+        //
+        try {
+            String statement = "";
+            String eventDescription = "Warning Something went wrong ";
+
+            statement =("INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES ('"
+                    + userId + "', '"
+                    + eventType + "', '"
+                    + eventDescription + "', '"
+                    + appendedBy + "'); "
+            );
+
+            // Add to statement
+            p = con.prepareStatement(statement);
+            p.executeUpdate();
+            results.close();
+            p.close();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //Race Condition Control
+        lock.unlock();
+        //
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    // Prints out all log entries
+    public synchronized void viewLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //Prints out all warning log entries
+    public synchronized void viewWarningLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IS 'WARNING' ");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //Prints out all error log entries
+    public synchronized void viewErrorLogEntries( ) {
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IS 'ERROR' ");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //Takes user ID as input and prints all activity from them
+    //
+    public String printSpecificUserResponsibility(int user_Id){
+        lock.lock();
+        StringBuilder builder = new StringBuilder();
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE u_id IS "+ user_Id + ";");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                //
+                String a = id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type + "\t\t" + event_description + "\t\t" + appended_by;
+                System.out.println(a);
+                builder.append(a);
+                builder.append("\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+            return builder.toString();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Returns all the suspicious activity of the system (Warnings , errors)
+    // If print boolen is true, it prints out all the warnings and errors
+    // If print boolean is false, it calculates responisbility and prints out the table
+    public  LinkedHashMap<String,LinkedList<Integer>> viewErrorAndWarningLogEntries(boolean print) {
+        //Race condition control
+        lock.lock();
+        LinkedHashMap<String, LinkedList<Integer>> userResponsibilityMap = new LinkedHashMap<>();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IN ('WARNING','ERROR');");
+            results = p.executeQuery();
+
+            LinkedList<Integer> values = new LinkedList<>();
+            LinkedList<Integer> newList = new LinkedList();
+
+
+            // Loop through each row and print
+            while (results.next()) {
+                newList.clear();
+                newList.add(0);
+                newList.add(0);
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                //
+                if(print) {
+                    System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type + "\t\t" + event_description + "\t\t" + appended_by);
+                }
+                // Populate responsibilities map
+                else {
+                    System.out.println("Trying to meow..;");
+                    //If User Already Exists in the Map
+                    if (userResponsibilityMap.containsKey(userId)) {
+                        System.out.println("User Exists in map");
+                        if (event_type.contains("WARNING")) {
+                            newList.set(0,userResponsibilityMap.get(userId).get(0) + 1);
+                            newList.set(1,userResponsibilityMap.get(userId).get(1));
+                            userResponsibilityMap.put(userId,new LinkedList<>(newList));
+                        }
+                        else if (event_type.contains("ERROR")) {
+                            System.out.println("\t Trying to update EROR");
+                            newList.set(0,userResponsibilityMap.get(userId).get(0));
+                            newList.set(1,userResponsibilityMap.get(userId).get(1) + 1);
+                            userResponsibilityMap.put(userId,new LinkedList<>(newList));
+                        }
+                    }
+                    // First time seeing this User Id
+                    else{
+                        values.clear();
+                        System.out.println("User doesn't exist in map");
+                        if (event_type.contains("WARNING")) {
+                            values.add(1);
+                            values.add(0);
+                        }
+                        else if (event_type.contains("ERROR")) {
+                            values.add(0);
+                            values.add(1);
+                        }
+                        userResponsibilityMap.put(userId,new LinkedList<>(values));
+                        Integer newValue = userResponsibilityMap.get(userId).get(0);
+                        System.out.println(newValue);
+                        Logger.printMap(userResponsibilityMap);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+        if(!print)
+            System.out.println("Returning map");
+        return userResponsibilityMap;
+    }
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    //END OF LOGGER METHODS
+    //////////////////////////////////////////////////////////////////////////////////
 
     public boolean checkEmailAvailable(String email) {
         lock.lock();
@@ -388,36 +670,6 @@ public class DatabaseConnection {
             lock.unlock();
         }
         return "Error in updating user #" + u_id;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // LOGGER METHODS
-    ////////////////////////////////////////////////////////////////////////////////
-
-    public void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
-        //Race Condition Control
-        lock.lock();
-        try {
-            String statement = "INSERT INTO event_logs (u_id, event_type, event_description, appended_by) VALUES (?, ?, ?, ?)";
-            p = con.prepareStatement(statement);
-
-            // Insert values
-            p.setInt(1, userId);
-            p.setString(2, eventType);
-            p.setString(3, eventDescription);
-            p.setInt(4, appendedBy);
-
-            p.executeUpdate();
-            results.close();
-            p.close();
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        //Race Condition Control
-        lock.unlock();
-        //
     }
 
 

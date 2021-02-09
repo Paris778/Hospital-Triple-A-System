@@ -39,4 +39,18 @@ public interface ServerInterface extends java.rmi.Remote {
     String getRole(String email_address) throws RemoteException;
 
     boolean userIsAdmin(String email) throws RemoteException;
+
+    //Logger Methods
+
+    abstract public void logEvent(int userId, int EVENT_ID, int appendedBy) throws RemoteException;
+
+    void viewLogEntries() throws RemoteException;
+
+    void viewLogEntriesWarnings() throws RemoteException;
+
+    void viewLogEntriesErrors() throws RemoteException;
+
+    void viewLogEntriesWarningsAndErrors() throws RemoteException;
+
+    void printUserResponsibility() throws RemoteException;
 }

@@ -22,7 +22,77 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         logger = new Logger(dbConnection);
 
         logger.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
+
+        createFakeLogWarning();
+        //();
+        //createFakeLogWarning();
+        //createFakeLogWarning();
+        //
+        createFakeLogError();
+        //();
+
+        // Tests
+        viewLogEntries();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesWarnings();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesErrors();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        viewLogEntriesWarningsAndErrors();
+        System.out.println("\n\n\n\n=======================================================\n\n");
+        printUserResponsibility();
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////LOGGER METHODS
+
+    @Override
+    public void logEvent(int EVENT_ID, int userId,int appendedBy) throws RemoteException {
+
+        this.logger.logEvent(userId,EVENT_ID,appendedBy);
+    }
+
+
+    @Override
+    public void viewLogEntriesWarningsAndErrors() {
+        dbConnection.viewErrorAndWarningLogEntries(true);
+    }
+
+
+    @Override
+    public void printUserResponsibility() {
+        Logger.printMap(dbConnection.viewErrorAndWarningLogEntries(false));
+    }
+
+
+    @Override
+    public void viewLogEntries() throws RemoteException {
+        this.dbConnection.viewLogEntries();
+    }
+
+    @Override
+    public void viewLogEntriesWarnings() throws RemoteException {
+        dbConnection.viewWarningLogEntries();
+    }
+
+    @Override
+    public void viewLogEntriesErrors() throws RemoteException {
+        dbConnection.viewErrorLogEntries();
+    }
+
+
+    public void createFakeLogWarning(){
+        System.out.println("Making fake log...");
+        dbConnection.createFakeLog(101,"WARNING","999999999");
+    }
+    public void createFakeLogError(){
+        System.out.println("Making fake log...");
+        dbConnection.createFakeLog(2000,"ERROR","999999999");
+    }
+
+
+    /////////////////// END OF LOGGER METHODS
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean checkPermissions(String email, String request) {
         return dbConnection.checkPermissions(email, request);
