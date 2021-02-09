@@ -40,17 +40,23 @@ public interface ServerInterface extends java.rmi.Remote {
 
     boolean userIsAdmin(String email) throws RemoteException;
 
-    //Logger Methods
+    ///////////////////////////////////////////
+    //LOGGER ADMIN  METHODS
+    ///////////////////////////////////////////
 
-    abstract public void logEvent(int userId, int EVENT_ID, int appendedBy) throws RemoteException;
+    void logEvent(int userId, int EVENT_ID, int appendedBy) throws RemoteException;
 
-    void viewLogEntries() throws RemoteException;
+    String viewLogEntries() throws RemoteException;
 
-    void viewLogEntriesWarnings() throws RemoteException;
+    String viewRecentLogs(int numberOfLogs) throws  RemoteException;
 
-    void viewLogEntriesErrors() throws RemoteException;
+    String viewLogEntriesWarnings() throws RemoteException;
 
-    void viewLogEntriesWarningsAndErrors() throws RemoteException;
+    String viewLogEntriesErrors() throws RemoteException;
 
-    void printUserResponsibility() throws RemoteException;
+    String viewLogEntriesWarningsAndErrors() throws RemoteException;
+
+    String printUserResponsibility() throws RemoteException;
+
+    String inspectSpecificUser(String userId) throws RemoteException;
 }

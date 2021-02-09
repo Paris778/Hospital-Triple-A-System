@@ -15,24 +15,26 @@ public class Logger {
         this.connection = connection;
     }
 
-    public static void printMap(LinkedHashMap<String, LinkedList<Integer>> map) {
+    public static String printMap(LinkedHashMap<String, LinkedList<Integer>> map) {
+        StringBuilder builder = new StringBuilder();
         System.out.println("LOGGER: Trying to print map");
         int i = 1;
-        System.out.println("\n------------------------------------------------------------------------------------------------------------------");
+        builder.append("\n------------------------------------------------------------------------------------------------------------------");
         for(String user : map.keySet()){
-            //System.out.println(map.get(user).get(0),map.get(user).get(1));
-            System.out.println(String.format("%3d .  |   USER ID: %-20s |   WARNINGS: %3d  |   ERRORS: %3d   |",i,user,map.get(user).get(0),map.get(user).get(1)));
+            builder.append(String.format("%3d .  |   USER ID: %-20s |   WARNINGS: %3d  |   ERRORS: %3d   |",i,user,map.get(user).get(0),map.get(user).get(1)));
+            builder.append("\n");
             i++;
         }
-        System.out.println("------------------------------------------------------------------------------------------------------------------\n");
-    }
+       builder.append("------------------------------------------------------------------------------------------------------------------\n");
 
+        return builder.toString();
+    }
 
     //This is the main function to log events.
     // Takes in a CONSTANT for the type of event and the database.User ID if applicable
     // The logEvent method is super charged for various logging types (future thing)
     public void logEvent(int userId, int EVENT_ID, int appendedBy){
-        System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
+        //System.err.println("Values got at logger : " + EVENT_ID + " " + userId);
         switch (EVENT_ID){
             //
             case Constants.LOG_SYSTEM_ONLINE:
@@ -113,23 +115,6 @@ public class Logger {
         }
     }
 
-    //This method prints out log entries
-    public void dumpLog(){
-        connection.viewLogEntries();
-    }
-
-    //This method prints out the most recent WARNING entries
-    public String printWarnings(){
-        return "";
-    }
-
-    //This method prints out the most recent ERROR entries
-    public String printErrors(){
-        return "";
-    }
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////
     // Support Methods
     private  String getEventType(int EVENT_ID){
@@ -150,7 +135,4 @@ public class Logger {
             return ("NON-REGISTERED EVENT");
         }
     }
-
-
-
 }

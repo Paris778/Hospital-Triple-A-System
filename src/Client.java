@@ -28,7 +28,11 @@ public class Client {
 
     public Client() {
         connectToServer();
-        runUserInterface();
+        try {
+            runUserInterface();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void connectToServer() {
@@ -118,7 +122,8 @@ public class Client {
 
     ////////////////////////////////////////////////
     //This method runs the main user interface
-    private void runUserInterface() {
+    private void runUserInterface() throws RemoteException {
+
         System.out.println("=========================================================");
         System.out.println("     Welcome to  the Hospital Service System");
         System.out.println("=========================================================");
@@ -146,31 +151,25 @@ public class Client {
                     forgotPasswordCommand();
                     break;
 
-                case "test":
-                    System.out.println("test");
-                    registerCommand();
-                    break;
-
                 default:
                     System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                     break;
             }
             userInput = "";
 
-            try {
-                System.out.println("> Logged in as: " +  server.getRole(email_address));
-                if(server.userIsAdmin(email_address)){
-                    System.out.println("=========================================================");
-                    System.out.println("> You have been verified as SYSTEM ADMIN");
-                    System.out.println("> Type 'help' to see all additional admin-only commands");
-                    System.out.println("=========================================================");
-
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
             while (loggedIn) {
+                try {
+                    System.out.println("> Logged in as: " +  server.getRole(email_address));
+                    if(server.userIsAdmin(email_address)){
+                        System.out.println("==========================================================");
+                        System.out.println("> You have been verified as |SYSTEM ADMIN|");
+                        System.out.println("> Type 'helpme' to see all additional admin-only commands");
+                        System.out.println("==========================================================");
 
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
                 System.out.println("> Welcome, Please select and type one of the following options");
                 System.out.println("-----------------------------------------------");
                 System.out.println("|  register | logout | view | delete | update |");
@@ -207,6 +206,39 @@ public class Client {
                         helpMeCommand(email_address);
                         break;
 
+                    //////////////////////////
+                    // ADMIN ONLY COMMANDS
+                    /////////////////////////
+
+                    case "viewalllogs":
+                        viewAllLogsCommand();
+                        break;
+
+                    case "viewrecent":
+                        viewRecentLogsCommand();
+                        break;
+
+                    case "responsibility":
+                        userResponsibilityCommand();
+                        break;
+
+                    case "viewwarnings":
+                        viewWarnings();
+                        break;
+
+                    case "viewerrors":
+                        viewErrors();
+                        break;
+
+                    case "viewsuspicious":
+                        viewSuspiciousActivity();
+                        break;
+
+                    case "inspectuser":
+                        inspectUserCommand();
+                        break;
+
+
                     default:
                         System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
                         break;
@@ -225,6 +257,122 @@ public class Client {
     // User input commands !!
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    ///////////////////////
+    //ADMIN Commands START
+    ///////////////////////
+
+    private void viewAllLogsCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.viewLogEntries());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //
+    private void viewRecentLogsCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                boolean validInput = false;
+                int numberOfLogs = 10;
+                while(!validInput){
+                    System.out.println("> Please specify how many logs you'd like to view. Default is 10");
+                    setUserInput();
+
+                    try{
+                        numberOfLogs = Integer.valueOf(userInput);
+                    } catch (Exception e){
+                        System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
+                        continue;
+                    }
+                    if( numberOfLogs < 50 ){
+                        System.out.println(server.viewRecentLogs(numberOfLogs));
+                        validInput = true;
+                    } else {
+                        System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
+                    }
+                }
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void userResponsibilityCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.printUserResponsibility());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //
+    private void inspectUserCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println("> Please type the ID of the user you'd like to inspect.");
+                setUserInput();
+                System.out.println(server.inspectSpecificUser(userInput));
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void viewWarnings() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.viewLogEntriesWarnings());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void viewErrors() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.viewLogEntriesErrors());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void viewSuspiciousActivity() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.viewLogEntriesWarningsAndErrors());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    ///////////////////////
+    //ADMIN Commands END
+    ///////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////
     // Help command function
@@ -252,11 +400,20 @@ public class Client {
 
         try {
             if(server.userIsAdmin(email_address)){
-                System.out.println("=========================================================");
-                System.out.println("                  ADMIN ONLY COMMANDS");
-                System.out.println("=========================================================");
-                System.out.println("> Use command 'seewarnings' to view all warning logs'");
-                System.out.println("=========================================================");
+                System.out.println("=============================================================");
+                System.out.println("                    ADMIN ONLY COMMANDS");
+                System.out.println("=============================================================");
+                System.out.println("> Use command 'viewAllLogs' to view all logs'"); //Done and Tested
+                System.out.println("> Use command 'viewRecent' to view most recent logs'"); //Done and Tested
+                System.out.println("> Use command 'responsibility' to see which users\n  are responsible for suspicious events.'"); //Done and Tested
+                System.out.println("> Use command 'viewWarnings' to view all Warning logs'"); //Done and Tested
+                System.out.println("> Use command 'viewErrors' to view all Error logs'"); //Done and Tested
+                System.out.println("> Use command 'viewSuspicious' to view all suspicious logs'"); //Done and Tested
+                System.out.println("> Use command 'inspectUser' to inspect a user's activity'"); //Done and Tested
+                //TO:DO
+                System.out.println("> Use (NEED TO IMPLEMENT) command 'lockAccount' to inspect a user's activity'");
+                System.out.println("> Use (NEED TO IMPLEMENT) command 'unlockAccount' to inspect a user's activity'");
+                System.out.println("=============================================================");
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -576,7 +733,7 @@ public class Client {
             System.out.println("> Please enter your email to register");
             String email_address = setUserInput("email");
 
-            if(email_address ==""){
+            if(email_address == ""){
                 return null;
             }else{
 
