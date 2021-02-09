@@ -433,24 +433,6 @@ public class Client {
             e.printStackTrace();
         }
 
-
-        while (true) {
-            System.out.println("> Please set your password");
-            System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
-            String temp1 = input.nextLine();
-
-            // password evaluation
-            // -------------------
-
-            System.out.println("> Confirm your password");
-            String temp2 = input.nextLine();
-            if (temp1.equals(temp2))// &&satisfy password requirements
-            {
-                break;
-            } else {
-                System.out.println("> The received password is different from the previous one.");
-            }
-        }
     }
 
     public void viewCommand() {
