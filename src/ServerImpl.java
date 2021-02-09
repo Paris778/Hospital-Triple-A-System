@@ -48,38 +48,46 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
     @Override
     public void logEvent(int EVENT_ID, int userId,int appendedBy) throws RemoteException {
-
         this.logger.logEvent(userId,EVENT_ID,appendedBy);
-    }
-
-
-    @Override
-    public void viewLogEntriesWarningsAndErrors() {
-        dbConnection.viewErrorAndWarningLogEntries(true);
-    }
-
+    } //Done
 
     @Override
-    public void printUserResponsibility() {
-        Logger.printMap(dbConnection.viewErrorAndWarningLogEntries(false));
-    }
-
+    public String viewLogEntriesWarningsAndErrors() {
+        return dbConnection.viewErrorAndWarningLogEntries(true);
+    } //Done
 
     @Override
-    public void viewLogEntries() throws RemoteException {
-        this.dbConnection.viewLogEntries();
+    public String printUserResponsibility() {
+        return dbConnection.viewErrorAndWarningLogEntries(false);
+    } //Done
+
+    @Override
+    public String inspectSpecificUser(String userId) throws RemoteException {
+        return dbConnection.inspectSpecificUser(userId);
     }
 
     @Override
-    public void viewLogEntriesWarnings() throws RemoteException {
-        dbConnection.viewWarningLogEntries();
+    public String viewLogEntries() throws RemoteException {
+        return dbConnection.viewLogEntries();
     }
 
     @Override
-    public void viewLogEntriesErrors() throws RemoteException {
-        dbConnection.viewErrorLogEntries();
+    public String viewRecentLogs(int numberOfLogs) throws RemoteException {
+        return dbConnection.viewRecentLogs(numberOfLogs);
     }
 
+    @Override
+    public String viewLogEntriesWarnings() throws RemoteException {
+        return dbConnection.viewWarningLogEntries();
+    }
+
+    @Override
+    public String viewLogEntriesErrors() throws RemoteException {
+        return dbConnection.viewErrorLogEntries();
+    }
+
+    /////////////////////////////////////
+    /// Testing methods please ignore
 
     public void createFakeLogWarning(){
         System.out.println("Making fake log...");

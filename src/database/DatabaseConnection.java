@@ -1,6 +1,5 @@
 package database;
 
-import utility.Constants;
 import utility.Logger;
 import utility.PasswordHandler;
 
@@ -26,7 +25,7 @@ public class DatabaseConnection {
     private final Lock lock = new ReentrantLock();
 
     ///////////////////////////////////////////////////////////////////////////////////
-    // LOGGER METHODS
+    // LOGGER METHODS START
     ///////////////////////////////////////////////////////////////////////////////////
 
     // This method appends a log entry to the event_logs table of the database
@@ -95,7 +94,10 @@ public class DatabaseConnection {
 
     /////////////////////////////////////////////////////////////////////////////////////
     // Prints out all log entries
-    public synchronized void viewLogEntries( ) {
+    public synchronized String viewLogEntries( ) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
         //Race condition control
         lock.lock();
         try {
@@ -112,7 +114,9 @@ public class DatabaseConnection {
                 String event_type = results.getString("event_type");
                 String event_description = results.getString("event_description");
                 String appended_by = results.getString("appended_by");
-                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+
+                builder.append("\n");
+                builder.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
             }
 
         } catch (SQLException e) {
@@ -121,13 +125,17 @@ public class DatabaseConnection {
             //Race condition control
             lock.unlock();
         }
+        return builder.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
     //Prints out all warning log entries
-    public synchronized void viewWarningLogEntries( ) {
+    public synchronized String viewWarningLogEntries( ) {
         //Race condition control
         lock.lock();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
         try {
             // Execute SQL query
 
@@ -142,20 +150,27 @@ public class DatabaseConnection {
                 String event_type = results.getString("event_type");
                 String event_description = results.getString("event_description");
                 String appended_by = results.getString("appended_by");
-                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+
+                builder.append("\n");
+                builder.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            builder = new StringBuilder();
+            builder.append("> Oops, something went wrong. Check that your input is correct.");
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return builder.toString();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
     //Prints out all error log entries
-    public synchronized void viewErrorLogEntries( ) {
+    public synchronized String viewErrorLogEntries( ) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
         //Race condition control
         lock.lock();
         try {
@@ -172,23 +187,28 @@ public class DatabaseConnection {
                 String event_type = results.getString("event_type");
                 String event_description = results.getString("event_description");
                 String appended_by = results.getString("appended_by");
-                System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type +"\t\t"+event_description +"\t\t"+ appended_by);
+
+                builder.append("\n");
+                builder.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            builder = new StringBuilder();
+            builder.append("> Oops, something went wrong. Check that your input is correct.");
         } finally {
             //Race condition control
             lock.unlock();
         }
+        return builder.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
     //Takes user ID as input and prints all activity from them
     //
-    public String printSpecificUserResponsibility(int user_Id){
+    public String inspectSpecificUser(String user_Id){
         lock.lock();
         StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
         try {
             // Execute SQL query
             p = con.prepareStatement("SELECT * FROM event_logs WHERE u_id IS "+ user_Id + ";");
@@ -203,13 +223,12 @@ public class DatabaseConnection {
                 String event_description = results.getString("event_description");
                 String appended_by = results.getString("appended_by");
                 //
-                String a = id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type + "\t\t" + event_description + "\t\t" + appended_by;
-                System.out.println(a);
-                builder.append(a);
                 builder.append("\n");
+                builder.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            builder = new StringBuilder();
+            builder.append("> Oops, something went wrong. Check that your imput is correct and that the user exists");
         } finally {
             //Race condition control
             lock.unlock();
@@ -219,16 +238,20 @@ public class DatabaseConnection {
 
     ///////////////////////////////////////////////////////////////////////////////////
     // Returns all the suspicious activity of the system (Warnings , errors)
-    // If print boolen is true, it prints out all the warnings and errors
-    // If print boolean is false, it calculates responisbility and prints out the table
-    public  LinkedHashMap<String,LinkedList<Integer>> viewErrorAndWarningLogEntries(boolean print) {
+    // If print boolean is true, it prints out all the warnings and errors
+    // If print boolean is false, it calculates responsibility and prints out the table
+
+    public  String viewErrorAndWarningLogEntries(boolean printJustLogs) {
         //Race condition control
         lock.lock();
         LinkedHashMap<String, LinkedList<Integer>> userResponsibilityMap = new LinkedHashMap<>();
+        StringBuilder builderResponsibility = new StringBuilder();
+        StringBuilder builderAllLogs = new StringBuilder();
         try {
             // Execute SQL query
 
             p = con.prepareStatement("SELECT * FROM event_logs WHERE event_type IN ('WARNING','ERROR');");
+            builderAllLogs.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
             results = p.executeQuery();
 
             LinkedList<Integer> values = new LinkedList<>();
@@ -247,12 +270,13 @@ public class DatabaseConnection {
                 String event_description = results.getString("event_description");
                 String appended_by = results.getString("appended_by");
                 //
-                if(print) {
-                    System.out.println(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type + "\t\t" + event_description + "\t\t" + appended_by);
+                if(printJustLogs) {
+                    //builderAllLogs.append(id + "\t\t" + userId + "\t\t" + time + "\t\t" + event_type + "\t\t" + event_description + "\t\t" + appended_by);
+                    builderAllLogs.append("\n");
+                    builderAllLogs.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
                 }
                 // Populate responsibilities map
                 else {
-                    System.out.println("Trying to meow..;");
                     //If User Already Exists in the Map
                     if (userResponsibilityMap.containsKey(userId)) {
                         System.out.println("User Exists in map");
@@ -262,7 +286,7 @@ public class DatabaseConnection {
                             userResponsibilityMap.put(userId,new LinkedList<>(newList));
                         }
                         else if (event_type.contains("ERROR")) {
-                            System.out.println("\t Trying to update EROR");
+                            System.out.println("\t Trying to update ERROR");
                             newList.set(0,userResponsibilityMap.get(userId).get(0));
                             newList.set(1,userResponsibilityMap.get(userId).get(1) + 1);
                             userResponsibilityMap.put(userId,new LinkedList<>(newList));
@@ -288,21 +312,67 @@ public class DatabaseConnection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            builderResponsibility = new StringBuilder();
+            builderResponsibility.append("> Oops, something went wrong. Check that your input is correct.");
+            return builderResponsibility.toString();
         } finally {
             //Race condition control
             lock.unlock();
         }
-        if(!print)
-            System.out.println("Returning map");
-        return userResponsibilityMap;
+        if(printJustLogs){
+            return builderAllLogs.toString();
+        }
+        else{
+            int i = 1;
+            builderResponsibility.append("\n------------------------------------------------------------------------------------------------------------------\n");
+            for(String user : userResponsibilityMap.keySet()){
+                builderResponsibility.append(String.format("%3d .  |   USER ID: %-20s |   WARNINGS: %3d  |   ERRORS: %3d   |",i,user,userResponsibilityMap.get(user).get(0),userResponsibilityMap.get(user).get(1)));
+                builderResponsibility.append("\n");
+                i++;
+            }
+            builderResponsibility.append("------------------------------------------------------------------------------------------------------------------\n");
+            return builderResponsibility.toString();
+        }
     }
 
+    public String viewRecentLogs(int amount){
+        lock.lock();
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("%4s .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |","No.", "USER ID", "TIME OF EVENT", "EVENT TYPE", "DESCRIPTION","APPEND BY"));
+        try {
+            // Execute SQL query
+            p = con.prepareStatement("SELECT * FROM (SELECT * FROM event_logs ORDER BY e_id DESC LIMIT ?) ORDER BY e_id ASC;");
+            p.setInt(1, amount);
+            results = p.executeQuery();
 
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("e_id");
+                String userId = results.getString("u_id");
+                String time = results.getString("time_of_event");
+                String event_type = results.getString("event_type");
+                String event_description = results.getString("event_description");
+                String appended_by = results.getString("appended_by");
+                //
+                builder.append("\n");
+                builder.append(String.format("%4d .  | %-20s |  %-32s |  %-11s  |  %-100s  | %-12s |",id,userId,time,event_type ,event_description,appended_by));
+            }
+        } catch (SQLException e) {
+            builder = new StringBuilder();
+            builder.append("> Oops, something went wrong. Check that your input is correct.");
+        } finally {
+            //Race condition control
+            lock.unlock();
+            return builder.toString();
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////
     //END OF LOGGER METHODS
     //////////////////////////////////////////////////////////////////////////////////
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean checkEmailAvailable(String email) {
         lock.lock();
