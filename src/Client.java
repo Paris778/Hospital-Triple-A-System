@@ -54,9 +54,12 @@ public class Client {
     private void runUserInterface() {
 
         while (tlsAuth == 1) {
-            System.out.println("> Welcome to  the Hospital Service System");
+            System.out.println("=========================================================");
+            System.out.println("     Welcome to  the Hospital Service System");
+            System.out.println("=========================================================");
             System.out.println("> If you already have an account,use command 'login'");
             System.out.println("> Otherwise type 'help' to see all available commands.");
+            System.out.println("=========================================================");
 
             setUserInput();
 
@@ -91,13 +94,20 @@ public class Client {
                 try {
                     System.out.println("> Logged in as: " +  server.getRole(email_address));
                     if(server.userIsAdmin(email_address)){
+                        System.out.println("=========================================================");
                         System.out.println("> You have been verified as SYSTEM ADMIN");
+                        System.out.println("> Type 'help' to see all additional admin-only commands");
+                        System.out.println("=========================================================");
+
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                System.out.println("> Welcome, Please select from one of the following options");
-                System.out.println(">   register, logout, view, delete, update");
+                System.out.println("> Welcome, Please select and type one of the following options");
+                System.out.println("-----------------------------------------------");
+                System.out.println("|  register | logout | view | delete | update |");
+                System.out.println("-----------------------------------------------");
+                System.out.println("> Otherwise type 'helpme' to see all available commands.");
                 setUserInput();
                 switch (userInput.toLowerCase()) {
                     case "register":
@@ -125,8 +135,12 @@ public class Client {
                         updateCommand();
                         break;
 
+                    case "helpme":
+                        helpMeCommand(email_address);
+                        break;
+
                     default:
-                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
                         break;
                 }
             }
@@ -148,10 +162,38 @@ public class Client {
     // Help command function
     //////////////////////////////////////
     private void helpCommand() {
+        System.out.println("=========================================================");
         System.out.println("> Use command 'register' if you're a new user.");
         System.out.println("> Use command 'login' if you're already registered.");
         System.out.println("> Use command 'logout' to logout.");
         System.out.println("> Use command 'forgotpw' to reset your password.");
+        System.out.println("=========================================================");
+    }
+
+    ////////////////////////////////////////////////
+    // HelpMe command function | Used after log in
+    ////////////////////////////////////////////////
+    private void helpMeCommand(String email_address){
+
+        System.out.println("===================================================================================");
+        System.out.println("> Use command 'register' if you're a new user.");
+        System.out.println("> Use command 'logout' in order to safely log out.");
+        System.out.println("> Use command 'view' to view records (APPROPRIATE LEVEL OF ACCESS REQUIRED)");
+        System.out.println("> Use command 'delete' to delete records (APPROPRIATE LEVEL OF ACCESS REQUIRED)");
+        System.out.println("> Use command 'update' to update records (APPROPRIATE LEVEL OF ACCESS REQUIRED)");
+        System.out.println("===================================================================================");
+
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println("=========================================================");
+                System.out.println("                  ADMIN ONLY COMMANDS");
+                System.out.println("=========================================================");
+                System.out.println("> Use command 'seewarnings' to view all warning logs'");
+                System.out.println("=========================================================");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     //////////////////////////////////////
