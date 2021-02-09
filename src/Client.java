@@ -54,6 +54,7 @@ public class Client {
         String test;
         String nameRegex = "^[a-zA-Z]+$";
         String wordRegex = "^[a-zA-Z]+$";
+        String dateRegex = "^[0-9]+$";
         String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
 
 
@@ -95,6 +96,16 @@ public class Client {
                     return "";
                 }
 
+            case "date":
+                test = new Scanner(System.in).nextLine();
+                if(test.matches(dateRegex)){
+                    userInput = test;
+                    return test;
+                }else{
+                    System.out.println("Incorrect Input - Only numbers are accepted.");
+                    userInput = "incorrect input";
+                    return "";
+                }
 
 
             default:
@@ -581,14 +592,49 @@ public class Client {
             //Note from Paris: Also make sure to do type checks and format checks
             //e.g That letters are not passed to integer fields and the date is formatted properly for
             // database storage
+            String forename = "", surname = "", year = "", month = "",day = "", date_of_birth = "", address = "";
             System.out.println("> Please enter forename");
-            String forename = input.nextLine();
-            System.out.println("> Please enter your surname");
-            String surname = input.nextLine();
-            System.out.println("> Please enter your date of birth in format XXXX-XX-XX");
-            String date_of_birth = input.nextLine();
-            System.out.println("> Please enter your address");
-            String address = input.nextLine();
+            forename = setUserInput("name");
+            if(forename ==""){
+                return null;
+
+            }else{
+                System.out.println("> Please enter your surname");
+                surname = setUserInput("name");
+                if(surname == ""){
+                    return null;
+
+                }else{
+                    System.out.println("> Please enter the year you were born");
+                    year = setUserInput("date");
+                    if(year == ""){
+                        return null;
+
+                    }else{
+                        System.out.println("> Please enter the month you were born");
+                        month = setUserInput("date");
+                        if(month == ""){
+                            return null;
+
+                        }else{
+                            System.out.println("> Please enter the day you were born");
+                            day = setUserInput("date");
+                            if(day == ""){
+                                return null;
+
+                            }else{
+                                System.out.println("> Please enter your address");
+                                address = input.nextLine();
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+
+            date_of_birth = year + "-" + month + "-" + day;
 
             // Register patient
             if (isPatient) {
