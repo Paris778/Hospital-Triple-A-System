@@ -375,18 +375,64 @@ public class Client {
     // Forgot Password command function
     //////////////////////////////////////
     public void forgotPasswordCommand() {
+
         System.out.println("> Please enter your email address and a one time password (OTP) will be sent");
-        String email_address = input.nextLine();
+        String email = setUserInput("email");
+        String password = null;
         // sent email
         try {
-            server.sendOTP(email_address);
+            server.sendOTP(email);
+            System.out.print("If your e-mail is valid an OTP will been sent your email, please enter the code: ");
+            Integer otp = new Scanner(System.in).nextInt();
+            if (server.verifyOTP(email, otp)) {
+                System.out.println("> OTP Correct - You can now change reset your password");
+
+                while (true) {
+                    boolean passwordEval = false;
+                    while (!passwordEval) {
+                        System.out.println("> Please set your password");
+                        System.out.println("> The length of the password should be more than 8 characters which must include a capital letter, a lower-case letter, a number and a special symbol");
+                        password = input.nextLine();
+                        passwordEval = passwordHandler.checkPasswordStrength(password) >= Constants.INTERMEDIATE_PASSWORD;
+                        // password evaluation
+                        if (passwordEval) {
+                            System.out.println("> Strong Password !");
+                            break;
+                        } else {
+                            passwordHandler.printPasswordImprovementSuggestions(); //Prints suggestions
+                            System.out.println("> Suggested strong password: " + passwordHandler.getStrongPassword());
+                        }
+                    }
+                    //
+                    System.out.println("> Please confirm your password (type again)");
+                    String temp2 = input.nextLine();
+                    // Satisfy password requirements
+                    if (password.equals(temp2)) {
+                        System.out.println("> Password Confirmed !!!!");
+                        // Create user and store hashed password in DB
+                        try {
+                            System.out.println("needs method for updating password");
+                            //need method to update user password.
+                            //
+                            //
+                            //
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        password = null; //Safety stuff
+                        temp2 = null; //Safety stuff
+                        break;
+                    } else
+                        System.out.println("> The received password is different from the previous one.");
+                }
+            } else {
+                System.out.println("OTP incorrect, please try again");
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        System.out.println("> Please enter your one time password (OTP)");
-        String otp = input.nextLine();
-        // verify the otp
-        // --------------
+
 
         while (true) {
             System.out.println("> Please set your password");
