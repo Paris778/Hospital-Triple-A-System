@@ -5,6 +5,7 @@ import utility.Constants;
 import utility.PasswordHandler;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
+import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -238,6 +239,13 @@ public class Client {
                         inspectUserCommand();
                         break;
 
+                    case "backup":
+                        backup(1);
+                        break;
+
+                    case "restore":
+                        backup(2);
+                        break;
 
                     default:
                         System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
@@ -307,6 +315,23 @@ public class Client {
         }
     }
 
+    public void backup(int x){
+        try {
+            if(server.userIsAdmin(email_address)){
+                if(x == 1){
+                    System.out.println(server.databaseEncryption("encrypt",new File("new-database.db"),new File("encryptedBackup.db")));
+                }else if(x == 2) {
+                    System.out.println(server.databaseEncryption("decrypt", new File("encryptedBackup.db"), new File("new-database.db")));
+                }
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     private void userResponsibilityCommand() {
         try {

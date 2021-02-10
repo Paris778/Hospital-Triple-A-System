@@ -107,10 +107,14 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
             inputStream.close();
             outputStream.close();
+            return "Function Completed";
 
-        }catch (Exception e) { e.printStackTrace();}
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "Function Failed";
+        }
 
-        return null;
+
     }
 
     @Override
