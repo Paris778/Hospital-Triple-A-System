@@ -20,6 +20,10 @@ public class Client {
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
 
+    // Misc Variables
+    private int wrongPasswordCounter = 0;
+    private int wrongOtpCounter = 0;
+
 
     //////////////////////////////////////////////////
     //Main Method
@@ -260,7 +264,7 @@ public class Client {
                         break;
 
                     default:
-                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                         userInput = "";
                         break;
                 }
@@ -496,14 +500,13 @@ public class Client {
                 System.out.println("> Use command 'lockAccount' to manually lock a user's account'");     //Done and Tested
                 System.out.println("> Use command 'unlockAccount' to manually unlock a user's account'");  //Done and Tested
                 System.out.println("> Use command 'viewLocked' to see all locked Accounts'");   //Done and Tested
-
-
-
-
                 // Send warning email                           //Done and Tested
                 // Counter to send warnings and lock/kick
                 // Check if locked                              //Done and Tested
                 // Warned if account is locked                  //Done and Tested
+
+                // TO:DO Fix UserIsAdmin MEthod in dbConnect
+                // Put logs where they need to go
                 System.out.println("====================================================================");
             }
         } catch (RemoteException e) {
@@ -608,18 +611,27 @@ public class Client {
                             System.out.println("> Logged in successfully.");
                         } else {
                             System.out.println("OTP incorrect, please try again");
+                            this.wrongOtpCounter++;
+                            if(detectMalicious()) {
+                                kickAndLock();
+                                break;
+                            }
                         }
                     }
                 } else {
                     System.out.println("> Incorrect. Please try again.");
+                    this.wrongPasswordCounter++;
+                    if(detectMalicious()) {
+                        kickAndLock();
+                    }
                     loggedIn = false;
                 }
             }
             //IF ACCOUNT IS LOCKED.
             else{
                 System.out.println("> We apologise but this account doesn't exist or has been LOCKED due to security concerns.\n" +
-                        "A System Administrator will review your case shortly.\n" +
-                        "For Further enquiries please message customer support");
+                        "> If your account is LOCKED, a System Administrator will review your case shortly.\n" +
+                        "> For Further enquiries please message customer support");
             }
         } catch(Exception e){
             e.printStackTrace();
@@ -629,6 +641,31 @@ public class Client {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean detectMalicious(){
+        if(wrongOtpCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES || wrongPasswordCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES){
+            return true;
+        }
+        return false;
+    }
+
+    //If user enters password or OTP wrong multiple times , their account gets locked.
+    // System admins can review locked accounts.
+    private void kickAndLock(){
+        logoutCommand();
+        System.out.println("\n\n---------------------------------------------------------------");
+        System.out.println("> We apologise !!! But malicious activity has been detected in this account.\n" +
+                "> Your account has been locked and you have been logged out." +
+                "> A system admin will review your case shortly");
+        System.out.println("---------------------------------------------------------------");
+        //Lock account and send warning email
+        try {
+            server.kickAndLockUserAutomatic(email_address);
+            server.sendWarningEmail(email_address);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 
     //////////////////////////////////////
     // Logout command function

@@ -608,10 +608,21 @@ public class DatabaseConnection {
         //Race condition control
         lock.lock();
         try {
-            p = con.prepareStatement("SELECT a_id FROM admins WHERE u_id= ?");
-            p.setString(1, String.valueOf(getUserId(email)));
+            //////////////////////////////////////////////////////////////
+            p = con.prepareStatement("SELECT u_id FROM admins WHERE u_id="+getUserId(email));
+            System.out.println(email);
+            System.out.println(getUserId(email) + "\n--------");
+            //p.setInt(1, getUserId(email));
             results = p.executeQuery();
-            return (results.next());
+            //
+            while(results.next()) {
+                System.out.println(getUserId(email));
+                System.out.println(results.getInt(1));
+                System.out.println(getUserId(email) == results.getInt(1));
+                return (getUserId(email) == results.getInt(1));
+            }
+            return false;
+            //////////////////////////////////////////////////////////////
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

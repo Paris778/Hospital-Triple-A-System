@@ -23,9 +23,15 @@ public class Constants {
     public static final String LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz"; 
     public static final String NUMBERS = "0123456789";
 
+    //Misc Constatns
+
+    public static final int MAX_ALLOWED_FALSE_ENTRIES = 5;
+
     //////////////////////////////////////////////////////////////////////////
     //      LOGGER CONSTANTS
     //////////////////////////////////////////////////////////////////////////
+
+
 
     //Appended By System
     public static final int USER_ID_SYSTEM = 999999999;

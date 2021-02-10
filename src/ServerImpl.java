@@ -356,8 +356,8 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public String kickAndLockUserAutomatic(String accountToLock) {
-        return dbConnection.lockAccount(accountToLock);
+    public String kickAndLockUserAutomatic(String emailAddress) {
+        return dbConnection.lockAccount(String.valueOf(getUserId(emailAddress)));
     }
 
     @Override
