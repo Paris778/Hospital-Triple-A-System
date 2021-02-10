@@ -19,11 +19,15 @@ public class Client {
     private final Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
+<<<<<<< HEAD
 
     // Misc Variables
     private int wrongPasswordCounter = 0;
     private int wrongOtpCounter = 0;
 
+=======
+    private int loginAttempts = 0;
+>>>>>>> f11707682decd6c6445b692de253885cbbf934d5
 
     //////////////////////////////////////////////////
     //Main Method
@@ -59,7 +63,7 @@ public class Client {
         return userInput;
     }
 
-    private String setUserInput(String s){
+    private String setUserInput(String s) {
         String test;
         String nameRegex = "^[a-zA-Z]+$";
         String wordRegex = "^[a-zA-Z]+$";
@@ -70,36 +74,34 @@ public class Client {
         switch (s) {
             case "word":
                 test = new Scanner(System.in).nextLine();
-                if(test.matches(wordRegex)){
+                if (test.matches(wordRegex)) {
                     userInput = test;
                     return test;
-                }else{
+                } else {
                     System.out.println("Incorrect Input - Only letters are accepted.");
                     userInput = "incorrect input";
                     return "";
                 }
 
 
-
             case "email":
                 test = new Scanner(System.in).nextLine();
-                if(test.matches(emailRegex)){
+                if (test.matches(emailRegex)) {
                     userInput = test;
                     return test;
-                }else{
+                } else {
                     System.out.println("Incorrect Input - Only E-mail addresses are accepted.");
                     userInput = "incorrect input";
                     return "";
                 }
 
 
-
             case "name":
                 test = new Scanner(System.in).nextLine();
-                if(test.matches(nameRegex)){
+                if (test.matches(nameRegex)) {
                     userInput = test;
                     return test;
-                }else{
+                } else {
                     System.out.println("Incorrect Input - Only letters are accepted.");
                     userInput = "incorrect input";
                     return "";
@@ -107,10 +109,10 @@ public class Client {
 
             case "date":
                 test = new Scanner(System.in).nextLine();
-                if(test.matches(dateRegex)){
+                if (test.matches(dateRegex)) {
                     userInput = test;
                     return test;
-                }else{
+                } else {
                     System.out.println("Incorrect Input - Only numbers are accepted.");
                     userInput = "incorrect input";
                     return "";
@@ -139,7 +141,6 @@ public class Client {
             System.out.println("=========================================================");
 
 
-
             switch (setUserInput("word").toLowerCase()) {
                 case "login":
                     System.out.println("login");
@@ -164,8 +165,8 @@ public class Client {
 
             while (loggedIn) {
                 try {
-                    System.out.println("> Logged in as: " +  server.getRole(email_address));
-                    if(server.userIsAdmin(email_address)){
+                    System.out.println("> Logged in as: " + server.getRole(email_address));
+                    if (server.userIsAdmin(email_address)) {
                         System.out.println("==========================================================");
                         System.out.println("> You have been verified as |SYSTEM ADMIN|");
                         System.out.println("> Type 'help' to see all additional admin-only commands");
@@ -290,9 +291,9 @@ public class Client {
 
     private void viewAllLogsCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntries());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -303,27 +304,27 @@ public class Client {
     //
     private void viewRecentLogsCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 boolean validInput = false;
                 int numberOfLogs = 10;
-                while(!validInput){
+                while (!validInput) {
                     System.out.println("> Please specify how many logs you'd like to view. Default is 10");
                     setUserInput();
 
-                    try{
+                    try {
                         numberOfLogs = Integer.valueOf(userInput);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
                         continue;
                     }
-                    if( numberOfLogs < 50 ){
+                    if (numberOfLogs < 50) {
                         System.out.println(server.viewRecentLogs(numberOfLogs));
                         validInput = true;
                     } else {
                         System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
                     }
                 }
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -331,16 +332,16 @@ public class Client {
         }
     }
 
-    public void backup(int x){
+    public void backup(int x) {
         try {
             //
-            if(server.userIsAdmin(email_address)){
-                if(x == 1){
-                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE,"new-database.db","encryptedBackup.db"));
-                }else if(x == 2) {
+            if (server.userIsAdmin(email_address)) {
+                if (x == 1) {
+                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE, "new-database.db", "encryptedBackup.db"));
+                } else if (x == 2) {
                     System.out.println(server.databaseEncryption(Cipher.DECRYPT_MODE, "encryptedBackup.db", "new2-database.db"));
                 }
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -352,9 +353,9 @@ public class Client {
 
     private void userResponsibilityCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.printUserResponsibility());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -365,11 +366,11 @@ public class Client {
     //
     private void inspectUserCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println("> Please type the ID of the user you'd like to inspect.");
                 setUserInput();
                 System.out.println(server.inspectSpecificUser(userInput));
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -379,9 +380,9 @@ public class Client {
 
     private void viewWarnings() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesWarnings());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -391,9 +392,9 @@ public class Client {
 
     private void viewErrors() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesErrors());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -403,9 +404,9 @@ public class Client {
 
     private void viewSuspiciousActivity() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesWarningsAndErrors());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -417,11 +418,11 @@ public class Client {
 
     private void lockAccountCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println("> Please type the ID of the user you'd like to LOCK the account of.");
                 setUserInput();
                 System.out.println(server.lockAccountManual(userInput));
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -431,11 +432,11 @@ public class Client {
 
     private void unlockAccountCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println("> Please type the ID of the user you'd like to UNLOCK the account of.");
                 setUserInput();
                 System.out.println(server.unlockAccount(userInput));
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -445,9 +446,9 @@ public class Client {
 
     private void viewLockedAccountsCommand() {
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLockedAccounts());
-            } else{
+            } else {
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -475,7 +476,7 @@ public class Client {
     ////////////////////////////////////////////////
     // HelpMe command function | Used after log in
     ////////////////////////////////////////////////
-    private void helpMeCommand(String email_address){
+    private void helpMeCommand(String email_address) {
 
         System.out.println("===================================================================================");
         System.out.println("> Use command 'register' if you're a new user.");
@@ -486,7 +487,7 @@ public class Client {
         System.out.println("===================================================================================");
 
         try {
-            if(server.userIsAdmin(email_address)){
+            if (server.userIsAdmin(email_address)) {
                 System.out.println("===================================================================");
                 System.out.println("                       ADMIN ONLY COMMANDS");
                 System.out.println("====================================================================");
@@ -500,6 +501,11 @@ public class Client {
                 System.out.println("> Use command 'lockAccount' to manually lock a user's account'");     //Done and Tested
                 System.out.println("> Use command 'unlockAccount' to manually unlock a user's account'");  //Done and Tested
                 System.out.println("> Use command 'viewLocked' to see all locked Accounts'");   //Done and Tested
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> f11707682decd6c6445b692de253885cbbf934d5
                 // Send warning email                           //Done and Tested
                 // Counter to send warnings and lock/kick
                 // Check if locked                              //Done and Tested
@@ -523,7 +529,7 @@ public class Client {
         System.out.println("> Enter -staff- to register as staff or enter -patient- to register for a patient if you are the admin");
         // String identity = input.nextLine();
 
-        String identity = setUserInput("word");;
+        String identity = setUserInput("word");
         //Integrity stuff
         identity = identity.toLowerCase();
         User user = null;
@@ -573,7 +579,7 @@ public class Client {
                 } else
                     System.out.println("> The received password is different from the previous one.");
             }
-        }else{
+        } else {
             System.out.println("Registration failed - Please try again");
         }
 
@@ -586,10 +592,10 @@ public class Client {
         System.out.print("> Please enter your e-mail:  ");
         String email = setUserInput("email");
         String userPassword;
-        if(email ==""){
+        if (email == "") {
             userPassword = "";
 
-        }else{
+        } else {
             System.out.print("> Please enter your password:  ");
             userPassword = setUserInput();
         }
@@ -625,15 +631,24 @@ public class Client {
                         kickAndLock();
                     }
                     loggedIn = false;
+                    loginAttempts++;
+
+                    // Allow 3 login attempts before locking account
+                    if (loginAttempts < 3) {
+                        loginCommand();
+                    } else {
+                        System.out.println("Your account has been temporarily locked due to too many failed login attempts.");
+                        server.lockAccountManual(email);
+                    }
                 }
             }
             //IF ACCOUNT IS LOCKED.
-            else{
+            else {
                 System.out.println("> We apologise but this account doesn't exist or has been LOCKED due to security concerns.\n" +
                         "> If your account is LOCKED, a System Administrator will review your case shortly.\n" +
                         "> For Further enquiries please message customer support");
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -868,9 +883,9 @@ public class Client {
             System.out.println("> Please enter your email to register");
             String email_address = setUserInput("email");
 
-            if(email_address == ""){
+            if (email_address == "") {
                 return null;
-            }else{
+            } else {
 
                 if (!server.checkEmailAvailable(email_address)) {
                     System.out.println("This email has already been used to register another user. Please try again.");
@@ -884,37 +899,37 @@ public class Client {
             //Note from Paris: Also make sure to do type checks and format checks
             //e.g That letters are not passed to integer fields and the date is formatted properly for
             // database storage
-            String forename = "", surname = "", year = "", month = "",day = "", date_of_birth = "", address = "";
+            String forename = "", surname = "", year = "", month = "", day = "", date_of_birth = "", address = "";
             System.out.println("> Please enter forename");
             forename = setUserInput("name");
-            if(forename ==""){
+            if (forename == "") {
                 return null;
 
-            }else{
+            } else {
                 System.out.println("> Please enter your surname");
                 surname = setUserInput("name");
-                if(surname == ""){
+                if (surname == "") {
                     return null;
 
-                }else{
+                } else {
                     System.out.println("> Please enter the year you were born");
                     year = setUserInput("date");
-                    if(year == ""){
+                    if (year == "") {
                         return null;
 
-                    }else{
+                    } else {
                         System.out.println("> Please enter the month you were born");
                         month = setUserInput("date");
-                        if(month == ""){
+                        if (month == "") {
                             return null;
 
-                        }else{
+                        } else {
                             System.out.println("> Please enter the day you were born");
                             day = setUserInput("date");
-                            if(day == ""){
+                            if (day == "") {
                                 return null;
 
-                            }else{
+                            } else {
                                 System.out.println("> Please enter your address");
                                 address = input.nextLine();
                             }
@@ -922,8 +937,6 @@ public class Client {
                     }
                 }
             }
-
-
 
 
             date_of_birth = year + "-" + month + "-" + day;

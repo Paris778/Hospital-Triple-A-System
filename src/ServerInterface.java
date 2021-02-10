@@ -48,7 +48,7 @@ public interface ServerInterface extends java.rmi.Remote {
 
     String viewLogEntries() throws RemoteException;
 
-    String viewRecentLogs(int numberOfLogs) throws  RemoteException;
+    String viewRecentLogs(int numberOfLogs) throws RemoteException;
 
     String viewLogEntriesWarnings() throws RemoteException;
 
@@ -60,7 +60,7 @@ public interface ServerInterface extends java.rmi.Remote {
 
     String inspectSpecificUser(String userId) throws RemoteException;
 
-    String databaseEncryption(int mode, String inputFile, String outputFile) throws  RemoteException;
+    String databaseEncryption(int mode, String inputFile, String outputFile) throws RemoteException;
 
     String viewLockedAccounts() throws RemoteException;
 
@@ -69,7 +69,11 @@ public interface ServerInterface extends java.rmi.Remote {
 
     String lockAccountManual(String id) throws RemoteException;
 
+<<<<<<< HEAD
     String kickAndLockUserAutomatic(String userId) throws RemoteException;
+=======
+    String kickAndLockUserAutomatic(int accountToLock) throws RemoteException;
+>>>>>>> f11707682decd6c6445b692de253885cbbf934d5
 
     String unlockAccount(String email) throws RemoteException;
 

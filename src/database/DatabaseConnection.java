@@ -384,11 +384,11 @@ public class DatabaseConnection {
         return adminEMail;
     }
 
-    public String lockAccount(String id) {
+    public String lockAccount(int id) {
         lock.lock();
         try {
             p = con.prepareStatement("UPDATE users SET account_locked=1 WHERE u_id= ?");
-            p.setString(1, id);
+            p.setInt(1, id);
             p.executeUpdate();
             return "> User #" + id + "'s account has been successfully locked.";
         } catch (SQLException e) {
