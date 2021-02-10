@@ -10,7 +10,6 @@ import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -74,26 +73,32 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public String databaseEncryption(String mode, File inputFile, File outputFile) throws RemoteException {
+    public String databaseEncryption(int mode, String inputFileName, String outputFileName) throws RemoteException {
+        File inputFile = new File(inputFileName);
+        File outputFile = new File(outputFileName);
 
         try{
 
+
+
             String password = "password";
-            InputStream keystoreStream = new FileInputStream("server_keystore.jks");
+            //InputStream keystoreStream = new FileInputStream("keystore.jceks");
             KeyStore keystore = KeyStore.getInstance("jks");
-            keystore.load(keystoreStream, password.toCharArray());
+            keystore.load(new FileInputStream("keystore.jceks"), password.toCharArray());
             Key key = keystore.getKey("dbkey", password.toCharArray());
-            keystoreStream.close();
+            //keystoreStream.close();
 
             Cipher cipher = Cipher.getInstance("AES");
 
-            if(mode == "encrypt"){
+         /*   if(mode == "encrypt"){
 
-                cipher.init(1, key);
+                cipher.init(Cipher.ENCRYPT_MODE, key);
 
             }else{
-                cipher.init(2, key);
-            }
+                cipher.init(Cipher.DECRYPT_MODE, key);
+            }*/
+
+            cipher.init(mode, key);
 
             FileInputStream inputStream = new FileInputStream(inputFile);
 
@@ -111,9 +116,10 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
         }catch (Exception e) {
             e.printStackTrace();
-            return "Function Failed";
+            //return "Function Failed";
         }
 
+        return "error";
 
     }
 

@@ -4,8 +4,8 @@ import database.User;
 import utility.Constants;
 import utility.PasswordHandler;
 
+import javax.crypto.Cipher;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
-import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -164,7 +164,7 @@ public class Client {
                     if(server.userIsAdmin(email_address)){
                         System.out.println("==========================================================");
                         System.out.println("> You have been verified as |SYSTEM ADMIN|");
-                        System.out.println("> Type 'helpme' to see all additional admin-only commands");
+                        System.out.println("> Type 'help' to see all additional admin-only commands");
                         System.out.println("==========================================================");
 
                     }
@@ -317,11 +317,12 @@ public class Client {
 
     public void backup(int x){
         try {
+            //
             if(server.userIsAdmin(email_address)){
                 if(x == 1){
-                    System.out.println(server.databaseEncryption("encrypt",new File("new-database.db"),new File("encryptedBackup.db")));
+                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE,"new-database.db","encryptedBackup.db"));
                 }else if(x == 2) {
-                    System.out.println(server.databaseEncryption("decrypt", new File("encryptedBackup.db"), new File("new-database.db")));
+                    System.out.println(server.databaseEncryption(Cipher.DECRYPT_MODE, "encryptedBackup.db", "new2-database.db"));
                 }
             } else{
                 System.out.println("> Sorry. You don't have access to this command.");
