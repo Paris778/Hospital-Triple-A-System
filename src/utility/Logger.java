@@ -17,7 +17,6 @@ public class Logger {
 
     public static String printMap(LinkedHashMap<String, LinkedList<Integer>> map) {
         StringBuilder builder = new StringBuilder();
-        System.out.println("LOGGER: Trying to print map");
         int i = 1;
         builder.append("\n------------------------------------------------------------------------------------------------------------------");
         for(String user : map.keySet()){

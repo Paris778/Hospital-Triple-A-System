@@ -279,14 +279,12 @@ public class DatabaseConnection {
                 else {
                     //If User Already Exists in the Map
                     if (userResponsibilityMap.containsKey(userId)) {
-                        System.out.println("User Exists in map");
                         if (event_type.contains("WARNING")) {
                             newList.set(0,userResponsibilityMap.get(userId).get(0) + 1);
                             newList.set(1,userResponsibilityMap.get(userId).get(1));
                             userResponsibilityMap.put(userId,new LinkedList<>(newList));
                         }
                         else if (event_type.contains("ERROR")) {
-                            System.out.println("\t Trying to update ERROR");
                             newList.set(0,userResponsibilityMap.get(userId).get(0));
                             newList.set(1,userResponsibilityMap.get(userId).get(1) + 1);
                             userResponsibilityMap.put(userId,new LinkedList<>(newList));
@@ -295,7 +293,6 @@ public class DatabaseConnection {
                     // First time seeing this User Id
                     else{
                         values.clear();
-                        System.out.println("User doesn't exist in map");
                         if (event_type.contains("WARNING")) {
                             values.add(1);
                             values.add(0);
@@ -306,7 +303,7 @@ public class DatabaseConnection {
                         }
                         userResponsibilityMap.put(userId,new LinkedList<>(values));
                         Integer newValue = userResponsibilityMap.get(userId).get(0);
-                        System.out.println(newValue);
+                        //System.out.println(newValue);
                         Logger.printMap(userResponsibilityMap);
                     }
                 }
@@ -367,6 +364,88 @@ public class DatabaseConnection {
         }
     }
 
+    public String getAdminEmailAddress(){
+        lock.lock();
+        String adminEMail = "";
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT email FROM users WHERE u_id IS (SELECT u_id FROM admins LIMIT 1);");
+            results = p.executeQuery();
+
+            adminEMail = results.getString(1);
+
+        } catch (SQLException e) {
+           System.out.println("Something went wrong");
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+        return adminEMail;
+    }
+
+    public String lockAccount(String id) {
+        lock.lock();
+        try {
+            p = con.prepareStatement("UPDATE users SET account_locked=1 WHERE u_id= ?");
+            p.setString(1, id);
+            p.executeUpdate();
+            return "> User #" + id + "'s account has been successfully locked.";
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return "> Error in locking account of User #" + id;
+    }
+
+    public String unlockAccount(String id) {
+        lock.lock();
+        try {
+            p = con.prepareStatement("UPDATE users SET account_locked=0 WHERE u_id= ?");
+            p.setString(1, id);
+            p.executeUpdate();
+            return "> User #" + id + "'s account has been successfully unlocked.";
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return "> Error in unlocking account of User #" + id;
+    }
+
+    public String viewLockedAccounts(){
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("|%4s .  | %-35s |  %-15s |","ID", "USER EMAIL", "ROLE"));
+        //Race condition control
+        lock.lock();
+        try {
+            // Execute SQL query
+
+            p = con.prepareStatement("SELECT u_id,email,roles FROM users WHERE account_locked IS 1");
+            results = p.executeQuery();
+
+            // Loop through each row and print
+            while (results.next()) {
+                int id = results.getInt("u_id");
+                String email = results.getString("email");
+                String role = results.getString("roles");
+
+                builder.append("\n");
+                builder.append(String.format("|%4s .  | %-35s |  %-15s |",id,email,role));
+            }
+
+        } catch (SQLException e) {
+            builder = new StringBuilder();
+            builder.append("> Oops, something went wrong. Check that your input is correct.");
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+        return builder.toString();
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////
     //END OF LOGGER METHODS
     //////////////////////////////////////////////////////////////////////////////////
@@ -391,20 +470,7 @@ public class DatabaseConnection {
         return true;
     }
 
-    public String lockAccount(int id) {
-        lock.lock();
-        try {
-            p = con.prepareStatement("UPDATE users SET account_locked=1 WHERE u_id= ?");
-            p.setInt(1, id);
-            p.executeUpdate();
-            return "User #" + id + "'s account has been successfully locked.";
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
-        }
-        return "Error in locking account of User #" + id;
-    }
+
 
     public String updateRole(int u_id, String newRole) {
         lock.lock();
@@ -542,9 +608,6 @@ public class DatabaseConnection {
         //Race condition control
         lock.lock();
         try {
-            // Get user id that corresponds to the email
-            //p = con.prepareStatement("SELECT a_id FROM admins WHERE u_id=(SELECT ?");
-            //p = con.prepareStatement("SELECT EXISTS(SELECT a_id FROM admins WHERE u_id= ?");
             p = con.prepareStatement("SELECT a_id FROM admins WHERE u_id= ?");
             p.setString(1, String.valueOf(getUserId(email)));
             results = p.executeQuery();
@@ -558,12 +621,29 @@ public class DatabaseConnection {
         }
     }
 
-    public int getUserId(String email) {
+    public boolean isAccountUnlocked(String email){
         //Race condition control
         lock.lock();
         try {
+            p = con.prepareStatement("SELECT email FROM users WHERE account_locked=1 AND u_id=? ");
+            p.setString(1, String.valueOf(getUserId(email)));
+            results = p.executeQuery();
+            return (results.next());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            //Race condition control
+            lock.unlock();
+        }
+    }
+
+    public int getUserId(String email) {
+        //Race condition controll
+        lock.lock();
+        try {
             // Get user id that corresponds to the email
-            p = con.prepareStatement("SELECT u_id FROM users WHERE email= ?");
+            p = con.prepareStatement("SELECT u_id FROM users WHERE email=?");
             p.setString(1, email);
             results = p.executeQuery();
             return results.getInt("u_id");
