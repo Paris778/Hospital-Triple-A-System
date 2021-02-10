@@ -4,6 +4,7 @@ import database.User;
 import utility.Constants;
 import utility.PasswordHandler;
 
+import javax.crypto.Cipher;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
