@@ -464,10 +464,13 @@ public class Client {
                 System.out.println("> Use command 'viewErrors' to view all Error logs'"); //Done and Tested
                 System.out.println("> Use command 'viewSuspicious' to view all suspicious logs'"); //Done and Tested
                 System.out.println("> Use command 'inspectUser' to inspect a user's activity'"); //Done and Tested
-                //New Features
                 System.out.println("> Use command 'lockAccount' to manually lock a user's account'");     //Done and Tested
                 System.out.println("> Use command 'unlockAccount' to manually unlock a user's account'");  //Done and Tested
                 System.out.println("> Use command 'viewLocked' to see all locked Accounts'");   //Done and Tested
+
+
+
+
                 // Send warning email                           //Done and Tested
                 // Counter to send warnings and lock/kick
                 // Check if locked                              //Done and Tested
