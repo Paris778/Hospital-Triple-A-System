@@ -4,6 +4,7 @@ import database.User;
 import utility.Constants;
 import utility.PasswordHandler;
 
+import javax.crypto.Cipher;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -159,7 +160,6 @@ public class Client {
 
             while (loggedIn) {
                 try {
-                    //server.sendWarningEmail(email_address);
                     System.out.println("> Logged in as: " +  server.getRole(email_address));
                     if(server.userIsAdmin(email_address)){
                         System.out.println("==========================================================");
@@ -176,8 +176,8 @@ public class Client {
                 System.out.println("|  register | logout | view | delete | update |");
                 System.out.println("-----------------------------------------------");
                 System.out.println("> Otherwise type 'help' to see all available commands.");
-                setUserInput("word");
-                switch (userInput.toLowerCase()) {
+
+                switch (setUserInput("word").toLowerCase()) {
                     case "register":
                         System.out.println("register");
                         registerCommand();
@@ -239,6 +239,14 @@ public class Client {
                         inspectUserCommand();
                         break;
 
+                    case "backup":
+                        backup(1);
+                        break;
+
+                    case "restore":
+                        backup(2);
+                        break;
+
                     case "lockaccount":
                         lockAccountCommand();
                         break;
@@ -252,10 +260,13 @@ public class Client {
                         break;
 
                     default:
-                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
+                        userInput = "";
                         break;
                 }
+                userInput = "";
             }
+            userInput = "";
         }
 
         if (tlsAuth == 0) {
@@ -316,6 +327,24 @@ public class Client {
         }
     }
 
+    public void backup(int x){
+        try {
+            //
+            if(server.userIsAdmin(email_address)){
+                if(x == 1){
+                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE,"new-database.db","encryptedBackup.db"));
+                }else if(x == 2) {
+                    System.out.println(server.databaseEncryption(Cipher.DECRYPT_MODE, "encryptedBackup.db", "new2-database.db"));
+                }
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     private void userResponsibilityCommand() {
         try {

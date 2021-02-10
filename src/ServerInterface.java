@@ -60,6 +60,8 @@ public interface ServerInterface extends java.rmi.Remote {
 
     String inspectSpecificUser(String userId) throws RemoteException;
 
+    String databaseEncryption(int mode, String inputFile, String outputFile) throws  RemoteException;
+
     String viewLockedAccounts() throws RemoteException;
 
     //
