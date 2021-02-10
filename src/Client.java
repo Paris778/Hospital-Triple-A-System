@@ -159,11 +159,12 @@ public class Client {
 
             while (loggedIn) {
                 try {
+                    //server.sendWarningEmail(email_address);
                     System.out.println("> Logged in as: " +  server.getRole(email_address));
                     if(server.userIsAdmin(email_address)){
                         System.out.println("==========================================================");
                         System.out.println("> You have been verified as |SYSTEM ADMIN|");
-                        System.out.println("> Type 'helpme' to see all additional admin-only commands");
+                        System.out.println("> Type 'help' to see all additional admin-only commands");
                         System.out.println("==========================================================");
 
                     }
@@ -238,9 +239,20 @@ public class Client {
                         inspectUserCommand();
                         break;
 
+                    case "lockaccount":
+                        lockAccountCommand();
+                        break;
+
+                    case "unlockaccount":
+                        unlockAccountCommand();
+                        break;
+
+                    case "viewlocked":
+                        viewLockedAccountsCommand();
+                        break;
 
                     default:
-                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
+                        System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'help' for a list of commands");
                         break;
                 }
             }
@@ -368,6 +380,48 @@ public class Client {
         }
     }
 
+    /// New Commands
+
+    private void lockAccountCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println("> Please type the ID of the user you'd like to LOCK the account of.");
+                setUserInput();
+                System.out.println(server.lockAccountManual(userInput));
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unlockAccountCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println("> Please type the ID of the user you'd like to UNLOCK the account of.");
+                setUserInput();
+                System.out.println(server.unlockAccount(userInput));
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void viewLockedAccountsCommand() {
+        try {
+            if(server.userIsAdmin(email_address)){
+                System.out.println(server.viewLockedAccounts());
+            } else{
+                System.out.println("> Sorry. You don't have access to this command.");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     ///////////////////////
     //ADMIN Commands END
     ///////////////////////
@@ -400,20 +454,25 @@ public class Client {
 
         try {
             if(server.userIsAdmin(email_address)){
-                System.out.println("=============================================================");
-                System.out.println("                    ADMIN ONLY COMMANDS");
-                System.out.println("=============================================================");
+                System.out.println("===================================================================");
+                System.out.println("                       ADMIN ONLY COMMANDS");
+                System.out.println("====================================================================");
                 System.out.println("> Use command 'viewAllLogs' to view all logs'"); //Done and Tested
                 System.out.println("> Use command 'viewRecent' to view most recent logs'"); //Done and Tested
-                System.out.println("> Use command 'responsibility' to see which users\n  are responsible for suspicious events.'"); //Done and Tested
+                System.out.println("> Use command 'responsibility' to see which users...\n       ...are responsible for suspicious events.'"); //Done and Tested
                 System.out.println("> Use command 'viewWarnings' to view all Warning logs'"); //Done and Tested
                 System.out.println("> Use command 'viewErrors' to view all Error logs'"); //Done and Tested
                 System.out.println("> Use command 'viewSuspicious' to view all suspicious logs'"); //Done and Tested
                 System.out.println("> Use command 'inspectUser' to inspect a user's activity'"); //Done and Tested
-                //TO:DO
-                System.out.println("> Use (NEED TO IMPLEMENT) command 'lockAccount' to inspect a user's activity'");
-                System.out.println("> Use (NEED TO IMPLEMENT) command 'unlockAccount' to inspect a user's activity'");
-                System.out.println("=============================================================");
+                //New Features
+                System.out.println("> Use command 'lockAccount' to manually lock a user's account'");     //Done and Tested
+                System.out.println("> Use command 'unlockAccount' to manually unlock a user's account'");  //Done and Tested
+                System.out.println("> Use command 'viewLocked' to see all locked Accounts'");   //Done and Tested
+                // Send warning email                           //Done and Tested
+                // Counter to send warnings and lock/kick
+                // Check if locked                              //Done and Tested
+                // Warned if account is locked                  //Done and Tested
+                System.out.println("====================================================================");
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -501,31 +560,38 @@ public class Client {
         }
 
         try {
-            // Verify that OTP matches OTP sent by server
-            if (server.verifyPassword(userPassword, email)) {
-                int verfiy = 1;
-                while (verfiy == 1) {
+            if (server.isAccountUnlocked(email)) {
+                // Verify that OTP matches OTP sent by server
+                if (server.verifyPassword(userPassword, email)) {
+                    int verfiy = 1;
+                    while (verfiy == 1) {
 
-                    email_address = email;
-                    System.out.print("If your e-mail is valid an OTP will been sent your email, please enter the code: ");
-                    server.sendOTP(email);
-                    Integer otp = new Scanner(System.in).nextInt();
-                    if (server.verifyOTP(email_address, otp)) {
-                        loggedIn = true;
-                        verfiy = 0;
-                        System.out.println("> Logged in successfully.");
-                    } else {
-                        System.out.println("OTP incorrect, please try again");
+                        email_address = email;
+                        System.out.print("If your e-mail is valid an OTP will been sent your email, please enter the code: ");
+                        server.sendOTP(email);
+                        Integer otp = new Scanner(System.in).nextInt();
+                        if (server.verifyOTP(email_address, otp)) {
+                            loggedIn = true;
+                            verfiy = 0;
+                            System.out.println("> Logged in successfully.");
+                        } else {
+                            System.out.println("OTP incorrect, please try again");
+                        }
                     }
+                } else {
+                    System.out.println("> Incorrect. Please try again.");
+                    loggedIn = false;
                 }
-            } else {
-                System.out.println("> Incorrect. Please try again.");
-                loggedIn = false;
             }
-        } catch (Exception e) {
+            //IF ACCOUNT IS LOCKED.
+            else{
+                System.out.println("> We apologise but this account doesn't exist or has been LOCKED due to security concerns.\n" +
+                        "A System Administrator will review your case shortly.\n" +
+                        "For Further enquiries please message customer support");
+            }
+        } catch(Exception e){
             e.printStackTrace();
         }
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
