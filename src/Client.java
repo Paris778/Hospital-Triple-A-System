@@ -175,8 +175,8 @@ public class Client {
                 System.out.println("|  register | logout | view | delete | update |");
                 System.out.println("-----------------------------------------------");
                 System.out.println("> Otherwise type 'help' to see all available commands.");
-                setUserInput("word");
-                switch (userInput.toLowerCase()) {
+
+                switch (setUserInput("word").toLowerCase()) {
                     case "register":
                         System.out.println("register");
                         registerCommand();
@@ -241,9 +241,12 @@ public class Client {
 
                     default:
                         System.out.println("> Sorry. Unrecognised command. Check your spelling.\n> Use 'helpme' for a list of commands");
+                        userInput = "";
                         break;
                 }
+                userInput = "";
             }
+            userInput = "";
         }
 
         if (tlsAuth == 0) {

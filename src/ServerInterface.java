@@ -1,5 +1,6 @@
 import database.User;
 
+import java.io.File;
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends java.rmi.Remote {
@@ -59,4 +60,6 @@ public interface ServerInterface extends java.rmi.Remote {
     String printUserResponsibility() throws RemoteException;
 
     String inspectSpecificUser(String userId) throws RemoteException;
+
+    String databaseEncryption(String mode, File inputFile, File outputFile) throws  RemoteException;
 }

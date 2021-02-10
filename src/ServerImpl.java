@@ -3,10 +3,17 @@ import database.User;
 import utility.Constants;
 import utility.Logger;
 
+import javax.crypto.Cipher;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.security.Key;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
@@ -64,6 +71,46 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String inspectSpecificUser(String userId) throws RemoteException {
         return dbConnection.inspectSpecificUser(userId);
+    }
+
+    @Override
+    public String databaseEncryption(String mode, File inputFile, File outputFile) throws RemoteException {
+
+        try{
+
+            String password = "password";
+            InputStream keystoreStream = new FileInputStream("server_keystore.jks");
+            KeyStore keystore = KeyStore.getInstance("jks");
+            keystore.load(keystoreStream, password.toCharArray());
+            Key key = keystore.getKey("dbkey", password.toCharArray());
+            keystoreStream.close();
+
+            Cipher cipher = Cipher.getInstance("AES");
+
+            if(mode == "encrypt"){
+
+                cipher.init(1, key);
+
+            }else{
+                cipher.init(2, key);
+            }
+
+            FileInputStream inputStream = new FileInputStream(inputFile);
+
+            byte[] inputBytes = new byte[(int) inputFile.length()];
+            inputStream.read(inputBytes);
+
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            FileOutputStream outputStream = new FileOutputStream(outputFile);
+            outputStream.write(outputBytes);
+
+            inputStream.close();
+            outputStream.close();
+
+        }catch (Exception e) { e.printStackTrace();}
+
+        return null;
     }
 
     @Override
@@ -308,4 +355,5 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         }
         return "You do not have the correct permissions to do that.";
     }
+
 }
