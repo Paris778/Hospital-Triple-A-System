@@ -176,6 +176,7 @@ public class Client {
             }
             userInput = "";
 
+
             while (loggedIn) {
                 try {
                     System.out.println("> Logged in as: " + server.getRole(email_address));
