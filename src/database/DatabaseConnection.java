@@ -637,9 +637,14 @@ public class DatabaseConnection {
         lock.lock();
         try {
             p = con.prepareStatement("SELECT email FROM users WHERE account_locked=1 AND u_id=? ");
-            p.setString(1, String.valueOf(getUserId(email)));
+            p.setInt(1, getUserId(email));
             results = p.executeQuery();
-            return (results.next());
+            while(results.next()) {
+                if(results.getString(1) == email){
+                    return true;
+                }
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

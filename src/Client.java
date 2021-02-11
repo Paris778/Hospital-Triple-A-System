@@ -19,15 +19,11 @@ public class Client {
     private final Scanner input = new Scanner(System.in);
     private final PasswordHandler passwordHandler = new PasswordHandler();
     private ServerInterface server;
-<<<<<<< HEAD
 
     // Misc Variables
     private int wrongPasswordCounter = 0;
     private int wrongOtpCounter = 0;
 
-=======
-    private int loginAttempts = 0;
->>>>>>> f11707682decd6c6445b692de253885cbbf934d5
 
     //////////////////////////////////////////////////
     //Main Method
@@ -501,18 +497,17 @@ public class Client {
                 System.out.println("> Use command 'lockAccount' to manually lock a user's account'");     //Done and Tested
                 System.out.println("> Use command 'unlockAccount' to manually unlock a user's account'");  //Done and Tested
                 System.out.println("> Use command 'viewLocked' to see all locked Accounts'");   //Done and Tested
-<<<<<<< HEAD
-=======
 
-
->>>>>>> f11707682decd6c6445b692de253885cbbf934d5
                 // Send warning email                           //Done and Tested
+                // Lcoked users can't login                    // Done and Tested
                 // Counter to send warnings and lock/kick
                 // Check if locked                              //Done and Tested
                 // Warned if account is locked                  //Done and Tested
 
-                // TO:DO Fix UserIsAdmin MEthod in dbConnect
+                // TO:DO
+                // Fix UserIsAdmin MEthod in dbConnect
                 // Put logs where they need to go
+                // unlock test user
                 System.out.println("====================================================================");
             }
         } catch (RemoteException e) {
@@ -630,16 +625,6 @@ public class Client {
                     if(detectMalicious()) {
                         kickAndLock();
                     }
-                    loggedIn = false;
-                    loginAttempts++;
-
-                    // Allow 3 login attempts before locking account
-                    if (loginAttempts < 3) {
-                        loginCommand();
-                    } else {
-                        System.out.println("Your account has been temporarily locked due to too many failed login attempts.");
-                        server.lockAccountManual(email);
-                    }
                 }
             }
             //IF ACCOUNT IS LOCKED.
@@ -668,6 +653,8 @@ public class Client {
     // System admins can review locked accounts.
     private void kickAndLock(){
         logoutCommand();
+        wrongOtpCounter = 0;
+        wrongPasswordCounter = 0;
         System.out.println("\n\n---------------------------------------------------------------");
         System.out.println("> We apologise !!! But malicious activity has been detected in this account.\n" +
                 "> Your account has been locked and you have been logged out." +

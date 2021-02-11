@@ -69,11 +69,7 @@ public interface ServerInterface extends java.rmi.Remote {
 
     String lockAccountManual(String id) throws RemoteException;
 
-<<<<<<< HEAD
     String kickAndLockUserAutomatic(String userId) throws RemoteException;
-=======
-    String kickAndLockUserAutomatic(int accountToLock) throws RemoteException;
->>>>>>> f11707682decd6c6445b692de253885cbbf934d5
 
     String unlockAccount(String email) throws RemoteException;
 
