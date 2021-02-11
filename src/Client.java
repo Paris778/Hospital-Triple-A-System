@@ -158,6 +158,9 @@ public class Client {
                     break;
             }
             userInput = "";
+            if(loggedIn){
+                backup(1);
+            }
 
             while (loggedIn) {
                 try {
