@@ -32,6 +32,8 @@ public class DatabaseConnection {
     // This method appends a log entry to the event_logs table of the database
     public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
         //Race Condition Control
+        System.out.println("-------------Trying to append Log");
+
         lock.lock();
         //
         try {
@@ -49,7 +51,6 @@ public class DatabaseConnection {
             p.executeUpdate();
             results.close();
             p.close();
-
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -403,8 +404,8 @@ public class DatabaseConnection {
     public String unlockAccount(String id) {
         lock.lock();
         try {
-            p = con.prepareStatement("UPDATE users SET account_locked=0 WHERE u_id= ?");
-            p.setString(1, id);
+            p = con.prepareStatement("UPDATE users SET account_locked=0 WHERE u_id=?");
+            p.setInt(1, Integer.valueOf(id));
             p.executeUpdate();
             return "> User #" + id + "'s account has been successfully unlocked.";
         } catch (SQLException e) {
@@ -650,7 +651,7 @@ public class DatabaseConnection {
     }
 
     public int getUserId(String email) {
-        //Race condition controll
+        //Race condition control
         lock.lock();
         try {
             // Get user id that corresponds to the email

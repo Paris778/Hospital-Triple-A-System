@@ -26,37 +26,42 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     public ServerImpl() throws RemoteException {
         dbConnection = new DatabaseConnection();
         logger = new Logger(dbConnection);
-
-        logger.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
-
-        //createFakeLogWarning();
-        //();
-        //createFakeLogWarning();
-        //createFakeLogWarning();
         //
-        //createFakeLogError();
+        logger.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_SYSTEM_ONLINE, Constants.USER_ID_SYSTEM);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////LOGGER METHODS
 
     @Override
-    public void logEvent(int EVENT_ID, int userId, int appendedBy) throws RemoteException {
+    public void logEvent(int userId,int EVENT_ID, int appendedBy) throws RemoteException {
         this.logger.logEvent(userId, EVENT_ID, appendedBy);
     } //Done
 
     @Override
     public String viewLogEntriesWarningsAndErrors() {
+        try {
+            logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         return dbConnection.viewErrorAndWarningLogEntries(true);
     } //Done
 
     @Override
     public String printUserResponsibility() {
+        try {
+            logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         return dbConnection.viewErrorAndWarningLogEntries(false);
     } //Done
 
     @Override
     public String inspectSpecificUser(String userId) throws RemoteException {
+        logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
         return dbConnection.inspectSpecificUser(userId);
     }
 
@@ -99,6 +104,8 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
             inputStream.close();
             outputStream.close();
+
+            logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_DATABASE_BACKEDUP, Constants.USER_ID_SYSTEM);
             return "Function Completed";
 
         } catch (Exception e) {
@@ -112,21 +119,25 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
     @Override
     public String viewLogEntries() throws RemoteException {
+        logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
         return dbConnection.viewLogEntries();
     }
 
     @Override
     public String viewRecentLogs(int numberOfLogs) throws RemoteException {
+        logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
         return dbConnection.viewRecentLogs(numberOfLogs);
     }
 
     @Override
     public String viewLogEntriesWarnings() throws RemoteException {
+        logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
         return dbConnection.viewWarningLogEntries();
     }
 
     @Override
     public String viewLogEntriesErrors() throws RemoteException {
+        logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
         return dbConnection.viewErrorLogEntries();
     }
 
@@ -152,20 +163,45 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     public void createUser(User user, String plaintext) {
+        try {
+            logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_CREATED_IN_DB, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         System.out.println("Creating user in database...");
         dbConnection.createUser(user, plaintext);
     }
 
     public String viewPatients(String email) {
         if (dbConnection.checkPermissions(email, "view_patient")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.viewPatients(-1);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
 
     public String viewPatients(String email, int s_id) {
         if (dbConnection.checkPermissions(email, "view_patient")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.viewPatients(s_id);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -173,7 +209,17 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String viewStaffs(String email) {
         if (dbConnection.checkPermissions(email, "view_staff")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.viewStaffs(-1);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -181,14 +227,34 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String viewStaffs(String email, int s_id) {
         if (dbConnection.checkPermissions(email, "view_staff")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_ACCESSED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.viewStaffs(s_id);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
 
     public String deletePatients(String email, int p_id) {
         if (dbConnection.checkPermissions(email, "delete_patient")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_DELETED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.deletePatients(p_id);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -196,7 +262,17 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String deleteStaffs(String email, int s_id) {
         if (dbConnection.checkPermissions(email, "delete_staff")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_DELETED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.deletePatients(s_id);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -204,7 +280,17 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String updatePatients(String email, int p_id, String command) {
         if (dbConnection.checkPermissions(email, "update_patient")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_MODIFIED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             dbConnection.updatePatients(p_id, command);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -212,7 +298,17 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     @Override
     public String updateStaffs(String email, int s_id, String command) {
         if (dbConnection.checkPermissions(email, "update_staff")) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_MODIFIED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.updateStaffs(s_id, command);
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
@@ -229,7 +325,20 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
     @Override
     public boolean userIsAdmin(String email) {
-        return (dbConnection.userIsAdmin(email));
+        if(dbConnection.userIsAdmin(email)) {
+            try {
+                logEvent(getUserId(email),Constants.LOG_USER_IS_ADMIN, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+        try {
+            logEvent(getUserId(email),Constants.LOG_TRIED_TO_ADMIN_COMMAND, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void sendOTP(String email) {
@@ -271,6 +380,11 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
             // Send message
             Transport.send(message);
             System.out.println("Email sent successfully");
+            try {
+                logEvent(getUserId(email),Constants.OTP_WAS_SENT, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -324,6 +438,12 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
             // Send message
             Transport.send(message);
             System.out.println("Email sent successfully");
+            try {
+                logEvent(getUserId(email),Constants.LOG_WARNING_EMAIL_SENT, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -331,6 +451,11 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
     @Override
     public String viewLockedAccounts() {
+        try {
+            logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         return dbConnection.viewLockedAccounts();
     }
 
@@ -352,6 +477,11 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
 
     @Override
     public String lockAccountManual(String userId) {
+        try {
+            logEvent(Integer.valueOf(userId),Constants.LOG_USER_ACCOUNT_LOCKED_MANUALLY, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         return dbConnection.lockAccount(Integer.valueOf(userId));
     }
 
@@ -361,14 +491,29 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
     }
 
     @Override
-    public String unlockAccount(String email) {
-        return dbConnection.unlockAccount(email);
+    public String unlockAccount(String id) {
+        try {
+            logEvent(Integer.valueOf(id),Constants.LOG_ACCOUNT_UNLOCKED, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return dbConnection.unlockAccount(id);
     }
 
     public String updateRole(String adminEmail, int userId, String role) {
         // Check user is a system admin before locking account
         if (dbConnection.checkPermissions(adminEmail, "lock_accounts")) {
+            try {
+                logEvent(getUserId(adminEmail),Constants.LOG_USER_MODIFIED_DATA, Constants.USER_ID_SYSTEM);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             return dbConnection.updateRole(userId, role);
+        }
+        try {
+            logEvent(getUserId(adminEmail),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
         return "You do not have the correct permissions to do that.";
     }
