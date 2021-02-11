@@ -31,13 +31,10 @@ public class Logger {
     // Takes in a CONSTANT for the type of event and the database.User ID if applicable
     // The logEvent method is super charged for various logging types (future thing)
     public void logEvent(int userId, int EVENT_ID, int appendedBy){
-        System.err.println("Values got at logger : Id:" + userId + " Ev:" + EVENT_ID);
         //
-
         // Might need to make a separate method for these
         switch (EVENT_ID) {
             case (Constants.LOG_SYSTEM_ONLINE) -> {
-                System.out.println("Trying to make online log");
                 connection.appendLog(
                         userId,
                         this.getEventType(EVENT_ID),
