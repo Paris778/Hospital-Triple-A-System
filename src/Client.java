@@ -503,6 +503,7 @@ public class Client {
                 // Counter to send warnings and lock/kick
                 // Check if locked                              //Done and Tested
                 // Warned if account is locked                  //Done and Tested
+                // Users who are locked can't access account    //Done and tested
 
                 // TO:DO
                 // Fix UserIsAdmin MEthod in dbConnect

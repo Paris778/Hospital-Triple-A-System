@@ -609,7 +609,7 @@ public class DatabaseConnection {
         lock.lock();
         try {
             //////////////////////////////////////////////////////////////
-            p = con.prepareStatement("SELECT u_id FROM admins WHERE u_id="+getUserId(email));
+            p = con.prepareStatement("SELECT COUNT(*) AS total FROM admins WHERE u_id=" + getUserId(email));
             System.out.println(email);
             System.out.println(getUserId(email) + "\n--------");
             //p.setInt(1, getUserId(email));
@@ -636,11 +636,10 @@ public class DatabaseConnection {
         //Race condition control
         lock.lock();
         try {
-            p = con.prepareStatement("SELECT email FROM users WHERE account_locked=1 AND u_id=? ");
-            p.setInt(1, getUserId(email));
+            p = con.prepareStatement("SELECT email FROM users WHERE account_locked=0 AND u_id=" + getUserId(email));
             results = p.executeQuery();
             while(results.next()) {
-                if(results.getString(1) == email){
+                if(results.getInt(1) == getUserId(email)){
                     return true;
                 }
             }
