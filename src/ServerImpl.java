@@ -162,6 +162,10 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         return dbConnection.checkPermissions(email, request);
     }
 
+    public void updatePassword(String email, String plaintext) {
+        dbConnection.updatePassword(email, plaintext);
+    }
+
     public void createUser(User user, String plaintext) {
         try {
             logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_USER_CREATED_IN_DB, Constants.USER_ID_SYSTEM);

@@ -8,6 +8,8 @@ public interface ServerInterface extends java.rmi.Remote {
 
     void createUser(User user, String password) throws RemoteException;
 
+    void updatePassword(String email, String plaintext) throws RemoteException;
+
     String viewPatients(String email) throws RemoteException;
 
     String viewPatients(String email, int s_id) throws RemoteException;

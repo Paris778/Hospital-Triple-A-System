@@ -35,7 +35,7 @@ public class Client {
         connectToServer();
 
         try {
-            server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_NEW_SERVER_CONNECTION, Constants.USER_ID_SYSTEM);
+            server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_NEW_SERVER_CONNECTION, Constants.USER_ID_SYSTEM);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class Client {
             runUserInterface();
         } catch (Exception e) {
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -64,7 +64,7 @@ public class Client {
             tlsAuth = 0;
             e.printStackTrace();
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -175,7 +175,7 @@ public class Client {
                     break;
             }
             userInput = "";
-            if(loggedIn){
+            if (loggedIn) {
                 backup(1);
             }
             while (loggedIn) {
@@ -190,7 +190,7 @@ public class Client {
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
-                    server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                    server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
                 }
                 System.out.println("> Welcome, Please select and type one of the following options");
                 System.out.println("-----------------------------------------------");
@@ -315,7 +315,7 @@ public class Client {
         } catch (RemoteException e) {
             e.printStackTrace();
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -336,7 +336,7 @@ public class Client {
                         numberOfLogs = Integer.valueOf(userInput);
                     } catch (Exception e) {
                         System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
-                        server.logEvent(server.getUserId(email_address),Constants.LOG_INVALID_INPUT, Constants.USER_ID_SYSTEM);
+                        server.logEvent(server.getUserId(email_address), Constants.LOG_INVALID_INPUT, Constants.USER_ID_SYSTEM);
                         continue;
                     }
                     if (numberOfLogs < 50) {
@@ -344,7 +344,7 @@ public class Client {
                         validInput = true;
                     } else {
                         System.out.println("> Invalid Input. Input must be an integer number lower than 50.");
-                        server.logEvent(server.getUserId(email_address),Constants.LOG_INVALID_INPUT, Constants.USER_ID_SYSTEM);
+                        server.logEvent(server.getUserId(email_address), Constants.LOG_INVALID_INPUT, Constants.USER_ID_SYSTEM);
                     }
                 }
             } else {
@@ -352,7 +352,7 @@ public class Client {
             }
         } catch (RemoteException e) {
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -365,7 +365,7 @@ public class Client {
             //
             if (server.userIsAdmin(email_address)) {
                 if (x == 1) {
-                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE, "new-database.db", "encryptedBackup.db"));
+                    System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE, "database.db", "encryptedBackup.db"));
                 } else if (x == 2) {
                     System.out.println(server.databaseEncryption(Cipher.DECRYPT_MODE, "encryptedBackup.db", "new2-database.db"));
                 }
@@ -374,7 +374,7 @@ public class Client {
             }
         } catch (RemoteException e) {
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -393,7 +393,7 @@ public class Client {
             }
         } catch (RemoteException e) {
             try {
-                server.logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
+                server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);
             } catch (RemoteException remoteException) {
                 remoteException.printStackTrace();
             }
@@ -421,7 +421,7 @@ public class Client {
             if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesWarnings());
             } else {
-                server.logEvent(server.getUserId(email_address),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+                server.logEvent(server.getUserId(email_address), Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -434,7 +434,7 @@ public class Client {
             if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesErrors());
             } else {
-                server.logEvent(server.getUserId(email_address),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+                server.logEvent(server.getUserId(email_address), Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -447,7 +447,7 @@ public class Client {
             if (server.userIsAdmin(email_address)) {
                 System.out.println(server.viewLogEntriesWarningsAndErrors());
             } else {
-                server.logEvent(server.getUserId(email_address),Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
+                server.logEvent(server.getUserId(email_address), Constants.LOG_USER_DENIED_ACCESS, Constants.USER_ID_SYSTEM);
                 System.out.println("> Sorry. You don't have access to this command.");
             }
         } catch (RemoteException e) {
@@ -566,7 +566,7 @@ public class Client {
     private void registerCommand() {
         String password = null;
         try {
-            server.logEvent(server.getUserId(email_address),Constants.LOG_USER_ENTERED_WRONG_OTP, Constants.USER_ID_SYSTEM);
+            server.logEvent(server.getUserId(email_address), Constants.LOG_USER_ENTERED_WRONG_OTP, Constants.USER_ID_SYSTEM);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -603,7 +603,7 @@ public class Client {
                         break;
                     } else {
                         try {
-                            server.logEvent(server.getUserId(email_address),Constants.LOG_USER_WEAK_PASSWORD, Constants.USER_ID_SYSTEM);
+                            server.logEvent(server.getUserId(email_address), Constants.LOG_USER_WEAK_PASSWORD, Constants.USER_ID_SYSTEM);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
@@ -632,7 +632,7 @@ public class Client {
         } else {
             System.out.println("Registration failed - Please try again");
             try {
-                server.logEvent(server.getUserId(email_address),Constants.LOG_FAILED_REGISTRATION, Constants.USER_ID_SYSTEM);
+                server.logEvent(server.getUserId(email_address), Constants.LOG_FAILED_REGISTRATION, Constants.USER_ID_SYSTEM);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -671,13 +671,13 @@ public class Client {
                             loggedIn = true;
                             verfiy = 0;
                             System.out.println("> Logged in successfully.");
-                            server.logEvent(server.getUserId(email_address),Constants.LOG_USER_LOGGED_IN, Constants.USER_ID_SYSTEM);
+                            server.logEvent(server.getUserId(email_address), Constants.LOG_USER_LOGGED_IN, Constants.USER_ID_SYSTEM);
                         } else {
                             System.out.println("OTP incorrect, please try again");
                             this.wrongOtpCounter++;
-                            server.logEvent(server.getUserId(email_address),Constants.LOG_USER_ENTERED_WRONG_OTP, Constants.USER_ID_SYSTEM);
+                            server.logEvent(server.getUserId(email_address), Constants.LOG_USER_ENTERED_WRONG_OTP, Constants.USER_ID_SYSTEM);
 
-                            if(detectMalicious()) {
+                            if (detectMalicious()) {
                                 kickAndLock();
                                 break;
                             }
@@ -686,8 +686,8 @@ public class Client {
                 } else {
                     System.out.println("> Incorrect. Please try again.");
                     this.wrongPasswordCounter++;
-                    server.logEvent(server.getUserId(email_address),Constants.LOG_USER_ENTERED_WRONG_PASSWORD, Constants.USER_ID_SYSTEM);
-                    if(detectMalicious()) {
+                    server.logEvent(server.getUserId(email_address), Constants.LOG_USER_ENTERED_WRONG_PASSWORD, Constants.USER_ID_SYSTEM);
+                    if (detectMalicious()) {
                         kickAndLock();
                     }
                 }
@@ -707,8 +707,8 @@ public class Client {
     // Helper Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean detectMalicious(){
-        if(wrongOtpCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES || wrongPasswordCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES){
+    private boolean detectMalicious() {
+        if (wrongOtpCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES || wrongPasswordCounter >= Constants.MAX_ALLOWED_FALSE_ENTRIES) {
             return true;
         }
         return false;
@@ -716,9 +716,9 @@ public class Client {
 
     //If user enters password or OTP wrong multiple times , their account gets locked.
     // System admins can review locked accounts.
-    private void kickAndLock(){
+    private void kickAndLock() {
         try {
-            server.logEvent(server.getUserId(email_address),Constants.LOG_USER_KICKED, Constants.USER_ID_SYSTEM);
+            server.logEvent(server.getUserId(email_address), Constants.LOG_USER_KICKED, Constants.USER_ID_SYSTEM);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -786,14 +786,10 @@ public class Client {
                     // Satisfy password requirements
                     if (password.equals(temp2)) {
                         System.out.println("> Password Confirmed !!!!");
-                        // Create user and store hashed password in DB
                         try {
-                            System.out.println("needs method for updating password");
-                            //need method to update user password.
-                            //
-                            //
-                            //
-
+                            // Set new password
+                            server.updatePassword(email, password);
+                            System.out.println("> Password was successfully changed. Please attempt to login again");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

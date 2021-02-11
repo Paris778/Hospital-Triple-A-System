@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DatabaseConnection {
     private final String JDBC_DRIVER = "org.sqlite.JDBC";
     private final String DATABASE_LOCATION = "jdbc:sqlite:";
-    private String dbName = "new-database.db";
+    private String dbName = "database.db";
     private Connection con = null;
     private PreparedStatement p = null;
     private ResultSet results = null;
@@ -509,6 +509,31 @@ public class DatabaseConnection {
             lock.unlock();
         }
         return false;
+    }
+
+    public void updatePassword(String email, String plaintext) {
+        lock.lock();
+        try {
+            // Get user id
+            int id = getUserId(email);
+
+            // Hash and salt user password
+            String salt = passwordHandler.generateSalt();
+            String password = passwordHandler.hashPassword(plaintext, salt.getBytes());
+
+            // Add password and email to users table
+            String statement = "UPDATE users SET password_hash = ?, password_salt = ? WHERE u_id = ?;";
+            p = con.prepareStatement(statement);
+            p.setString(1, password);
+            p.setString(2, salt);
+            p.setInt(3, id);
+
+            p.executeUpdate();
+        } catch (SQLException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void createUser(User user, String plaintext) {
