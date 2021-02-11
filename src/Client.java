@@ -500,7 +500,7 @@ public class Client {
 
                 // Send warning email                           //Done and Tested
                 // Lcoked users can't login                    // Done and Tested
-                // Counter to send warnings and lock/kick
+                // Counter to send warnings and lock/kick      // Done and Tested
                 // Check if locked                              //Done and Tested
                 // Warned if account is locked                  //Done and Tested
                 // Users who are locked can't access account    //Done and tested
