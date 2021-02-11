@@ -656,11 +656,11 @@ public class Client {
         logoutCommand();
         wrongOtpCounter = 0;
         wrongPasswordCounter = 0;
-        System.out.println("\n\n---------------------------------------------------------------");
+        System.out.println("\n\n-----------------------------------------------------------------------------------------------");
         System.out.println("> We apologise !!! But malicious activity has been detected in this account.\n" +
                 "> Your account has been locked and you have been logged out." +
-                "> A system admin will review your case shortly");
-        System.out.println("---------------------------------------------------------------");
+                "\n> A system admin will review your case shortly");
+        System.out.println("-----------------------------------------------------------------------------------------------");
         //Lock account and send warning email
         try {
             server.kickAndLockUserAutomatic(email_address);
@@ -675,6 +675,8 @@ public class Client {
     //////////////////////////////////////
     public void logoutCommand() {
         loggedIn = false;
+        wrongPasswordCounter = 0;
+        wrongOtpCounter = 0;
     }
 
     //////////////////////////////////////

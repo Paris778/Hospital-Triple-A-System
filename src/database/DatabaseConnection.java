@@ -27,6 +27,7 @@ public class DatabaseConnection {
     ///////////////////////////////////////////////////////////////////////////////////
     // LOGGER METHODS START
     ///////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////
 
     // This method appends a log entry to the event_logs table of the database
     public synchronized void appendLog(int userId, String eventType, String eventDescription, int appendedBy) {
@@ -609,17 +610,12 @@ public class DatabaseConnection {
         lock.lock();
         try {
             //////////////////////////////////////////////////////////////
-            p = con.prepareStatement("SELECT COUNT(*) AS total FROM admins WHERE u_id=" + getUserId(email));
-            System.out.println(email);
-            System.out.println(getUserId(email) + "\n--------");
-            //p.setInt(1, getUserId(email));
+            int userId = getUserId(email);
+            p = con.prepareStatement("SELECT * FROM admins WHERE u_id=" + getUserId(email));
             results = p.executeQuery();
             //
             while(results.next()) {
-                System.out.println(getUserId(email));
-                System.out.println(results.getInt(1));
-                System.out.println(getUserId(email) == results.getInt(1));
-                return (getUserId(email) == results.getInt(1));
+                return (userId == results.getInt("u_id"));
             }
             return false;
             //////////////////////////////////////////////////////////////
