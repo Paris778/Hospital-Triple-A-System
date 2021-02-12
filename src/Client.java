@@ -362,16 +362,11 @@ public class Client {
 
     public void backup(int x) {
         try {
-            //
-            if (server.userIsAdmin(email_address)) {
                 if (x == 1) {
                     System.out.println(server.databaseEncryption(Cipher.ENCRYPT_MODE, "database.db", "encryptedBackup.db"));
                 } else if (x == 2) {
                     System.out.println(server.databaseEncryption(Cipher.DECRYPT_MODE, "encryptedBackup.db", "new2-database.db"));
                 }
-            } else {
-                System.out.println("> Sorry. You don't have access to this command.");
-            }
         } catch (RemoteException e) {
             try {
                 server.logEvent(Constants.USER_ID_SYSTEM, Constants.LOG_ERROR_EXCEPTION_THROWN, Constants.USER_ID_SYSTEM);

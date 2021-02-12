@@ -1,30 +1,52 @@
 # 363 Group Project
 
-Word document:
-https://livelancsac-my.sharepoint.com/:w:/g/personal/patelav_lancaster_ac_uk/EdZ6jKcH7cJIvUxLVewNVYgBYAM_2Aw4C1Hk2ixgV0SKDA?e=UaWMEA&fbclid=IwAR3PjZlBELMNzDXA04sujOR5NquADXf52scXv2rtI3w1mJUMVUgCNond3_I
-
-class diagram:
-https://livelancsac-my.sharepoint.com/:w:/g/personal/patelav_lancaster_ac_uk/ER1v8fNb-M1BitC9Hm0lJvkBpE5wORYzZZvZHer4RQ0x1Q?e=APjorW&fbclid=IwAR2KY_Qsrf9G9_2GF3EXO9wd_okLXl-CPTpG-zG0Xrv6gmg9TN22kj4Onl0
-
-
 ==========================================
            ADMIN CREDENTIALS
 ==========================================
-(provided just for marking)
-email: zackmartin591@gmail.com
+Email: zackmartin591@gmail.com
 Password : The_best_admin_ever123!
 
-
-////////////////////////////////////
-//TO:Do
-
-Lock Accounts
-Unlock Accounts
-Add actual logs in methods 
-
----
-Write your stuff in the report with screenshots
+Please contact Paraskeva Solomou for the OTP.
+He will be happy to forward it to you at your convenience.
 
 
+++++++++++++++++++++++++++++++++++++++++++
+		How to run
+++++++++++++++++++++++++++++++++++++++++++
+
+Please run in IntelliJ IDE. Import as a project.
+Build project, Run "Sever" then run "client".
+"Server" must be running otherwise "client" will close.
 
 
+
+                       .,,uod8B8bou,,.
+              ..,uod8BBBBBBBBBBBBBBBBRPFT?l!i:.
+         ,=m8BBBBBBBBBBBBBBBRPFT?!||||||||||||||
+         !...:!TVBBBRPFT||||||||||!!^^""'   ||||
+         !.......:!?|||||!!^^""'            ||||
+         !.........||||                     ||||
+         !.........|||| ##                  ||||
+         !.........||||                     ||||
+         !.........||||                     ||||
+         !.........||||                     ||||
+         !.........||||                     ||||
+         `.........||||                    ,||||
+          .;.......||||               _.-!!|||||
+   .,uodWBBBBb.....||||       _.-!!|||||||||!:'
+!YBBBBBBBBBBBBBBb..!|||:..-!!|||||||!iof68BBBBBb....
+!..YBBBBBBBBBBBBBBb!!||||||||!iof68BBBBBBRPFT?!::   `.
+!....YBBBBBBBBBBBBBBbaaitf68BBBBBBRPFT?!:::::::::     `.
+!......YBBBBBBBBBBBBBBBBBBBRPFT?!::::::;:!^"`;:::       `.
+!........YBBBBBBBBBBRPFT?!::::::::::^''...::::::;         iBBbo.
+`..........YBRPFT?!::::::::::::::::::::::::;iof68bo.      WBBBBbo.
+  `..........:::::::::::::::::::::::;iof688888888888b.     `YBBBP^'
+    `........::::::::::::::::;iof688888888888888888888b.     `
+      `......:::::::::;iof688888888888888888888888888888b.
+        `....:::;iof688888888888888888888888888888888899fT!
+          `..::!8888888888888888888888888888888899fT|!^"'
+            `' !!988888888888888888888888899fT|!^"'
+                `!!8888888888888888899fT|!^"'
+                  `!988888888899fT|!^"'
+                    `!9899fT|!^"'
+                      `!^"'

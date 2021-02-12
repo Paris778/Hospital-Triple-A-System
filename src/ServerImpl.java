@@ -106,7 +106,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
             outputStream.close();
 
             logEvent(Constants.USER_ID_SYSTEM,Constants.LOG_DATABASE_BACKEDUP, Constants.USER_ID_SYSTEM);
-            return "Function Completed";
+            return "Backup Completed";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,6 +227,7 @@ public class ServerImpl extends java.rmi.server.UnicastRemoteObject implements S
         }
         return "You do not have the correct permissions to do that.";
     }
+
 
     @Override
     public String viewStaffs(String email, int s_id) {
