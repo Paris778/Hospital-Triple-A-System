@@ -580,8 +580,10 @@ public class Client {
         User user = null;
 
         // Print error message if no valid identity entered
-        if (!identity.equals("patient") && !identity.equals("staff")) {
+        if(!identity.equals("patient") && !identity.equals("staff")) {
+            user = register(identity.equals("staff"));
             System.out.println("> Please enter an valid identity");
+
         } else {
             user = register(identity.equals("patient"));
         }
