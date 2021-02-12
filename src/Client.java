@@ -820,7 +820,7 @@ public class Client {
                     System.out.println(server.viewPatients(email_address, id));
                     break;
                 case "patient":
-                    System.out.println("Enter a valid id to view patient information or type");
+                    System.out.println("Enter a valid id to view patient information or type | Enter 0 for full table");
                     id = input.nextInt();
                     if (id <= 0)
                         System.out.println(server.viewPatients(email_address));
@@ -828,7 +828,7 @@ public class Client {
                         System.out.println(server.viewPatients(email_address, id));
                     break;
                 case "staff":
-                    System.out.println("Enter a valid id to view patient information or type");
+                    System.out.println("Enter a valid id to view patient information or type | Enter 0 for full table");
                     id = input.nextInt();
                     if (id <= 0)
                         System.out.println(server.viewStaffs(email_address));
