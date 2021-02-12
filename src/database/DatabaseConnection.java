@@ -823,22 +823,22 @@ public class DatabaseConnection {
         return "Error in deleting user #" + u_id;
     }
 
-    public String updatePatients(int u_id, String command) {
+    public String updatePatients(int p_id, String command) {
         lock.lock();
         try {
             // Execute SQL query
-            p = con.prepareStatement("UPDATE patients SET ? WHERE u_id = ?");
+            p = con.prepareStatement("UPDATE patients SET ? WHERE p_id = ?");
             p.setString(1, command);
-            p.setInt(2, u_id);
+            p.setInt(2, p_id);
             results = p.executeQuery();
-            return "User #" + u_id + "has been successfully updated.";
+            return "User #" + p_id + "has been successfully updated.";
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             //Race condition control
             lock.unlock();
         }
-        return "Error in updating user #" + u_id;
+        return "Error in updating user #" + p_id;
     }
 
     public String updateStaffs(int u_id, String command) {
