@@ -1,4 +1,8 @@
 # 363 Group Project
+## System Dependencies
+- sqlite-jdbc-3.7.2.jar
+- activation-jaf1.1.1.jar
+- javax.mail.jar
 
 ## ADMIN CREDENTIALS
 Email: zackmartin591@gmail.com
