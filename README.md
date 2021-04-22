@@ -1,4 +1,4 @@
-# A simple triple A system
+# A Secure Triple A system
 (developed as a requirement for the SCC-363 Module at Lancaster University 2021) 
 
 This is an implementation of a secure Authentication, Authorisation and Accountability (AAA) system to store electronic health records.
