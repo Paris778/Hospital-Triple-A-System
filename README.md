@@ -5,14 +5,14 @@ This is an implementation of a secure Authentication, Authorisation and Accounta
 This system will be used by many user types such as patients, doctors and administration staff, as well as the regulatory body who ensures operations go smoothly.
 
 ## System Features
-###### Registration & Authentication
+##### Registration & Authentication
 1. Support for signup and login operations 
 2. Support for password strength evaluation to prevent weak/common passwords
 3. Support for salting and secure password storage using the SHA3 Hashing Algorithm
 4. Support for multifactor authentication using OTP E-mail keys
 5. Session key and credential negotiation 
 6. Strong Password Suggestion
-######  Authorisation and secure data exchange
+#####  Authorisation and secure data exchange
 1. Clearly defined and practical roles, assigned with the appropriate permissions following an access control policy
 2. Support for least privilege 
 3. Support for defining separation of duties 
